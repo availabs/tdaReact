@@ -1,0 +1,96 @@
+/***************************/
+/* Geo Styles              */   
+/***************************/
+.zone{
+  stroke:#e5603b;
+  stroke-width:0px;
+  fill:#fff;
+  opacity: 0.4;
+}
+
+.zone:hover{
+  stroke-width:3px;
+  fill:#4ab0ce;
+  opacity: 0.7;
+  cursor: pointer;
+}
+
+
+
+
+/***************************/
+/*          Panels         */
+/***************************/
+.panel-heading {
+  padding: 0;
+}
+.panel-heading > .accordion-toggle {
+  display: block;
+  padding: 8px 15px;
+}
+
+.panel {
+  border: none;
+  background-color: whitesmoke;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+
+.panel:nth-child(1n) .panel-heading {
+  border-left: 5px solid #e5603b;
+}
+.panel:nth-child(2n) .panel-heading {
+  border-left: 5px solid #eac85e;
+}
+.panel:nth-child(3n) .panel-heading {
+  border-left: 5px solid #8cbf26;
+}
+.panel:nth-child(4n) .panel-heading {
+  border-left: 5px solid #56bc76;
+}
+.panel:nth-child(5n) .panel-heading {
+  border-left: 5px solid #4ab0ce;
+}
+.panel:nth-child(6n) .panel-heading {
+  border-left: 5px solid #618fb0;
+}
+.panel:nth-child(7n) .panel-heading {
+  border-left: 5px solid #a05000;
+}
+.panel:nth-child(8n) .panel-heading {
+  border-left: 5px solid #d04f4f;
+}
+.panel .panel-heading a {
+  color: #666666;
+  font-weight: normal;
+  color: #666666;
+}
+
+.panel-body {
+  border-top-color: whitesmoke;
+}
+
+/*************************************
+Util Styles
+**************************************/
+
+.no-padding {
+  padding:0;
+}
+/************************************
+Overwrite Styles
+**************************************/
+.content{
+  padding: 0 2.5641%
+}
+.listCheck{
+  float: left;
+  width: 40px;
+  padding-left:10px;
+  color:#8cbf26;
+}
+
+.centered:{
+  width:100%;
+  text-align: center;
+};
