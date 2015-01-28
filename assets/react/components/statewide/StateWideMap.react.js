@@ -70,7 +70,7 @@ var StateIndex = React.createClass({
     },
 
     stateClick: function(d){
-
+        map.setZoom(4);
         var scope = this,
             newState = this.state;
 
@@ -87,6 +87,7 @@ var StateIndex = React.createClass({
         //stationLayer.externalUpdate(newState.stations);
         this.setState(newState);
         ClientActionsCreator.setSelectedState(newState.selectedState);
+        //
         map.fitBounds([d3.geo.bounds(d)[0].reverse(),d3.geo.bounds(d)[1].reverse()]);
 
     },
