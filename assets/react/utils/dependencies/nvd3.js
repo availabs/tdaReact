@@ -11187,6 +11187,10 @@ nv.models.scatter = function() {
           pointPaths.exit().remove();
           pointPaths
               .attr('d', function(d) {
+                if(!d){
+                  return;//'M 0 0'
+                  console.log('here be dragons',d);
+                }
                 if (d.data.length === 0)
                     return 'M 0 0'
                 else

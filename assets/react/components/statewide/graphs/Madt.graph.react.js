@@ -47,6 +47,22 @@ var GraphContainer = React.createClass({
                 .ADT.order(function(p){return p.avg})
                 .top(Infinity)
 
+             var data = scope.state.classByDay.getGroups()
+                    .ADT.order(function(p){return p.avg || 0})
+                    .top(Infinity)
+                    .filter(function(p){ 
+                        return !isNaN(p.value.avg);
+                    })
+                    .map(function(p){
+                        return p.value.monthAvg
+                    });
+                    
+            console.log(
+                'update graph',
+                data,
+                data.length
+            )
+
             AdtScale.domain(stationADT.map(function(ADT){
                 return ADT.value.avg;
             }));
@@ -71,8 +87,11 @@ var GraphContainer = React.createClass({
                             .map(function (ADT){
                                 return {
                                     "key":ADT.key,
-                                    "values":ADT.value.monthAvg.map(function(d,i){ return {month:i,y:d} }),
-                                    "color":AdtScale(ADT.value.avg)
+                                    "values":ADT.value.monthAvg.map(function(d,i){ 
+                                        var value = d || 0;
+                                        return {month:i,y:value} 
+                                    }),
+                                    "color":AdtScale(ADT.value.avg || 0)
                                 }
                             })
                         

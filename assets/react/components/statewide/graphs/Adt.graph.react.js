@@ -43,6 +43,7 @@ var GraphContainer = React.createClass({
         var scope = this;
         if(Object.keys(this.state.classByDay.getDimensions()).length > 0){
 
+
             var stationADT = scope.state.classByDay.getGroups()
                 .ADT.order(function(p){return p.avg})
                 .top(Infinity)
@@ -67,8 +68,11 @@ var GraphContainer = React.createClass({
                         [{
                             key:"ADT",
                             values:scope.state.classByDay.getGroups()
-                            .ADT.order(function(p){return p.avg})
+                            .ADT.order(function(p){return p.avg || 0 })
                             .top(Infinity)
+                            .filter(function(p){ 
+                                return !isNaN(p.value.avg);
+                            })
                             .map(function (ADT){
                                 return {
                                     "label":ADT.key,

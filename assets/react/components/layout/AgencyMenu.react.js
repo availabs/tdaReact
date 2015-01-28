@@ -33,7 +33,7 @@ var AgencyListing = React.createClass({
         var selected = <span />;
 
         if(this.props.data.id === this.state.selectedAgency.id){
-            console.log('AgencyListing / Render ',this.props.data.id , this.state.selectedAgency)
+            //console.log('AgencyListing / Render ',this.props.data.id , this.state.selectedAgency)
             selected = <i className="listCheck glyphicon glyphicon-ok"></i>;
         }
 
@@ -75,7 +75,7 @@ var AgencyMenu = React.createClass({
     },
     render: function(){
         var scope = this;        
-        console.log('AgencyMenu / Render',this.state.agencies)
+        //console.log('AgencyMenu / Render',this.state.agencies)
 
         var messages = Object.keys(this.state.agencies).map(function(key){
             return (

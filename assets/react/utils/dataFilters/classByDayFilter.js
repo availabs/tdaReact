@@ -1,17 +1,14 @@
 var crossfilter = require('crossfilter');
 
-
-
-
 function reduceAddAvg() {
   return function(p,v) {
     ++p.count
     p.sum += +v['f0_'];
     p.avg = p.sum/p.count;
 
-    ++p.monthCount[+v['month']]
+    ++p.monthCount[+v['month']-1]
     p.monthSum[+v['month']-1] +=  +v['f0_'];
-    p.monthAvg[+v['month']-1] = p.monthSum[+v['month']]/p.monthCount[+v['month']];
+    p.monthAvg[+v['month']-1] = Math.round(p.monthSum[+v['month']-1]/p.monthCount[+v['month']-1]);
     
     return p;
   };
@@ -23,9 +20,9 @@ function reduceRemoveAvg() {
     p.sum -= +v['f0_'];
     p.avg = p.sum/p.count;
 
-    --p.monthCount[+v['month']]
+    --p.monthCount[+v['month']-1]
     p.monthSum[+v['month']-1] -=  +v['f0_'];
-    p.monthAvg[+v['month']-1] = p.monthSum[+v['month']]/p.monthCount[+v['month']];
+    p.monthAvg[+v['month']-1] = Math.round(p.monthSum[+v['month']-1]/p.monthCount[+v['month']-1]);
 
     return p;
   };
@@ -58,22 +55,15 @@ module.exports  = {
 
 	init:function(data,dataset){
 
-		//console.log('classFilter Init',dataset,currentDataSet);
 			
 		if(dataset !== currentDataSet){
 
+			console.log('classFilter Init',dataset,currentDataSet,data.length);
+			console.time('crossFIlterData')
 			currentDataSet = dataset;
-			var fullData = data.rows.map(function(row,index){
-				var outrow = {}
-				
-				data.schema.fields.forEach(function(field,i){
-					outrow[field.name] = row.f[i].v;
-				});
-				outrow['single_day'] = outrow.station_id +'-'+ outrow.year+'-'+outrow.month+'-'+outrow.day
-				return outrow;
-			});
 
-			classData = crossfilter(fullData);
+			
+			classData = crossfilter(data);
 			all = classData.groupAll(),
 			
 
@@ -81,8 +71,11 @@ module.exports  = {
 
 			dimensions['stationId'] = classData.dimension(function(d){ return d.station_id });
 
-			dimensions['year'] = classData.dimension(function(d){ return d.year });
+			dimensions['year'] = classData.dimension(function(d){ return +d.year });
 			groups['year'] = dimensions['year'].group().reduceCount();
+
+			dimensions['month'] = classData.dimension(function(d){ return +d.month });
+			groups['month'] = dimensions['month'].group().reduceCount();
 
 
 			//dimensions['year'] = classData.dimension(function(d){ return d.year });
@@ -93,7 +86,8 @@ module.exports  = {
 				.reduce(reduceAddAvg('f0_'), reduceRemoveAvg('f0_'), reduceInitAvg);
 
 			initialized = true;
-
+			console.timeEnd('crossFIlterData')
+			console.log()
 		}
 	},
 	getDimension:function(dim){

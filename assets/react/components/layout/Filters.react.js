@@ -59,6 +59,23 @@ var Filters = React.createClass({
 
 
                 return (<li rel="1"><a tabindex="-1" onClick={scope._setYearFilter} value={year.key} className="">20{year.key}</a></li>)
+                console.log('test',year)
+
+            })
+            return output;
+        }
+        return;
+    },
+
+     _getMonths : function(){
+        var scope = this;
+
+        if(this.state.classByDay.getGroup('month')){
+
+            var output = this.state.classByDay.getGroup('month').top(Infinity).map(function(month){
+
+
+                return (<li rel="1"><a tabindex="-1" onClick={scope._setmonthFilter} value={month.key} className="">{month.key}</a></li>)
                 //console.log('test',year)
 
             })
@@ -71,6 +88,7 @@ var Filters = React.createClass({
         var scope = this;
         var currenYear = this.state.currenYear || 'All';
         var years = this._getYears()
+        var months = this._getMonths();
         if(currenYear !== 'All'){ currenYear = '20'+currenYear; }
 
         return (
@@ -90,14 +108,13 @@ var Filters = React.createClass({
                             	</ul>
                             </div>               
                         </div>
-                        <label className="control-label centered" style={labelStyle} ><strong>Direction</strong></label>
+                        <label className="control-label centered" style={labelStyle} ><strong>Months</strong></label>
                         <div className="controls form-group">
                             <div className="btn-group bootstrap-select col-md-12">
                             	<button className="btn dropdown-toggle clearfix btn-primary btn-lg btn-block" data-toggle="dropdown" id="simple-big" tabindex="-1" aria-expanded="false"><span className="filter-option">Combined</span>&nbsp;<i className="fa fa-caret-down"></i></button>
                             	<ul className="dropdown-menu" role="menu" >
-                            		<li rel="0"><a tabindex="-1" href="#" className="">Fourth Item</a></li>
-                            		<li rel="1"><a tabindex="-1" href="#" className="">Fifth Item</a></li>
-                            		<li rel="2"><a tabindex="-1" href="#" className="">Sixth item</a></li>
+                            		<li rel="0"><a tabindex="-1" onClick={scope._setYearFilter} value={null}>All</a></li>
+                                    {months}
                             	</ul>
                             </div>               
                         </div>

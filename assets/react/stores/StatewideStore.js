@@ -14,7 +14,7 @@ var AppDispatcher = require('../dispatcher/AppDispatcher'),
     CHANGE_EVENT = 'change',
 
     SailsWebApi = require('../utils/api/SailsWebApi'),
-    ClassFilter = require('../utils/dataFilters/classFilter.js');
+    ClassByDayFilter = require('../utils/dataFilters/classByDayFilter.js');
 
 var _selectedState = null,
     _classbyDay = {};
@@ -25,7 +25,7 @@ function _setState(fips){
 }
 
 function _filterYear(year){
-  ClassFilter.getDimension('year').filter(year);
+  ClassByDayFilter.getDimension('year').filter(year);
 }
 
 var StatewideStore = assign({}, EventEmitter.prototype, {
@@ -55,8 +55,8 @@ var StatewideStore = assign({}, EventEmitter.prototype, {
     //if data is loaded send it
     //console.log('StatewideStore / getClassByDay',_selectedState);
     if(_classbyDay[_selectedState] && _classbyDay[_selectedState] !== 'loading' ){
-      ClassFilter.init(_classbyDay[_selectedState],_selectedState);
-      return ClassFilter;
+      ClassByDayFilter.init(_classbyDay[_selectedState],_selectedState);
+      return ClassByDayFilter;
     }
     
     //if data hasn't start started loading, load it 
@@ -67,7 +67,7 @@ var StatewideStore = assign({}, EventEmitter.prototype, {
 
     //if requested data isn't loaded send most recent data
     // may want to rethink this
-    return ClassFilter;
+    return ClassByDayFilter;
   }
 
 

@@ -17,7 +17,7 @@ var _selectedStations = [],
     _stations = {};
 
 function _addStations(rawData) {
-  console.log('stores/StationStore/_addStations',rawData.length);
+  //console.log('stores/StationStore/_addStations',rawData.length);
   rawData.forEach(function(station,i) {
     
     if(!_stations[station.state_fips]){
@@ -91,7 +91,7 @@ StationStore.dispatchToken = AppDispatcher.register(function(payload) {
   switch(action.type) {
 
     case ActionTypes.RECEIVE_STATIONS:
-      console.log('StationStore / receieve_stations')
+      //console.log('StationStore / receieve_stations')
       _addStations(action.data);
       StationStore.emitChange();
     break;
