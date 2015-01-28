@@ -70,7 +70,6 @@ var StateIndex = React.createClass({
     },
 
     stateClick: function(d){
-        map.setZoom(4);
         var scope = this,
             newState = this.state;
 
@@ -193,7 +192,7 @@ var StateIndex = React.createClass({
             
 
             stationLayer.externalUpdate(scope.state.stations);
-
+            
         }
     },
 
