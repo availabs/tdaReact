@@ -17,7 +17,7 @@ var _selectedStations = [],
     _stations = {};
 
 function _addStations(rawData) {
-  //console.log('stores/StationStore/_addStations',rawData.length);
+  console.log('stores/StationStore/_addStations',rawData.length);
   rawData.forEach(function(station,i) {
     
     if(!_stations[station.state_fips]){
