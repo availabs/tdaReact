@@ -71,6 +71,7 @@ var StationStore = assign({}, EventEmitter.prototype, {
   },
 
   getStateStations: function(fips) {
+    console.log(_stations[fips])
     return Object.keys(_stations[fips]).map(function(key){
       return _stations[fips][key];
     });
