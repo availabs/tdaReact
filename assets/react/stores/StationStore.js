@@ -17,7 +17,6 @@ var _selectedStations = [],
     _stations = {};
 
 function _addStations(rawData) {
-  console.log('stores/StationStore/_addStations',rawData.length);
   rawData.forEach(function(station,i) {
     
     if(!_stations[station.state_fips]){
@@ -71,10 +70,13 @@ var StationStore = assign({}, EventEmitter.prototype, {
   },
 
   getStateStations: function(fips) {
-    console.log(_stations[fips])
-    return Object.keys(_stations[fips]).map(function(key){
-      return _stations[fips][key];
-    });
+    if(_stations[fips]){
+      return Object.keys(_stations[fips]).map(function(key){
+        return _stations[fips][key];
+      });
+    else{
+      return [];
+    }
   },
 
   getAll: function() {
