@@ -39,6 +39,16 @@ module.exports = {
       ServerActionCreators.getClassByDay(data,fips);
     })
   },
+  getClassByMonth : function(fips){
+    if(!AgencyStore.getSelectedAgency()){
+      console.log('Error: No Agency Datasource Selected');
+      return []
+    }
+
+    io.socket.post('/tmgClass/byMonth',{database:AgencyStore.getSelectedAgency().datasource,fips:fips},function(data){
+      ServerActionCreators.getClassByMonth(data,fips);
+    })
+  },
 
   //---------------------------------------------------
   //  Get GeoJson

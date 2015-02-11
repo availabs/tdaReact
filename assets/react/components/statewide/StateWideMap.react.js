@@ -11,34 +11,21 @@ var React = require('react'),
     ClientActionsCreator = require('../../actions/ClientActionsCreator'),
 
     //--Utils
-    L =             require('leaflet'),
-    d3 =            require('d3'),
-    topojson =      require('topojson'),
-    colorbrewer =   require('colorbrewer'),
-    leafletLayer =  require('../../utils/dependencies/d3LeafletLayers'),
-    hpmsMap =  require('../../utils/dependencies/hpms');
+    L =                 require('../../utils/dependencies/leaflet.min'),
+    d3 =                require('d3'),
+    topojson =          require('topojson'),
+    colorbrewer =       require('colorbrewer'),
+    leafletTileLayer =  require('../../utils/dependencies/L.Tilelayer.Vector'),
+    fips2state =        require('../../utils/data/fips2state');
     
 var map = null,
     geoData = {'states':null,'congress':null,'counties':null},
-    currentLayer = null,
+    stateLayer = null,
     stationLayer = null,
-    colorRange = colorbrewer.RdYlGn[5].reverse(),
-    AdtScale = d3.scale.quantile().domain([0,70000]).range([2,4,6,8,10]),
-    
-    stationRadius = function(d){
-        AdtScale.range([3]);
-        // if(map.getZoom() > 8){
-        //     AdtScale.range([3,4,6,8]);
-        // }
-        return AdtScale(d.properties.ADT || 0)
-    },
-    
-    stationColor = function(d){
-
-        AdtScale.range(colorRange)
-        return AdtScale(d.properties.ADT || 0)
-    
-    };
+    vectorLayer = null,
+    colorRange = colorbrewer.RdBu[5].reverse(),
+    AdtScale = d3.scale.quantile().domain([0,70000]),
+    hpmsData = [];
 
 var StateIndex = React.createClass({
     
@@ -59,42 +46,11 @@ var StateIndex = React.createClass({
         };
     },
     
-    setGeoClass: function(d){
     
-        if(d.properties.geoid){
-            return 'zone geo-'+d.properties.geoid;
-        }else{
-            return 'zone geo-'+d.properties.DISTRICT;
-        }
-
-    },
-
-    stateClick: function(d){
-        var scope = this,
-            newState = this.state;
-
-        d3.select('.active_geo').classed('active_geo',false);
-        if(d.properties.geoid){
-            d3.select('.geo-'+d.properties.geoid).classed('active_geo',true);
-        }else{
-            d3.select('.geo-'+d.properties.DISTRICT).classed('active_geo',true);
-        }
-        
-        newState.selectedState = d.properties.geoid;
-        newState.stations.features = StationStore.getStateStations(d.properties.geoid);
-
-        //stationLayer.externalUpdate(newState.stations);
-        this.setState(newState);
-        ClientActionsCreator.setSelectedState(newState.selectedState);
-        //
-        map.fitBounds([d3.geo.bounds(d)[0].reverse(),d3.geo.bounds(d)[1].reverse()]);
-
-    },
-
     
     componentDidMount: function() {
 
-        StationStore.addChangeListener(this._onChange);
+        StationStore.addChangeListener(this._onStationsLoad);
         StateWideStore.addChangeListener(this._newData);
         var scope = this;
 
@@ -103,8 +59,8 @@ var StateIndex = React.createClass({
         mapDiv.setAttribute("style","height:"+this.props.height+"px");
         
 
-        var mapquestOSM = L.tileLayer("http://{s}.tiles.mapbox.com/v3/am3081.h0po4e8k/{z}/{x}/{y}.png");
-        
+        var mapquestOSM = L.tileLayer("http://{s}.tiles.mapbox.com/v3/am3081.h0pna3ah/{z}/{x}/{y}.png");
+        L.Icon.Default.imagePath= '/bower_components/leaflet/dist/images';
         map = L.map("map", {
           center: [39.8282, -98.5795],
           zoom: 4,
@@ -112,49 +68,62 @@ var StateIndex = React.createClass({
           zoomControl: false
         });
         d3.json('/geo/states.json',function(data){
-            //geoData.states = data;
+            //if data is topo, convert
+            if (data.type == "Topology") {
+                for(var key in data.objects){
+                  data = topojson.feature(data, data.objects[key]);
+                } 
+            }
             
-
-            geoData.states = data;
-            
-            
-                        
-            var options = {
-                layerId:'election',
-                //classed:'states',
-                on:{
-                    click:scope.stateClick
+            stateLayer = L.geoJson(data, {
+                style: function (feature) {
+                  return {
+                    stroke:false,
+                    fillOpacity:0.0,
+                    className:'geo-'+feature.properties.geoid
+                  };
                 },
-                attr:{
-                    class:scope.setGeoClass
-                }
+                onEachFeature: function (feature, layer) {
+                    
+                    layer.on({
+                        click: scope.stateClick,
+                        mouseover: function(e){
+                            var layer = e.target;
+                            if(layer._path.className.baseVal.split(' ').indexOf('active_geo') < 0){
+                                layer.setStyle({
+                                    stroke:false,
+                                    fillOpacity:0.3
+                                });
+                            }
 
-            };
-            currentLayer = new L.GeoJSON.d3(geoData.states,options);
-            map.addLayer(currentLayer);
-            stationLayer = new L.GeoJSON.d3(scope.state.stations,{
-                layerId:'stations',
-                classed:'station',
-                type:'point',
-                attr:{
-                    r:stationRadius,
-                    fill:stationColor
+                        },
+                        mouseout: function(e){
+                             var layer = e.target;
+                             layer.setStyle({
+                                stroke:false,
+                                fillOpacity:0.0
+                              });
+                        }
+                    });
+
+
                 }
-            });     
-            map.addLayer(stationLayer);   
+            })
+            stateLayer.addTo(map);
             //hpmsMap.init(map);
         });
     },
     
     componentWillUnmount: function() {
-        StationStore.removeChangeListener(this._onChange);
+        StationStore.removeChangeListener(this._onStationsLoad);
         StateWideStore.removeChangeListener(this._newData);
     },
 
-    _onChange:function(){
+    _onStationsLoad:function(){
+        console.log('state change');
         if(this.state.selectedState){
             var newState = this.state;
-            newState.stations.features = StationStore.getStateStations(this.state.selectedState);
+            newState.stations.features = StationStore.getStateStations(this.state.selectedState);    
         }
 
     },
@@ -181,18 +150,15 @@ var StateIndex = React.createClass({
             }));
 
 
-            scope.state.stations.features = scope.state.stations.features.filter(function(station){
-                return stationData[station.properties.station_id];
-            });
 
             scope.state.stations.features = scope.state.stations.features.map(function(station){
-                station.properties.ADT = stationData[station.properties.station_id]
+                station.properties.ADT = stationData[station.properties.station_id] || 0;
                 return station;
             });
             
-
-            stationLayer.externalUpdate(scope.state.stations);
+            scope._updateStations(scope.state.stations);
             
+
         }
     },
 
@@ -204,7 +170,179 @@ var StateIndex = React.createClass({
         return (
             <div id="map"></div>
         );
-    }
+    },
+    
+    //---------------------------------------------------------------------------------------------------------------
+    // Map Actions
+    //---------------------------------------------------------------------------------------------------------------
+    stateClick: function(e){
+        //console.log(e);
+        if (e.originalEvent.ctrlKey) {
+            var scope = this,
+                newState = this.state;
+
+            ///e.target.setStyle({fill:false});
+        
+            
+            var d = e.target.feature;
+            
+            d3.select('.active_geo').attr('fill','#3388ff').classed('active_geo',false);
+            if(d.properties.geoid){
+                console.log('selecting','.geo-'+d.properties.geoid);
+                d3.select('.geo-'+d.properties.geoid)
+                    .attr('fill','none')
+                    .classed('active_geo',true);
+            }
+            
+            newState.selectedState = d.properties.geoid;
+            newState.stations.features = StationStore.getStateStations(d.properties.geoid);
+
+            //stationLayer.externalUpdate(newState.stations);
+            this.setState(newState);
+            ClientActionsCreator.setSelectedState(newState.selectedState);
+            //
+            map.fitBounds(e.target._bounds);
+            scope._loadHPMS();
+            
+        }
+
+    },
+    //---------------------------------------------------------------------------------------------------------------
+    //Station Visualizationing
+    //---------------------------------------------------------------------------------------------------------------
+    _updateStations : function(stationsGeo){
+        console.log('update stations')
+        if(map.hasLayer(stationLayer)){
+            map.removeLayer(stationLayer)
+        }
+        
+        console.log(stationsGeo);
+        stationLayer = L.geoJson(stationsGeo, {
+            pointToLayer: function (d, latlng) {
+                var options = {
+                   
+                    color: "#000",
+                    weight: 1,
+                    opacity: 1,
+                    fillOpacity: 0.8,
+                    stroke:false,
+                    className:'station station_'+d.properties.station_id
+                };
+
+                AdtScale.range([3,4,5,6,7,8,9])
+                options.radius = AdtScale(d.properties.ADT || 0);
+                AdtScale.range(colorRange);                
+                options.fillColor = AdtScale(d.properties.ADT || 0);
+
+                return L.circleMarker(latlng, options);
+            },
+            onEachFeature: function (feature, layer) {
+                
+                layer.on({
+                    click: function(e){
+                        console.log('station_click',e.target.feature.properties);
+                    },
+                    mouseover: function(e){
+                        e.target.setStyle({stroke:true,weight:3})
+                    },
+                    mouseout: function(e){
+                        e.target.setStyle({stroke:false})
+                    }
+                });
+
+
+            }
+        });
+        stationLayer.addTo(map);
+    },
+    //----------------------------------------------------------------------------------------------------------------
+    // HPMS
+    //----------------------------------------------------------------------------------------------------------------
+    _loadHPMS:function(stateFips){
+        if(map.hasLayer(vectorLayer)){
+            map.removeLayer(vectorLayer);
+        }
+        hpmsData = [];
+        var style = function(d){
+            return{
+                "color": "#1B1",
+                "fillColor": "#1B1",
+                "opacity": 0.8,
+                "fillOpacity": 0.1,
+                "cursor": 'pointer',
+                "className" : 'route_'+d.properties.type+'_'+d.properties.route,
+                //"stroke":true
+            }
+            
+        };
+        // style of feature when hovered
+        var highlightStyle = {
+            "color": "#f00",
+            "weight": 13,
+            "fillOpacity": 0.4
+        };
+
+        function mousover(e) {
+            //console.log('mouseover',e.target.options.className)
+            if(e.target.feature.properties.route != '0'){
+                d3.selectAll("."+e.target.options.className).attr('stroke-width','10px').style('cursor','pointer');
+            }
+        }
+
+        function mousout(e) {
+            //var layer = e.target;
+            //layer.setStyle(style);
+            d3.selectAll("."+e.target.options.className).attr('stroke-width','3px')
+        }
+
+        function onEachFeature(feature, layer) {
+            layer.on({
+                mouseover: mousover,
+                mouseout: mousout
+            });
+            if (feature.properties) {
+                // TODO disabled due to error with Leaflet master (0.8-dev)
+                //layer.bindLabel(feature.properties.name);
+                var popupString = '<div class="popup">';
+                        for (var k in feature.properties) {
+                            var v = feature.properties[k];
+                            popupString += k + ': ' + v + '<br />';
+                        }
+                        popupString += '</div>';
+                layer.bindPopup(popupString);
+            }
+        }
+
+        // filters out invalid (empty) geometries in Polymaps county dataset
+        // to avoid exceptions in L.GeoJSON
+        function filterInvalidGeometry(feature) {
+            var geometry = feature.type === 'Feature' ? feature.geometry : feature;
+            return geometry.type !== undefined;
+        };
+
+        var vectorOptions = {
+            style: style,
+            onEachFeature: onEachFeature,
+            filter: filterInvalidGeometry
+        };
+        var state = fips2state[this.state.selectedState].name.replace(/\s/g,'').toLowerCase();
+        var url = 'http://lor.availabs.org:1331/'+state+'2012/{z}/{x}/{y}.json';
+        var options = {
+            // remove tiles outside viewport
+            unloadInvisibleTiles: true,
+            // no tile loading while panning (slow with large vector tiles)
+            updateWhenIdle: true,
+            serverZooms: [3,4,5,6,7,8,9,10,11,12,13],
+            //serverZooms: [3,5,7],
+            //maxNativeZoom: 7,
+            minZoom: 2
+        };
+        vectorLayer = new L.TileLayer.Vector(url, options, vectorOptions); 
+       
+            // add as base to switch with radio instead of checkbox
+        vectorLayer.addTo(map);
+            
+    },
     
     
     
@@ -214,5 +352,3 @@ var StateIndex = React.createClass({
 });
 
 module.exports = StateIndex;
-
-

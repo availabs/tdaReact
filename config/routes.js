@@ -13,6 +13,8 @@ module.exports.routes = {
   // User controller 
   //-------------------------------
 
+
+
   '/landing': 'LandingController.index', //Landing View
   '/': 'LandingController.flux', //Main Flux App
 

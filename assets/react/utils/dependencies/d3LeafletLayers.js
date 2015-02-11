@@ -1,5 +1,6 @@
 var d3 = require('d3'),
-    topojson = require('topojson');
+    topojson = require('topojson'),
+    L = require('../../utils/dependencies/leaflet.min');
 
 
 module.exports=(function() {
@@ -21,6 +22,7 @@ module.exports=(function() {
     externalUpdate:function(data){
       this.geojson = data;
       this.updateData();
+      //this._map.fire('viewreset');
     },
 
     updateData: function() {
@@ -187,40 +189,6 @@ module.exports=(function() {
     }
   });
 
-  L.GeoJSON.d3.async = L.GeoJSON.d3.extend({
-    initialize: function(geojsonUrl, options) {
-      this.geojsonUrl = geojsonUrl;
-      options = options || {};
-      options.layerId = options.layerId || geojsonUrl.replace(/[^A-Za-z0-9]/g, "-");
-      return L.GeoJSON.d3.prototype.initialize.call(this, null, options);
-    },
-    getData: function(map) {
-      var mapBounds, thisLayer, url;
-      mapBounds = map.getBounds().toBBoxString();
-      url = "" + this.geojsonUrl;// + "&bbox=" + mapBounds;
-      thisLayer = this;
-      return d3.json(url, function(geojson) {
-        thisLayer.geojson = geojson;
-        if (thisLayer._svg != null) {
-          return L.GeoJSON.d3.prototype.updateData.call(thisLayer, map);
-        } else {
-          return L.GeoJSON.d3.prototype.onAdd.call(thisLayer, map);
-        }
-      });
-    },
-    onAdd: function(map) {
-      var newData, thisLayer;
-      thisLayer = this;
-      this.newData = newData = function(e) {
-        return L.GeoJSON.d3.async.prototype.getData.call(thisLayer, e.target);
-      };
-      map.on("moveend", newData);
-      return this.getData(map);
-    },
-    onRemove: function(map) {
-      L.GeoJSON.d3.prototype.onRemove.call(this, map);
-      return map.off("moveend", this.newData);
-    }
-  });
+
 
 }).call(this);

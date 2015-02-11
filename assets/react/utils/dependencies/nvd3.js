@@ -5230,7 +5230,7 @@ nv.models.line = function() {
       groups.exit().remove();
 
       groups
-          .attr('class', function(d,i) { return 'nv-group nv-series-' + i })
+          .attr('class', function(d,i) { return 'nv-group nv-line-data nv-series-' + i })
           .classed('hover', function(d) { return d.hover })
           .style('fill', function(d,i){ return color(d, i) })
           .style('stroke', function(d,i){ return color(d, i)});
@@ -11117,8 +11117,8 @@ nv.models.scatter = function() {
                 var pX = getX(point,pointIndex);
                 var pY = getY(point,pointIndex);
 
-                return [x(pX)+ Math.random() * 1e-7,
-                        y(pY)+ Math.random() * 1e-7,
+                return [x(pX),
+                        y(pY),
                         groupIndex,
                         pointIndex, point]; //temp hack to add noise untill I think of a better way so there are no duplicates
               })
@@ -11131,7 +11131,7 @@ nv.models.scatter = function() {
 
 
         //inject series and point index for reference into voronoi
-        if (useVoronoi === true) {
+        if (useVoronoi === true && vertices.length > 1) {
 
           if (clipVoronoi) {
             var pointClipsEnter = wrap.select('defs').selectAll('.nv-point-clips')
@@ -11155,23 +11155,14 @@ nv.models.scatter = function() {
                 .attr('clip-path', 'url(#nv-points-clip-' + id + ')');
           }
 
-
-          if(vertices.length) {
-            // Issue #283 - Adding 2 dummy points to the voronoi b/c voronoi requires min 3 points to work
-            vertices.push([x.range()[0] - 20, y.range()[0] - 20, null, null]);
-            vertices.push([x.range()[1] + 20, y.range()[1] + 20, null, null]);
-            vertices.push([x.range()[0] - 20, y.range()[0] + 20, null, null]);
-            vertices.push([x.range()[1] + 20, y.range()[1] - 20, null, null]);
-          }
-
           var bounds = d3.geom.polygon([
               [-10,-10],
               [-10,height + 10],
               [width + 10,height + 10],
               [width + 10,-10]
           ]);
-
-          var voronoi = d3.geom.voronoi(vertices).map(function(d, i) {
+                  
+          var voronoi =d3.geom.voronoi(vertices).map(function(d, i) {
               return {
                 'data': bounds.clip(d),
                 'series': vertices[i][2],
@@ -11179,6 +11170,7 @@ nv.models.scatter = function() {
               }
             });
 
+          
 
           var pointPaths = wrap.select('.nv-point-paths').selectAll('path')
               .data(voronoi);
@@ -11219,9 +11211,15 @@ nv.models.scatter = function() {
               })
               .on('mouseover', function(d) {
                 mouseEventCallback(d, dispatch.elementMouseover);
+                // console.log(d)
+                // d3.selectAll('.nv-group').classed
+                //classing may be faster then setting attributes??
+                d3.selectAll('.nv-line-data').attr('opacity',0.1)
+                d3.selectAll('.nv-line-data.nv-series-'+d.series).attr('opacity',0.9)
               })
               .on('mouseout', function(d, i) {
                 mouseEventCallback(d, dispatch.elementMouseout);
+                d3.selectAll('.nv-line-data').attr('opacity',1)
               });
 
 

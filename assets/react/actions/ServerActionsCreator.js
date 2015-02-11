@@ -31,6 +31,13 @@ module.exports = {
       fips: fips
     })
   },
+  getClassByMonth : function(data,fips){
+    AppDispatcher.handleServerAction({
+      type: ActionTypes.TMG_CLASS_BYMONTH,
+      data: data,
+      fips: fips
+    })
+  },
   
   //------------------------------------
   // User

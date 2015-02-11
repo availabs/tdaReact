@@ -8,12 +8,6 @@
   opacity: 0.4;
 }
 
-.zone:hover{
-  stroke-width:3px;
-  fill:#4ab0ce;
-  opacity: 0.7;
-  cursor: pointer;
-}
 
 
 
@@ -94,3 +88,6 @@ Overwrite Styles
   width:100%;
   text-align: center;
 };
+.active_geo{
+  fill:none;
+}

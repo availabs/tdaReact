@@ -18,6 +18,51 @@ var bigQuery = googleapis.bigquery('v2');
 
 module.exports = {
 	
+	byMonth:function(req,res){
+		var database = req.param('database'),
+ 			fips = req.param('fips'),
+ 			output = {};
+
+ 		fileCache.checkCache({datasource:database,type:'classByMonth',typeId:fips},function(data){
+ 			//console.log('find cache',data);
+ 			if(data){
+ 				console.log('cache sucess');
+ 				console.time('send cache');
+ 				res.send(data)
+ 				console.timeEnd('send cache');
+ 			}else{
+			    var sql = 'SELECT'+ 
+				  'station_id,dir,year,month,count(distinct day) as numDays,'+
+				  'sum(total_vol),sum(class1),sum(class2),'+
+				  'sum(class3),sum(class4),sum(class5),sum(class6),'+
+				  'sum(class7),sum(class8),sum(class9),sum(class10),sum(class11),sum(class12),sum(class13) '+
+				  "FROM [tmasWIM12."+database+"Class] where state_fips = '"+fips+"' "+
+				  'group by station_id,dir,year,month'+
+				  'order by station_id,dir,year,month'
+				
+				BQuery(sql,function(data){
+
+					var fullData = data.rows.map(function(row,index){
+						var outrow = {}
+						
+						data.schema.fields.forEach(function(field,i){
+							outrow[field.name] = row.f[i].v;
+						});
+						outrow['single_day'] = outrow.station_id +'-'+ outrow.year+'-'+outrow.month+'-'+outrow.day
+						return outrow;
+					});
+					console.time('send Data');
+					res.json(fullData);
+					console.timeEnd('send Data');
+					console.log('caching');
+					fileCache.addData({datasource:database,type:'classByMonth',typeId:fips},fullData);
+				});
+
+			}
+ 	
+		})
+	},
+
 	byDay:function(req,res){
  		var database = req.param('database'),
  			fips = req.param('fips'),

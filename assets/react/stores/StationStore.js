@@ -33,7 +33,7 @@ function _addStations(rawData) {
       station.latitude = station.latitude.replace(/\s+/g, '').replace(/^(\d\d)/, '$1.');
      
       
-      var feature = {type:"Point",properties:station,geometry:{coordinates:[+station.longitude,+station.latitude]}}
+      var feature = {type:"Feature",properties:station,geometry:{type:"Point",coordinates:[+station.longitude,+station.latitude]}}
               
        _stations[station.state_fips][station.station_id] = feature;
     }

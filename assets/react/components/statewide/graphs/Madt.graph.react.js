@@ -8,7 +8,7 @@ var React = require('react'),
     StateWideStore = require('../../../stores/StatewideStore'),
 
     //-- Utils
-    colorRange = colorbrewer.RdYlGn[5],
+    colorRange = colorbrewer.RdBu[5],
     AdtScale = d3.scale.quantile().domain([0,70000]).range(colorRange);
 
 function getStatefromStores(){
@@ -57,11 +57,11 @@ var GraphContainer = React.createClass({
                         return p.value.monthAvg
                     });
                     
-            console.log(
-                'update graph',
-                data,
-                data.length
-            )
+            // console.log(
+            //     'update graph',
+            //     data,
+            //     data.length
+            // )
 
             AdtScale.domain(stationADT.map(function(ADT){
                 return ADT.value.avg;
