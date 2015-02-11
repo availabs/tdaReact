@@ -97,7 +97,7 @@ var GraphContainer = React.createClass({
           width: '100%'
         };
         return (
-        	<section className="widget large">
+        	<section className="widget large" style={{ background:'none'}}>
                 <header>
                     <h4>
                         {this.state.selectedState}
