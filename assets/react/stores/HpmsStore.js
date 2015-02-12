@@ -14,24 +14,21 @@ var AppDispatcher = require('../dispatcher/AppDispatcher'),
     CHANGE_EVENT = 'change',
 
     SailsWebApi = require('../utils/api/SailsWebApi'),
-    ClassByDayFilter = require('../utils/dataFilters/classByDayFilter.js'),
-    ClassByMonthFilter = require('../utils/dataFilters/classByDayFilter.js');
+    ClassByDayFilter = require('../utils/dataFilters/classByDayFilter.js');
 
 var _selectedState = null,
-    _classbyDay = {},
-    _classbyMonth = {};
+    _classbyDay = {};
 
 function _setState(fips){
-  //console.log('StatewideStore / _setState ',fips)
+  //console.log('HpmsStore / _setState ',fips)
   _selectedState = fips;
 }
 
 function _filterYear(year){
   ClassByDayFilter.getDimension('year').filter(year);
-  ClassByMonthFilter.getDimension('year').filter(year);
 }
 
-var StatewideStore = assign({}, EventEmitter.prototype, {
+var HpmsStore = assign({}, EventEmitter.prototype, {
 
   emitChange: function() {
     this.emit(CHANGE_EVENT);
@@ -56,6 +53,7 @@ var StatewideStore = assign({}, EventEmitter.prototype, {
   getClassByDay:function(){
     
     //if data is loaded send it
+    //console.log('HpmsStore / getClassByDay',_selectedState);
     if(_classbyDay[_selectedState] && _classbyDay[_selectedState] !== 'loading' ){
       ClassByDayFilter.init(_classbyDay[_selectedState],_selectedState);
       return ClassByDayFilter;
@@ -70,54 +68,30 @@ var StatewideStore = assign({}, EventEmitter.prototype, {
     //if requested data isn't loaded send most recent data
     // may want to rethink this
     return ClassByDayFilter;
-  },
-
-  getClassByMonth:function(){
-    
-    //if data is loaded send it
-    if(_classbyMonth[_selectedState] && _classbyMonth[_selectedState] !== 'loading' ){
-      ClassByMonthFilter.init(_classbyMonth[_selectedState],_selectedState);
-      return ClassByDayFilter;
-    }
-    
-    //if data hasn't start started loading, load it 
-    if(_classbyMonth[_selectedState] !== 'loading'){
-      SailsWebApi.getClassByMonth(_selectedState);
-      _classbyMonth[_selectedState] = 'loading';
-    }
-
-    //if requested data isn't loaded send most recent data
-    // may want to rethink this
-    return ClassByMonthFilter;
   }
 
 
 
 });
 
-StatewideStore.dispatchToken = AppDispatcher.register(function(payload) {
+HpmsStore.dispatchToken = AppDispatcher.register(function(payload) {
   var action = payload.action;
 
   switch(action.type) {
 
     case ActionTypes.SET_SELECTED_STATE:
       _setState(action.Id);
-      StatewideStore.emitChange();
+      HpmsStore.emitChange();
     break;
 
     case ActionTypes.FILTER_YEAR:
       _filterYear(action.year);
-      StatewideStore.emitChange();
+      HpmsStore.emitChange();
     break;
 
     case ActionTypes.TMG_CLASS_BYDAY:
       _classbyDay[action.fips] = action.data;
-      StatewideStore.emitChange();
-    break;
-
-    case ActionTypes.TMG_CLASS_BYMONTH:
-      _classbyMonth[action.fips] = action.data;
-      StatewideStore.emitChange();
+      HpmsStore.emitChange();
     break;
 
     default:
@@ -126,4 +100,4 @@ StatewideStore.dispatchToken = AppDispatcher.register(function(payload) {
 
 });
 
-module.exports = StatewideStore;
+module.exports = HpmsStore;

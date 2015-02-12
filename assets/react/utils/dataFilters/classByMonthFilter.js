@@ -7,7 +7,7 @@ function reduceAddAvg() {
     p.avg = p.sum/p.count;
 
     ++p.monthCount[+v['month']-1]
-    p.monthSum[+v['month']-1] +=  +v['f0_'];
+    p.monthSum[+v['month']-1] +=  +v['f0_']/v['numDays'];
     p.monthAvg[+v['month']-1] = Math.round(p.monthSum[+v['month']-1]/p.monthCount[+v['month']-1]);
     
     return p;
@@ -21,7 +21,7 @@ function reduceRemoveAvg() {
     p.avg = p.sum/p.count;
 
     --p.monthCount[+v['month']-1]
-    p.monthSum[+v['month']-1] -=  +v['f0_'];
+    p.monthSum[+v['month']-1] -=  +v['f0_']/v['numDays'];
     p.monthAvg[+v['month']-1] = Math.round(p.monthSum[+v['month']-1]/p.monthCount[+v['month']-1]);
 
     return p;
@@ -67,7 +67,7 @@ module.exports  = {
 			all = classData.groupAll(),
 			
 
-			dimensions['ADT'] = classData.dimension(function(d){ return d.single_day });
+			dimensions['ADT'] = classData.dimension(function(d){ return d.year+"_"+d.month });
 
 			dimensions['stationId'] = classData.dimension(function(d){ return d.station_id });
 

@@ -14,7 +14,7 @@ var React = require('react'),
 function getStatefromStores(){
     return {
         selectedState : StateWideStore.getSelectedState(),
-        classByDay : StateWideStore.getClassByDay()
+        classByMonth : StateWideStore.getClassByMonth()
     }
 };
 
@@ -41,9 +41,9 @@ var GraphContainer = React.createClass({
     },
     updateGraph: function(){
         var scope = this;
-        if(Object.keys(this.state.classByDay.getDimensions()).length > 0){
+        if(Object.keys(this.state.classByMonth.getDimensions()).length > 0){
 
-            var stationADT = scope.state.classByDay.getGroups()
+            var stationADT = scope.state.classByMonth.getGroups()
                 .ADT.order(function(p){return p.avg})
                 .top(Infinity)
 
@@ -66,7 +66,7 @@ var GraphContainer = React.createClass({
                     .datum(
                         [{
                             key:"ADT",
-                            values:scope.state.classByDay.getGroups()
+                            values:scope.state.classByMonth.getGroups()
                             .ADT.order(function(p){return p.avg})
                             .top(Infinity)
                             .map(function (ADT){

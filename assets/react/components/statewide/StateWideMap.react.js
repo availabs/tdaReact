@@ -25,6 +25,7 @@ var map = null,
     vectorLayer = null,
     colorRange = colorbrewer.RdBu[5].reverse(),
     AdtScale = d3.scale.quantile().domain([0,70000]),
+    HpmsScale = d3.scale.quantile().domain([500,150000]).range(colorRange),
     hpmsData = [];
 
 var StateIndex = React.createClass({
@@ -42,7 +43,7 @@ var StateIndex = React.createClass({
                 type:"FeatureCollection",
                 features: []
             },
-            classByDay : StateWideStore.getClassByDay()
+            classByMonth : StateWideStore.getClassByMonth()
         };
     },
     
@@ -59,7 +60,7 @@ var StateIndex = React.createClass({
         mapDiv.setAttribute("style","height:"+this.props.height+"px");
         
 
-        var mapquestOSM = L.tileLayer("http://{s}.tiles.mapbox.com/v3/am3081.h0pna3ah/{z}/{x}/{y}.png");
+        var mapquestOSM = L.tileLayer("http://{s}.tiles.mapbox.com/v3/am3081.h0po4e8k/{z}/{x}/{y}.png");
         L.Icon.Default.imagePath= '/bower_components/leaflet/dist/images';
         map = L.map("map", {
           center: [39.8282, -98.5795],
@@ -84,7 +85,7 @@ var StateIndex = React.createClass({
                   };
                 },
                 onEachFeature: function (feature, layer) {
-                    
+                    hpmsData.push(feature.properties.AADT);
                     layer.on({
                         click: scope.stateClick,
                         mouseover: function(e){
@@ -131,7 +132,7 @@ var StateIndex = React.createClass({
     _newData:function(){
         var scope = this;
 
-        this.setState({classByDay:StateWideStore.getClassByDay()})
+        this.setState({classByDay:StateWideStore.getClassByMonth()})
         if(Object.keys(this.state.classByDay.getDimensions()).length > 0){
             
             var stationData = {};
@@ -181,9 +182,8 @@ var StateIndex = React.createClass({
             var scope = this,
                 newState = this.state;
 
-            ///e.target.setStyle({fill:false});
         
-            
+            map.fitBounds(e.target._bounds);
             var d = e.target.feature;
             
             d3.select('.active_geo').attr('fill','#3388ff').classed('active_geo',false);
@@ -197,11 +197,8 @@ var StateIndex = React.createClass({
             newState.selectedState = d.properties.geoid;
             newState.stations.features = StationStore.getStateStations(d.properties.geoid);
 
-            //stationLayer.externalUpdate(newState.stations);
             this.setState(newState);
             ClientActionsCreator.setSelectedState(newState.selectedState);
-            //
-            map.fitBounds(e.target._bounds);
             scope._loadHPMS();
             
         }
@@ -249,8 +246,15 @@ var StateIndex = React.createClass({
                         e.target.setStyle({stroke:false})
                     }
                 });
-
-
+                if (feature.properties) {
+                    var popupString = '<div class="popup">';
+                            for (var k in feature.properties) {
+                                var v = feature.properties[k];
+                                popupString += k + ': ' + v + '<br />';
+                            }
+                            popupString += '</div>';
+                    layer.bindPopup(popupString);
+                }
             }
         });
         stationLayer.addTo(map);
@@ -265,7 +269,7 @@ var StateIndex = React.createClass({
         hpmsData = [];
         var style = function(d){
             return{
-                "color": "#1B1",
+                "color": HpmsScale(d.properties.aadt),
                 "fillColor": "#1B1",
                 "opacity": 0.8,
                 "fillOpacity": 0.1,
@@ -277,7 +281,6 @@ var StateIndex = React.createClass({
         };
         // style of feature when hovered
         var highlightStyle = {
-            "color": "#f00",
             "weight": 13,
             "fillOpacity": 0.4
         };
@@ -301,8 +304,6 @@ var StateIndex = React.createClass({
                 mouseout: mousout
             });
             if (feature.properties) {
-                // TODO disabled due to error with Leaflet master (0.8-dev)
-                //layer.bindLabel(feature.properties.name);
                 var popupString = '<div class="popup">';
                         for (var k in feature.properties) {
                             var v = feature.properties[k];

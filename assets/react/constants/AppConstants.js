@@ -32,7 +32,8 @@ module.exports = {
     SET_SESSION_USER:null,
 
     //-------Data--------------------------------------------
-    TMG_CLASS_BYDAY: null
+    TMG_CLASS_BYDAY: null,
+    TMG_CLASS_BYMONTH: null
 
   }),
 

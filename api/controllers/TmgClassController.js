@@ -31,13 +31,13 @@ module.exports = {
  				res.send(data)
  				console.timeEnd('send cache');
  			}else{
-			    var sql = 'SELECT'+ 
+			    var sql = 'SELECT '+ 
 				  'station_id,dir,year,month,count(distinct day) as numDays,'+
 				  'sum(total_vol),sum(class1),sum(class2),'+
 				  'sum(class3),sum(class4),sum(class5),sum(class6),'+
 				  'sum(class7),sum(class8),sum(class9),sum(class10),sum(class11),sum(class12),sum(class13) '+
 				  "FROM [tmasWIM12."+database+"Class] where state_fips = '"+fips+"' "+
-				  'group by station_id,dir,year,month'+
+				  'group by station_id,dir,year,month '+
 				  'order by station_id,dir,year,month'
 				
 				BQuery(sql,function(data){
@@ -195,7 +195,7 @@ var fileCache = {
 	cache : {},
 
 	checkCache : function(request,callback){
-		console.log('----------------checkCache----------------')
+		console.log('------------checkCache----'+request.datasource+'---'+request.type+request.typeId+'----------------')
 		var file = __dirname.substring(0,__dirname.length-15) + 'assets/cache/'+request.datasource+'/'+request.type+request.typeId+'.json';
 		
 		//console.log(file,callback);

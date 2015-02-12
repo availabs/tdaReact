@@ -15,10 +15,10 @@ var labelStyle = {
 }
 
 
-function updateClassByDay(){
+function updateClassByMonth(){
 
     return {
-        classByDay : StateWideStore.getClassByDay(),
+        classByMonth : StateWideStore.getClassByMonth(),
     };
 }
 
@@ -26,7 +26,7 @@ var Filters = React.createClass({
 //style="overflow-y: auto; min-height: 60px; max-height: 123px;"
     getInitialState: function() {
         return {
-            classByDay : StateWideStore.getClassByDay(),
+            classByMonth : StateWideStore.getClassByMonth(),
             currentYear: null
         }
     },
@@ -40,8 +40,8 @@ var Filters = React.createClass({
     },
 
     _onChange:function(){
-        this.setState(updateClassByDay());
-        console.log('on change years',this.state.classByDay.getGroup('year'))
+        this.setState(updateClassByMonth());
+        console.log('on change years',this.state.classByMonth.getGroup('year'))
     },
 
     _setYearFilter:function(e){
@@ -53,9 +53,9 @@ var Filters = React.createClass({
     _getYears : function(){
         var scope = this;
 
-        if(this.state.classByDay.getGroup('year')){
+        if(this.state.classByMonth.getGroup('year')){
 
-            var output = this.state.classByDay.getGroup('year').top(Infinity).map(function(year){
+            var output = this.state.classByMonth.getGroup('year').top(Infinity).map(function(year){
 
 
                 return (<li rel="1"><a tabindex="-1" onClick={scope._setYearFilter} value={year.key} className="">20{year.key}</a></li>)
@@ -70,9 +70,9 @@ var Filters = React.createClass({
      _getMonths : function(){
         var scope = this;
 
-        if(this.state.classByDay.getGroup('month')){
+        if(this.state.classByMonth.getGroup('month')){
 
-            var output = this.state.classByDay.getGroup('month').top(Infinity).map(function(month){
+            var output = this.state.classByMonth.getGroup('month').top(Infinity).map(function(month){
 
 
                 return (<li rel="1"><a tabindex="-1" onClick={scope._setmonthFilter} value={month.key} className="">{month.key}</a></li>)
