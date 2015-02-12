@@ -34,20 +34,23 @@ module.exports = {
       console.log('Error: No Agency Datasource Selected');
       return []
     }
+    var url = '/tmgClass/byDay';
+    var postData = {database:AgencyStore.getSelectedAgency().datasource,fips:fips};
+    d3.json(url).post(JSON.stringify(postData),function(err,data){
+     ServerActionCreators.getClassByDay(data,fips);
+    });
 
-    io.socket.post('/tmgClass/byDay',{database:AgencyStore.getSelectedAgency().datasource,fips:fips},function(data){
-      ServerActionCreators.getClassByDay(data,fips);
-    })
   },
   getClassByMonth : function(fips){
     if(!AgencyStore.getSelectedAgency()){
       console.log('Error: No Agency Datasource Selected');
       return []
     }
-
-    io.socket.post('/tmgClass/byMonth',{database:AgencyStore.getSelectedAgency().datasource,fips:fips},function(data){
+    var postData ={database:AgencyStore.getSelectedAgency().datasource,fips:fips};
+    d3.json('/tmgClass/byMonth').post(JSON.stringify(postData),function(err,data){
+      console.log('data',data);
       ServerActionCreators.getClassByMonth(data,fips);
-    })
+    });
   },
 
   //---------------------------------------------------
@@ -63,17 +66,16 @@ module.exports = {
   // Sails Rest Route
   //---------------------------------------------------
   create: function(type,data){
-    io.socket.post('/'+type,data,function(resData){
+    d3.xhr('/'+type).post(JSON.stringify(data),function(err,resData){
       //ToDo Check for Errors and Throw Error Case
-      console.log('utils/sailsWebApi/createUser',resData);
-
+      //console.log('utils/sailsWebApi/createUser',resData);
       //add new user back to store through 
       ServerActionCreators.receiveData(type,[resData]);
     });
   },
   
   read: function(type) {
-    io.socket.get('/'+type,function(data){     
+    d3.json('/'+type,function(err,data){     
       //console.log('utils/sailsWebApi/getUsers',data);
       ServerActionCreators.receiveData(type,data);
     });
