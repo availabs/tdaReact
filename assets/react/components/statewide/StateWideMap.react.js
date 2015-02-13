@@ -60,7 +60,7 @@ var StateIndex = React.createClass({
         mapDiv.setAttribute("style","height:"+this.props.height+"px");
         
 
-        var mapquestOSM = L.tileLayer("http://{s}.tiles.mapbox.com/v3/am3081.h0pna3ah/{z}/{x}/{y}.png");
+        var mapquestOSM = L.tileLayer("http://{s}.tiles.mapbox.com/v3/am3081.h0po4e8k/{z}/{x}/{y}.png");
         L.Icon.Default.imagePath= '/bower_components/leaflet/dist/images';
         map = L.map("map", {
           center: [39.8282, -98.5795],

@@ -125,3 +125,5 @@ Unified Station ID highlight Styles
   fill-opacity: 1;
   stroke-opacity:1;
 }
+
+#map{box-shadow: 5px 5px 5px #aaa;}
