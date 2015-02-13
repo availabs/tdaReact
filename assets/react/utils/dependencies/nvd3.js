@@ -996,17 +996,6 @@ nv.utils.NaNtoZero = function(n) {
     return n;
 };
 
-/*
-Snippet of code you can insert into each nv.models.* to give you the ability to
-do things like:
-chart.options({
-  showXAxis: true,
-  tooltips: true
-});
-
-To enable in the chart:
-chart.options = nv.utils.optionsFunc.bind(chart);
-*/
 nv.utils.optionsFunc = function(args) {
     if (args) {
       d3.map(args).forEach((function(key,value) {
@@ -1852,27 +1841,12 @@ nv.models.bullet = function() {
           .attr('width', w1(rangeMax > 0 ? rangeMax : rangeMin))
           .attr('x', xp1(rangeMax > 0 ? rangeMax : rangeMin))
           .datum(rangeMax > 0 ? rangeMax : rangeMin)
-          /*
-          .attr('x', rangeMin < 0 ?
-                         rangeMax > 0 ?
-                             x1(rangeMin)
-                           : x1(rangeMax)
-                       : x1(0))
-                      */
 
       g.select('rect.nv-rangeAvg')
           .attr('height', availableHeight)
           .attr('width', w1(rangeAvg))
           .attr('x', xp1(rangeAvg))
           .datum(rangeAvg)
-          /*
-          .attr('width', rangeMax <= 0 ?
-                             x1(rangeMax) - x1(rangeAvg)
-                           : x1(rangeAvg) - x1(rangeMin))
-          .attr('x', rangeMax <= 0 ?
-                         x1(rangeAvg)
-                       : x1(rangeMin))
-                      */
 
       g.select('rect.nv-rangeMin')
           .attr('height', availableHeight)
@@ -1954,101 +1928,9 @@ nv.models.bullet = function() {
             })
           })
 
-/* // THIS IS THE PREVIOUS BULLET IMPLEMENTATION, WILL REMOVE SHORTLY
-      // Update the range rects.
-      var range = g.selectAll('rect.nv-range')
-          .data(rangez);
-
-      range.enter().append('rect')
-          .attr('class', function(d, i) { return 'nv-range nv-s' + i; })
-          .attr('width', w0)
-          .attr('height', availableHeight)
-          .attr('x', reverse ? x0 : 0)
-          .on('mouseover', function(d,i) { 
-              dispatch.elementMouseover({
-                value: d,
-                label: (i <= 0) ? 'Maximum' : (i > 1) ? 'Minimum' : 'Mean', //TODO: make these labels a variable
-                pos: [x1(d), availableHeight/2]
-              })
-          })
-          .on('mouseout', function(d,i) { 
-              dispatch.elementMouseout({
-                value: d,
-                label: (i <= 0) ? 'Minimum' : (i >=1) ? 'Maximum' : 'Mean' //TODO: make these labels a variable
-              })
-          })
-
-      d3.transition(range)
-          .attr('x', reverse ? x1 : 0)
-          .attr('width', w1)
-          .attr('height', availableHeight);
-
-
-      // Update the measure rects.
-      var measure = g.selectAll('rect.nv-measure')
-          .data(measurez);
-
-      measure.enter().append('rect')
-          .attr('class', function(d, i) { return 'nv-measure nv-s' + i; })
-          .style('fill', function(d,i) { return color(d,i ) })
-          .attr('width', w0)
-          .attr('height', availableHeight / 3)
-          .attr('x', reverse ? x0 : 0)
-          .attr('y', availableHeight / 3)
-          .on('mouseover', function(d) { 
-              dispatch.elementMouseover({
-                value: d,
-                label: 'Current', //TODO: make these labels a variable
-                pos: [x1(d), availableHeight/2]
-              })
-          })
-          .on('mouseout', function(d) { 
-              dispatch.elementMouseout({
-                value: d,
-                label: 'Current' //TODO: make these labels a variable
-              })
-          })
-
-      d3.transition(measure)
-          .attr('width', w1)
-          .attr('height', availableHeight / 3)
-          .attr('x', reverse ? x1 : 0)
-          .attr('y', availableHeight / 3);
-
-
-
-      // Update the marker lines.
-      var marker = g.selectAll('path.nv-markerTriangle')
-          .data(markerz);
-
-      var h3 =  availableHeight / 6;
-      marker.enter().append('path')
-          .attr('class', 'nv-markerTriangle')
-          .attr('transform', function(d) { return 'translate(' + x0(d) + ',' + (availableHeight / 2) + ')' })
-          .attr('d', 'M0,' + h3 + 'L' + h3 + ',' + (-h3) + ' ' + (-h3) + ',' + (-h3) + 'Z')
-          .on('mouseover', function(d,i) {
-              dispatch.elementMouseover({
-                value: d,
-                label: 'Previous',
-                pos: [x1(d), availableHeight/2]
-              })
-          })
-          .on('mouseout', function(d,i) {
-              dispatch.elementMouseout({
-                value: d,
-                label: 'Previous'
-              })
-          });
-
-      d3.transition(marker)
-          .attr('transform', function(d) { return 'translate(' + (x1(d) - x1(0)) + ',' + (availableHeight / 2) + ')' });
-
-      marker.exit().remove();
-*/
 
     });
 
-    // d3.timer.flush();  // Not needed?
 
     return chart;
   }
@@ -3912,6 +3794,7 @@ nv.models.discreteBarChart = function() {
     return chart;
   };
 
+
   chart.tooltips = function(_) {
     if (!arguments.length) return tooltips;
     tooltips = _;
@@ -5230,7 +5113,7 @@ nv.models.line = function() {
       groups.exit().remove();
 
       groups
-          .attr('class', function(d,i) { return 'nv-group nv-line-data nv-series-' + i })
+          .attr('class', function(d,i) { return 'nv-group nv-line-data station_'+d.key+' nv-series-' + i })
           .classed('hover', function(d) { return d.hover })
           .style('fill', function(d,i){ return color(d, i) })
           .style('stroke', function(d,i){ return color(d, i)});
@@ -10977,7 +10860,7 @@ nv.models.scatter = function() {
     , padData      = false // If true, adds half a data points width to front and back, for lining up a line chart with a bar chart
     , padDataOuter = .1 //outerPadding to imitate ordinal scale outer padding
     , clipEdge     = false // if true, masks points within x and y scale
-    , clipVoronoi  = true // if true, masks each point with a circle... can turn off to slightly increase performance
+    , clipVoronoi  = false // if true, masks each point with a circle... can turn off to slightly increase performance
     , clipRadius   = function() { return 25 } // function to get the radius for voronoi point clips
     , xDomain      = null // Override x domain (skips the calculation from data)
     , yDomain      = null // Override y domain
@@ -11211,9 +11094,10 @@ nv.models.scatter = function() {
               })
               .on('mouseover', function(d) {
                 mouseEventCallback(d, dispatch.elementMouseover);
-                // console.log(d)
+                console.log(d)
                 // d3.selectAll('.nv-group').classed
                 //classing may be faster then setting attributes??
+                console.log(d3.select('.nv-series-'+d.series).attr('class'))
                 d3.selectAll('.nv-line-data').attr('opacity',0.1)
                 d3.selectAll('.nv-line-data.nv-series-'+d.series).attr('opacity',0.9)
               })
