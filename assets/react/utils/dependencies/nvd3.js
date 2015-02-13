@@ -1580,7 +1580,10 @@ nv.models.historicalBar = function() {
 
       bars
           .attr('fill', function(d,i) { return color(d, i); })
-          .attr('class', function(d,i,j) { return (getY(d,i) < 0 ? 'nv-bar negative' : 'nv-bar positive') + ' nv-bar-' + j + '-' + i })
+          .attr('class', function(d,i,j) { 
+            console.log('bar class',d);
+            return (getY(d,i) < 0 ? 'nv-bar negative' : 'nv-bar positive') + ' nv-bar-' + j + '-' + i 
+          })
           .transition()
           .attr('transform', function(d,i) { return 'translate(' + (x(getX(d,i)) - availableWidth / data[0].values.length * .45) + ',0)'; }) 
            //TODO: better width calculations that don't assume always uniform data spacing;w
@@ -3260,6 +3263,15 @@ nv.models.discreteBar = function() {
           })
           .on('mouseover', function(d,i) { //TODO: figure out why j works above, but not here
             d3.select(this).classed('hover', true);
+            //search me to find me
+             var stationClass = d3.select(this)
+                  .attr('class')
+                  .split(" ")
+                  .filter(function(cl){ return cl.substr(0,7) === 'station' })[0];
+                //d3.selectAll('.nv-line-data').classed('nv-line-background',true)
+
+              d3.selectAll('.'+stationClass).classed('highlighted-station',true);
+              
             dispatch.elementMouseover({
               value: getY(d,i),
               point: d,
@@ -3272,6 +3284,8 @@ nv.models.discreteBar = function() {
           })
           .on('mouseout', function(d,i) {
             d3.select(this).classed('hover', false);
+            d3.selectAll('.highlighted-station').classed('highlighted-station',false);
+
             dispatch.elementMouseout({
               value: getY(d,i),
               point: d,
@@ -3327,7 +3341,11 @@ nv.models.discreteBar = function() {
       }
 
       bars
-          .attr('class', function(d,i) { return getY(d,i) < 0 ? 'nv-bar negative' : 'nv-bar positive' })
+          .attr('class', function(d,i) { 
+            //console.log('bars enter',d); 
+            var posNeg = getY(d,i) < 0 ? 'nv-bar negative' : 'nv-bar positive';
+            return posNeg+' station_'+d.label;
+          })
           .style('fill', function(d,i) { return d.color || color(d,i) })
           .style('stroke', function(d,i) { return d.color || color(d,i) })
         .select('rect')
@@ -5107,8 +5125,8 @@ nv.models.line = function() {
       var groups = wrap.select('.nv-groups').selectAll('.nv-group')
           .data(function(d) { return d }, function(d) { return d.key });
       groups.enter().append('g')
-          .style('stroke-opacity', 1e-6)
-          .style('fill-opacity', 1e-6);
+          // .style('stroke-opacity', 1e-6)
+          // .style('fill-opacity', 1e-6);
 
       groups.exit().remove();
 
@@ -5119,8 +5137,8 @@ nv.models.line = function() {
           .style('stroke', function(d,i){ return color(d, i)});
       groups
           .transition()
-          .style('stroke-opacity', 1)
-          .style('fill-opacity', .5);
+          // .style('stroke-opacity', 1)
+          // .style('fill-opacity', .5);
 
 
 
@@ -11094,31 +11112,29 @@ nv.models.scatter = function() {
               })
               .on('mouseover', function(d) {
                 mouseEventCallback(d, dispatch.elementMouseover);
-                console.log(d)
+                //console.log(d)
                 // d3.selectAll('.nv-group').classed
                 //classing may be faster then setting attributes??
-                console.log(d3.select('.nv-series-'+d.series).attr('class'))
-                d3.selectAll('.nv-line-data').attr('opacity',0.1)
-                d3.selectAll('.nv-line-data.nv-series-'+d.series).attr('opacity',0.9)
+                console.log()
+                var stationClass = d3.select('.nv-series-'+d.series)
+                  .attr('class')
+                  .split(" ")
+                  .filter(function(cl){ return cl.substr(0,7) === 'station' })[0];
+                //d3.selectAll('.nv-line-data').classed('nv-line-background',true)
+
+                d3.selectAll('.'+stationClass).classed('highlighted-station',true);
+
+
+
               })
               .on('mouseout', function(d, i) {
                 mouseEventCallback(d, dispatch.elementMouseout);
-                d3.selectAll('.nv-line-data').attr('opacity',1)
+                d3.selectAll('.highlighted-station').classed('highlighted-station',false)
               });
 
 
         } else {
-          /*
-          // bring data in form needed for click handlers
-          var dataWithPoints = vertices.map(function(d, i) {
-              return {
-                'data': d,
-                'series': vertices[i][2],
-                'point': vertices[i][3]
-              }
-            });
-           */
-
+        
           // add event handlers to points instead voronoi paths
           wrap.select('.nv-groups').selectAll('.nv-group')
             .selectAll('.nv-point')

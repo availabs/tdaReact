@@ -240,10 +240,12 @@ var StateIndex = React.createClass({
                         console.log('station_click',e.target.feature.properties);
                     },
                     mouseover: function(e){
-                        e.target.setStyle({stroke:true,weight:3})
+                        //e.target.setStyle({stroke:true,weight:3});
+                        d3.selectAll('.station_'+e.target.feature.properties.station_id).classed('highlighted-station',true);
                     },
                     mouseout: function(e){
-                        e.target.setStyle({stroke:false})
+                        //e.target.setStyle({stroke:false})
+                        d3.selectAll('.highlighted-station').classed('highlighted-station',false)
                     }
                 });
                 if (feature.properties) {

@@ -48,7 +48,6 @@ module.exports = {
     }
     var postData ={database:AgencyStore.getSelectedAgency().datasource,fips:fips};
     d3.json('/tmgClass/byMonth').post(JSON.stringify(postData),function(err,data){
-      console.log('data',data);
       ServerActionCreators.getClassByMonth(data,fips);
     });
   },

@@ -99,4 +99,29 @@ background: radial-gradient(farthest-side ellipse at 10% 0, rgba(255,255,255, 0.
 background: -webkit-radial-gradient(10% 0, farthest-side ellipse, rgba(255,255,255, 0.89), rgba(226, 226, 226, 0.87), rgba(200,200,200, 0.87)), url("/images/bgnoise_lg_dark.png");
 background: -moz-radial-gradient(10% 0, farthest-side ellipse, rgba(255,255,255, 0.89), rgba(226, 226, 226, 0.87), rgba(200,200,200, 0.87)), url("/images/bgnoise_lg_dark.png");
 }
+
+
+
+/********************************************************************
+Unified Station ID highlight Styles
+*********************************************************************/
+
+
+.nv-line-data{
+  opacity: 0.1;
+}
+
+.nv-line-data.highlighted-station{
+  opacity: 1;
+}
+
+.station.highlighted-station{
+  stroke:#000;
+  stroke-width:7px;
+}
+.nv-bar.highlighted-station rect{
+  fill:yellow;
+  strok-width:5px;
+  fill-opacity: 1;
+  stroke-opacity:1;
 }

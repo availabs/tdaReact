@@ -92,7 +92,7 @@ var Filters = React.createClass({
         if(currenYear !== 'All'){ currenYear = '20'+currenYear; }
 
         return (
-        	<section className="widget ui-sortable no-padding">
+        	<section className="widget ui-sortable no-padding" style={{background:'none'}}>
     			<fieldset>
                     <div className="control-group">
                         <label className="control-label centered" style={labelStyle} ><strong>Year</strong></label>
