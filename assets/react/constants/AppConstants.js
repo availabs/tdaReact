@@ -13,9 +13,13 @@ module.exports = {
     CREATE_USER:null,
     SET_SELECTED_AGENCY:null,
     SET_SELECTED_STATE:null,
+    CBM_INITIALIZED:null,
 
-      //-- Filters
+    // -- Filters
     FILTER_YEAR:null,
+    FILTER_MONTH:null,
+    FILTER_VCLASS:null,
+    FILTER_STATIONS:null,
 
     //-------------------------------------------------------
     //Server actions 

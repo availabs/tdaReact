@@ -1,29 +1,32 @@
 var crossfilter = require('crossfilter');
-
+var i = 0;
 function reduceAddAvg() {
   return function(p,v) {
-    ++p.count
-    p.sum += +v['f0_'];
-    p.avg = p.sum/p.count;
+  	if(v['numDays'] && v['numDays'] > 0 ){
+	  	++p.count
+	    p.sum += +parseInt(+v['f0_']/v['numDays']);
+	    p.avg = p.sum/p.count;
 
-    ++p.monthCount[+v['month']-1]
-    p.monthSum[+v['month']-1] +=  +v['f0_']/v['numDays'];
-    p.monthAvg[+v['month']-1] = Math.round(p.monthSum[+v['month']-1]/p.monthCount[+v['month']-1]);
-    
-    return p;
+	    ++p.monthCount[+v['month']-1]
+	    p.monthSum[+v['month']-1] +=  +parseInt(+v['f0_']/v['numDays']);
+	    p.monthAvg[+v['month']-1] = Math.round(p.monthSum[+v['month']-1]/p.monthCount[+v['month']-1]);
+	}
+	return p;
   };
 }
 
 function reduceRemoveAvg() {
   return function(p,v) {
-    --p.count
-    p.sum -= +v['f0_'];
-    p.avg = p.sum/p.count;
+  	if(v['numDays'] && v['numDays'] > 0 ){
+	
+	    --p.count
+	    p.sum -= parseInt(+v['f0_']/v['numDays']);
+	    p.avg = p.sum/p.count;
 
-    --p.monthCount[+v['month']-1]
-    p.monthSum[+v['month']-1] -=  +v['f0_']/v['numDays'];
-    p.monthAvg[+v['month']-1] = Math.round(p.monthSum[+v['month']-1]/p.monthCount[+v['month']-1]);
-
+	    --p.monthCount[+v['month']-1]
+	    p.monthSum[+v['month']-1] -=  +parseInt(v['f0_']/v['numDays']);
+	    p.monthAvg[+v['month']-1] = Math.round(p.monthSum[+v['month']-1]/p.monthCount[+v['month']-1]);
+	}
     return p;
   };
 }
@@ -58,8 +61,8 @@ module.exports  = {
 			
 		if(dataset !== currentDataSet){
 
-			console.log('classFilter Init',dataset,currentDataSet,data.length);
-			console.time('crossFIlterData')
+			console.log('class By Month Init',dataset,currentDataSet,data.length);
+			console.time('CBM crossFIlterData')
 			currentDataSet = dataset;
 
 			
@@ -67,10 +70,12 @@ module.exports  = {
 			all = classData.groupAll(),
 			
 
-			dimensions['ADT'] = classData.dimension(function(d){ return d.year+"_"+d.month });
+			dimensions['ADT'] = classData.dimension(function(d){ return d.single_day});
 
 			dimensions['stationId'] = classData.dimension(function(d){ return d.station_id });
+			groups['stationId'] = dimensions['stationId'].group().reduceCount();
 
+			
 			dimensions['year'] = classData.dimension(function(d){ return +d.year });
 			groups['year'] = dimensions['year'].group().reduceCount();
 
@@ -78,22 +83,22 @@ module.exports  = {
 			groups['month'] = dimensions['month'].group().reduceCount();
 
 
-			//dimensions['year'] = classData.dimension(function(d){ return d.year });
-
-
 			groups['ADT'] = dimensions['ADT']
 				.group( function (d,i){ return d.substr(0,6) })
 				.reduce(reduceAddAvg('f0_'), reduceRemoveAvg('f0_'), reduceInitAvg);
 
+			
+
 			initialized = true;
-			console.timeEnd('crossFIlterData')
-			console.log()
+			console.timeEnd('CBM crossFIlterData')
 		}
+
 	},
 	getDimension:function(dim){
 		return dimensions[dim];
 	},
 	getDimensions:function(){
+		//console.log('classByMonthFilter / getDimensions',Object.keys(dimensions))
 		return dimensions;
 	},
 	getGroup:function(group){

@@ -10912,6 +10912,12 @@ nv.models.scatter = function() {
           availableHeight = height - margin.top - margin.bottom,
           container = d3.select(this);
 
+      data = data.filter(function(d){
+        return d;
+      });
+
+      
+
       //add series index to each data point for reference
       data.forEach(function(series, i) {
         series.values.forEach(function(point) {
@@ -10931,7 +10937,10 @@ nv.models.scatter = function() {
                 })
               })
             );
-
+      seriesData = seriesData.filter(function(d,i){ 
+        return d;
+      })
+      
       x   .domain(xDomain || d3.extent(seriesData.map(function(d) { return d.x; }).concat(forceX)))
 
       if (padData && data[0])
@@ -11209,8 +11218,8 @@ nv.models.scatter = function() {
         var points = groups.selectAll('circle.nv-point')
             .data(function(d) { return d.values }, pointKey);
         points.enter().append('circle')
-            .style('fill', function (d,i) { return d.color })
-            .style('stroke', function (d,i) { return d.color })
+            .style('fill', function (d,i) { return d ? d.color : '#000' })
+            .style('stroke', function (d,i) { return d ? d.color : '#000'; })
             .attr('cx', function(d,i) { return nv.utils.NaNtoZero(x0(getX(d,i))) })
             .attr('cy', function(d,i) { return nv.utils.NaNtoZero(y0(getY(d,i))) })
             .attr('r', function(d,i) { return Math.sqrt(z(getSize(d,i))/Math.PI) });

@@ -3,20 +3,24 @@
 var React = require('react'),
     
     
-    //--Stores
+    // -- Stores
     StationStore = require('../../stores/StationStore'),
     StateWideStore = require('../../stores/StatewideStore'),
 
-    //--Actions
+    // -- Components
+    ToolTip = require('../utils/ToolTip.react'),
+
+    // -- Actions
     ClientActionsCreator = require('../../actions/ClientActionsCreator'),
 
-    //--Utils
+    // -- Utils
     L =                 require('../../utils/dependencies/leaflet.min'),
     d3 =                require('d3'),
     topojson =          require('topojson'),
     colorbrewer =       require('colorbrewer'),
     leafletTileLayer =  require('../../utils/dependencies/L.Tilelayer.Vector'),
-    fips2state =        require('../../utils/data/fips2state');
+    fips2state =        require('../../utils/data/fips2state'),
+    stnCardMeta =        require('../../utils/data/stnCardMeta');
     
 var map = null,
     geoData = {'states':null,'congress':null,'counties':null},
@@ -28,7 +32,7 @@ var map = null,
     HpmsScale = d3.scale.quantile().domain([500,150000]).range(colorRange),
     hpmsData = [];
 
-var StateIndex = React.createClass({
+var StateWideMap = React.createClass({
     
     getDefaultProps: function() {
         return {
@@ -66,7 +70,8 @@ var StateIndex = React.createClass({
           center: [39.8282, -98.5795],
           zoom: 4,
           layers: [mapquestOSM],
-          zoomControl: false
+          zoomControl: false,
+          attributionControl:false
         });
         d3.json('/geo/states.json',function(data){
             //if data is topo, convert
@@ -121,7 +126,6 @@ var StateIndex = React.createClass({
     },
 
     _onStationsLoad:function(){
-        console.log('state change');
         if(this.state.selectedState){
             var newState = this.state;
             newState.stations.features = StationStore.getStateStations(this.state.selectedState);    
@@ -169,7 +173,9 @@ var StateIndex = React.createClass({
     render: function() {
 
         return (
-            <div id="map"></div>
+            <div id="map">
+                <ToolTip />
+            </div>
         );
     },
     
@@ -188,7 +194,6 @@ var StateIndex = React.createClass({
             
             d3.select('.active_geo').attr('fill','#3388ff').classed('active_geo',false);
             if(d.properties.geoid){
-                console.log('selecting','.geo-'+d.properties.geoid);
                 d3.select('.geo-'+d.properties.geoid)
                     .attr('fill','none')
                     .classed('active_geo',true);
@@ -208,12 +213,11 @@ var StateIndex = React.createClass({
     //Station Visualizationing
     //---------------------------------------------------------------------------------------------------------------
     _updateStations : function(stationsGeo){
-        console.log('update stations')
+        var scope = this;
         if(map.hasLayer(stationLayer)){
             map.removeLayer(stationLayer)
         }
         
-        console.log(stationsGeo);
         stationLayer = L.geoJson(stationsGeo, {
             pointToLayer: function (d, latlng) {
                 var options = {
@@ -223,10 +227,10 @@ var StateIndex = React.createClass({
                     opacity: 1,
                     fillOpacity: 0.8,
                     stroke:false,
-                    className:'station station_'+d.properties.station_id
+                    className:'station station_'+d.properties.station_id+' '+'route_'+parseInt(d.properties.posted_sign_route_num)
                 };
 
-                AdtScale.range([3,4,5,6,7,8,9])
+                AdtScale.range([0,3,4,5,6,7,8,9])
                 options.radius = AdtScale(d.properties.ADT || 0);
                 AdtScale.range(colorRange);                
                 options.fillColor = AdtScale(d.properties.ADT || 0);
@@ -237,15 +241,31 @@ var StateIndex = React.createClass({
                 
                 layer.on({
                     click: function(e){
-                        console.log('station_click',e.target.feature.properties);
+                        //console.log('station_click',e.target.feature.properties);
                     },
                     mouseover: function(e){
                         //e.target.setStyle({stroke:true,weight:3});
                         d3.selectAll('.station_'+e.target.feature.properties.station_id).classed('highlighted-station',true);
+                        var toolTip = d3.select('.ToolTip').style({
+                            top:e.originalEvent.clientY+'px',
+                            left:e.originalEvent.clientX+'px',
+                            display:'block'
+                        });
+
+                        toolTip.select('h4')
+                            .attr('class','TT_Title')
+                            .html('STATION '+feature.properties.station_id);
+
+                        toolTip.select('span')
+                            .attr('class','TT_Content')
+                            .html(scope._StationToolTipContent(feature.properties));
+                    
                     },
                     mouseout: function(e){
                         //e.target.setStyle({stroke:false})
-                        d3.selectAll('.highlighted-station').classed('highlighted-station',false)
+                        d3.selectAll('.highlighted-station').classed('highlighted-station',false);
+                        d3.select('.ToolTip').style({display:'none'});
+                        
                     }
                 });
                 if (feature.properties) {
@@ -261,10 +281,38 @@ var StateIndex = React.createClass({
         });
         stationLayer.addTo(map);
     },
+    _StationToolTipContent:function(props){
+        
+        var rows = Object.keys(stnCardMeta.stationNameMap).map(function(key){
+            var value = stnCardMeta[key] ?  stnCardMeta[key][props[key]] : props[key];
+            var row = ''+
+                '<tr>'+
+                    '<td>'+stnCardMeta.stationNameMap[key]+'</td>'+
+                    '<td>'+ value +'</td>'+
+                '</tr>'
+            return row;
+        });
+        var type = props.method_of_truck_weighing > 0 ? 'WIM' :'Class';
+        var c =''+
+            '<table class="table">'+
+                '<tr>'+
+                    '<td>Type</td>'+
+                    '<td>'+ type +'</td>'+
+                '</tr>'+
+                '<tr>'+
+                    '<td>Route</td>'+
+                    '<td>'+ stnCardMeta.posted_route_sign_abbr[props.posted_route_sign]+'-'+ parseInt(props.posted_sign_route_num) +'</td>'+
+                '</tr>'+
+                rows.join(' ')+
+            '</table>';
+
+        return c;
+    },
     //----------------------------------------------------------------------------------------------------------------
     // HPMS
     //----------------------------------------------------------------------------------------------------------------
     _loadHPMS:function(stateFips){
+        var scope = this;
         if(map.hasLayer(vectorLayer)){
             map.removeLayer(vectorLayer);
         }
@@ -288,32 +336,50 @@ var StateIndex = React.createClass({
         };
 
         function mousover(e) {
-            //console.log('mouseover',e.target.options.className)
-            if(e.target.feature.properties.route != '0'){
-                d3.selectAll("."+e.target.options.className).attr('stroke-width','10px').style('cursor','pointer');
+            var feature = e.target.feature;
+            if(feature.properties.route != '0'){
+                d3.selectAll("."+e.target.options.className).attr('stroke-width','13px').style('cursor','pointer');
             }
+
+            d3.selectAll('.station_'+e.target.feature.properties.station_id).classed('highlighted-station',true);
+            var toolTip = d3.select('.ToolTip').style({
+                top:+(e.originalEvent.clientY+5)+'px',
+                left:+(e.originalEvent.clientX+5)+'px',
+                display:'block'
+            });
+
+            toolTip.select('h4')
+                .attr('class','TT_Title')
+                .html(stnCardMeta.posted_route_sign_abbr[feature.properties.type]+'-'+ parseInt(feature.properties.route)+" AADT:"+feature.properties.aadt);
+
+            toolTip.select('span')
+                .attr('class','TT_Content')
+                .html('');
         }
 
         function mousout(e) {
             //var layer = e.target;
             //layer.setStyle(style);
-            d3.selectAll("."+e.target.options.className).attr('stroke-width','3px')
+            d3.selectAll("."+e.target.options.className).attr('stroke-width','3px');
+            d3.select('.ToolTip').style({display:'none'});            
+        }
+
+        function click(e) {
+            var props = e.target.feature.properties;
+            var stations = d3.selectAll('.route_'+props.route)[0].map(function(ds){
+                return  ds.classList[1].split('_')[1];
+            });
+            //console.log('click',stations)
+            ClientActionsCreator.filterStations(stations);
         }
 
         function onEachFeature(feature, layer) {
             layer.on({
                 mouseover: mousover,
-                mouseout: mousout
+                mouseout: mousout,
+                click:click
             });
-            if (feature.properties) {
-                var popupString = '<div class="popup">';
-                        for (var k in feature.properties) {
-                            var v = feature.properties[k];
-                            popupString += k + ': ' + v + '<br />';
-                        }
-                        popupString += '</div>';
-                layer.bindPopup(popupString);
-            }
+
         }
 
         // filters out invalid (empty) geometries in Polymaps county dataset
@@ -345,13 +411,7 @@ var StateIndex = React.createClass({
             // add as base to switch with radio instead of checkbox
         vectorLayer.addTo(map);
             
-    },
-    
-    
-    
-
-    
-
+    }
 });
 
-module.exports = StateIndex;
+module.exports = StateWideMap;

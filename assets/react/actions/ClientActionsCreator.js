@@ -37,6 +37,41 @@ module.exports = {
       year:year
     })
   
+  },
+
+  filterMonth : function(month){
+  
+    AppDispatcher.handleViewAction({
+      type: ActionTypes.FILTER_MONTH,
+      month:month
+    })
+  
+  },
+
+  filterVClass: function(vclass){
+  
+    AppDispatcher.handleViewAction({
+      type: ActionTypes.FILTER_VCLASS,
+      vclass:vclass
+    })
+  
+  },
+
+  filterStations: function(stations){
+  
+    AppDispatcher.handleViewAction({
+      type: ActionTypes.FILTER_STATIONS,
+      stations:stations
+    })
+  
+  },
+  
+  classByMonthInitialized: function(){
+  
+    AppDispatcher.handleViewAction({
+      type: ActionTypes.CBM_INITIALIZED
+    })
+  
   }
 
 };

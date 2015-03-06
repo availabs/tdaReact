@@ -11,7 +11,7 @@ var React = require('react'),
 
 var labelStyle = {
 	width:"100%",
-	"text-align":"center"
+	"textlign":"center"
 }
 
 
@@ -41,7 +41,16 @@ var Filters = React.createClass({
 
     _onChange:function(){
         this.setState(updateClassByMonth());
-        console.log('on change years',this.state.classByMonth.getGroup('year'))
+        if(this.state.classByMonth.getGroup('stationId')){
+            // console.log(
+            //     'on change Filter2',
+            //     this.state.classByMonth.getGroup('stationId')
+            //         .top(Infinity)
+            //         .map(function(d){
+            //             return d.key
+            //         })
+            // )
+        }
     },
 
     _setYearFilter:function(e){
@@ -55,10 +64,10 @@ var Filters = React.createClass({
 
         if(this.state.classByMonth.getGroup('year')){
 
-            var output = this.state.classByMonth.getGroup('year').top(Infinity).map(function(year){
+            var output = this.state.classByMonth.getGroup('year').top(Infinity).map(function(year,i){
 
 
-                return (<li rel="1"><a tabindex="-1" onClick={scope._setYearFilter} value={year.key} className="">20{year.key}</a></li>)
+                return (<li rel="1" key={i}><a tabIndex="-1" onClick={scope._setYearFilter} value={year.key} className="">20{year.key}</a></li>)
                 console.log('test',year)
 
             })
@@ -72,10 +81,10 @@ var Filters = React.createClass({
 
         if(this.state.classByMonth.getGroup('month')){
 
-            var output = this.state.classByMonth.getGroup('month').top(Infinity).map(function(month){
+            var output = this.state.classByMonth.getGroup('month').top(Infinity).map(function(month,i){
 
 
-                return (<li rel="1"><a tabindex="-1" onClick={scope._setmonthFilter} value={month.key} className="">{month.key}</a></li>)
+                return (<li rel="1" key={i}><a tabIndex="-1" onClick={scope._setmonthFilter} value={month.key} className="">{month.key}</a></li>)
                 //console.log('test',year)
 
             })
@@ -99,11 +108,11 @@ var Filters = React.createClass({
                         <div className="controls form-group">
                             <div className="btn-group bootstrap-select col-md-12">
                             	<button className="btn dropdown-toggle clearfix btn-primary btn-lg btn-block" 
-                                    data-toggle="dropdown" id="simple-big" tabindex="-1" aria-expanded="false">
+                                    data-toggle="dropdown" id="simple-big" tabIndex="-1" aria-expanded="false">
                                     <span className="filter-option">{currenYear}</span>&nbsp;<i className="fa fa-caret-down"></i>
                                 </button>
                             	<ul className="dropdown-menu" role="menu" >
-                            		<li rel="0"><a tabindex="-1" onClick={scope._setYearFilter} value={null}>All</a></li>
+                            		<li rel="0"><a tabIndex="-1" onClick={scope._setYearFilter} value={null}>All</a></li>
                                     {years}
                             	</ul>
                             </div>               
@@ -111,9 +120,9 @@ var Filters = React.createClass({
                         <label className="control-label centered" style={labelStyle} ><strong>Months</strong></label>
                         <div className="controls form-group">
                             <div className="btn-group bootstrap-select col-md-12">
-                            	<button className="btn dropdown-toggle clearfix btn-primary btn-lg btn-block" data-toggle="dropdown" id="simple-big" tabindex="-1" aria-expanded="false"><span className="filter-option">Combined</span>&nbsp;<i className="fa fa-caret-down"></i></button>
+                            	<button className="btn dropdown-toggle clearfix btn-primary btn-lg btn-block" data-toggle="dropdown" id="simple-big" tabIndex="-1" aria-expanded="false"><span className="filter-option">Combined</span>&nbsp;<i className="fa fa-caret-down"></i></button>
                             	<ul className="dropdown-menu" role="menu" >
-                            		<li rel="0"><a tabindex="-1" onClick={scope._setYearFilter} value={null}>All</a></li>
+                            		<li rel="0"><a tabIndex="-1" onClick={scope._setYearFilter} value={null}>All</a></li>
                                     {months}
                             	</ul>
                             </div>               
@@ -121,13 +130,16 @@ var Filters = React.createClass({
                         <label className="control-label centered" style={labelStyle} ><strong>ClassName</strong></label>
                         <div className="controls form-group">
                             <div className="btn-group bootstrap-select col-md-12">
-                            	<button className="btn dropdown-toggle clearfix btn-primary btn-lg btn-block" data-toggle="dropdown" id="simple-big" tabindex="-1" aria-expanded="false"><span className="filter-option">All</span>&nbsp;<i className="fa fa-caret-down"></i></button>
+                            	<button className="btn dropdown-toggle clearfix btn-primary btn-lg btn-block" data-toggle="dropdown" id="simple-big" tabIndex="-1" aria-expanded="false"><span className="filter-option">All</span>&nbsp;<i className="fa fa-caret-down"></i></button>
                             	<ul className="dropdown-menu" role="menu" >
-                            		<li rel="0"><a tabindex="-1" href="#" className="">Class 1</a></li>
-                            		<li rel="1"><a tabindex="-1" href="#" className="">Class 2</a></li>
-                            		<li rel="2"><a tabindex="-1" href="#" className="">Class 3</a></li>
+                            		<li rel="0"><a tabIndex="-1" href="#" className="">Class 1</a></li>
+                            		<li rel="1"><a tabIndex="-1" href="#" className="">Class 2</a></li>
+                            		<li rel="2"><a tabIndex="-1" href="#" className="">Class 3</a></li>
                             	</ul>
                             </div>               
+                        </div>
+                        <div>
+
                         </div>
                     </div>
                 </fieldset>

@@ -51,16 +51,25 @@ var GraphContainer = React.createClass({
                     .ADT.order(function(p){return p.avg || 0})
                     .top(Infinity)
                     .filter(function(p){ 
-                        return !isNaN(p.value.avg);
+                        return p.value.avg && !isNaN(p.value.avg);
                     })
-                    .map(function(p){
+                    .map(function(p,i){
+                        if(p.value.monthAvg.length > 12){
+                            
+                            p.value.monthAvg =  p.value.monthAvg.filter(function(d,i){
+                                return i < 12 && !isNaN(d);
+                            })
+                            
+                        
+                        }
                         return p.value.monthAvg
                     });
-                    
+                   
             // console.log(
             //     'update graph',
             //     data,
-            //     data.length
+            //     data.length,
+            //     stationADT
             // )
 
             AdtScale.domain(stationADT.map(function(ADT){

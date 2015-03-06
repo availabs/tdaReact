@@ -2,7 +2,7 @@ var crossfilter = require('crossfilter');
 
 function reduceAddAvg() {
   return function(p,v) {
-    ++p.count
+  	++p.count
     p.sum += +v['f0_'];
     p.avg = p.sum/p.count;
 
@@ -87,7 +87,11 @@ module.exports  = {
 
 			initialized = true;
 			console.timeEnd('crossFIlterData')
-			console.log()
+			console.log(
+				'stations group init',
+				dimensions['ADT']
+					.group( function (d,i){ return d.substr(0,6) })
+			);
 		}
 	},
 	getDimension:function(dim){

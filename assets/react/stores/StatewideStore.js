@@ -15,11 +15,15 @@ var AppDispatcher = require('../dispatcher/AppDispatcher'),
 
     SailsWebApi = require('../utils/api/SailsWebApi'),
     ClassByDayFilter = require('../utils/dataFilters/classByDayFilter.js'),
-    ClassByMonthFilter = require('../utils/dataFilters/classByDayFilter.js');
+    ClassByMonthFilter = require('../utils/dataFilters/classByMonthFilter.js');
 
 var _selectedState = null,
     _classbyDay = {},
-    _classbyMonth = {};
+    _classbyMonth = {},
+    _filters={
+      year:null,
+      stations:[]
+    };
 
 function _setState(fips){
   //console.log('StatewideStore / _setState ',fips)
@@ -27,8 +31,15 @@ function _setState(fips){
 }
 
 function _filterYear(year){
-  ClassByDayFilter.getDimension('year').filter(year);
+  //ClassByDayFilter.getDimension('year').filter(year);
   ClassByMonthFilter.getDimension('year').filter(year);
+}
+
+function _filterStations(stations){
+  ClassByMonthFilter.getDimension('stationId').filterFunction(function(d){
+    //console.log('filter stations',stations.indexOf(d),d)
+    return stations.indexOf(d) >= 0;
+  });
 }
 
 var StatewideStore = assign({}, EventEmitter.prototype, {
@@ -54,7 +65,6 @@ var StatewideStore = assign({}, EventEmitter.prototype, {
   },
 
   getClassByDay:function(){
-    
     //if data is loaded send it
     if(_classbyDay[_selectedState] && _classbyDay[_selectedState] !== 'loading' ){
       ClassByDayFilter.init(_classbyDay[_selectedState],_selectedState);
@@ -77,10 +87,9 @@ var StatewideStore = assign({}, EventEmitter.prototype, {
     //if data is loaded send it
     if(_classbyMonth[_selectedState] && _classbyMonth[_selectedState] !== 'loading' ){
       ClassByMonthFilter.init(_classbyMonth[_selectedState],_selectedState);
-      return ClassByDayFilter;
+      return ClassByMonthFilter;
     }
     
-    //if data hasn't start started loading, load it 
     if(_classbyMonth[_selectedState] !== 'loading'){
       SailsWebApi.getClassByMonth(_selectedState);
       _classbyMonth[_selectedState] = 'loading';
@@ -100,6 +109,7 @@ StatewideStore.dispatchToken = AppDispatcher.register(function(payload) {
 
   switch(action.type) {
 
+   
     case ActionTypes.SET_SELECTED_STATE:
       _setState(action.Id);
       StatewideStore.emitChange();
@@ -110,15 +120,27 @@ StatewideStore.dispatchToken = AppDispatcher.register(function(payload) {
       StatewideStore.emitChange();
     break;
 
+    case ActionTypes.FILTER_STATIONS:
+      _filterStations(action.stations);
+      StatewideStore.emitChange();
+    break;
+
     case ActionTypes.TMG_CLASS_BYDAY:
       _classbyDay[action.fips] = action.data;
       StatewideStore.emitChange();
     break;
 
     case ActionTypes.TMG_CLASS_BYMONTH:
+      //console.log('---------------------------StatewideStore Action1',action.type);
       _classbyMonth[action.fips] = action.data;
       StatewideStore.emitChange();
+      //console.log('StatewideStore Action----------------------------',action.type);
     break;
+
+     case ActionTypes.CBM_INITIALIZED:
+      StatewideStore.emitChange();
+    break;
+
 
     default:
       // do nothing

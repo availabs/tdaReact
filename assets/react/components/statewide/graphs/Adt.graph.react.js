@@ -19,6 +19,7 @@ function getStatefromStores(){
 };
 
 var GraphContainer = React.createClass({
+
     getInitialState: function() {
         return getStatefromStores();
     },
@@ -34,19 +35,22 @@ var GraphContainer = React.createClass({
     },
     
     _onChange:function(){
-        
         this.setState(getStatefromStores());
         var scope = this;
         this.updateGraph();
     },
+
     updateGraph: function(){
         var scope = this;
-        if(Object.keys(this.state.classByMonth.getDimensions()).length > 0){
+        
+
+        if(Object.keys(scope.state.classByMonth.getDimensions()).length > 0){
 
 
             var stationADT = scope.state.classByMonth.getGroups()
                 .ADT.order(function(p){return p.avg})
                 .top(Infinity)
+
 
             AdtScale.domain(stationADT.map(function(ADT){
                 return ADT.value.avg;
@@ -63,23 +67,38 @@ var GraphContainer = React.createClass({
                   .transitionDuration(350)
                   .showXAxis(false);
                 
+                // console.log(
+                //     'AADT GRaph / NV Addgraph',
+                //     scope.state.classByMonth.getGroups()
+                //         .ADT.order(function(p){return p.avg})
+                //         .top(Infinity)
+                //         .filter(function(p){ 
+                //                     return !isNaN(p.value.avg);
+                //         })
+                //         .map(function(d){ 
+                //             return d.value.avg
+                //         })
+                // );
                 d3.select('#adtchart svg')
                     .datum(
                         [{
                             key:"ADT",
                             values:scope.state.classByMonth.getGroups()
-                            .ADT.order(function(p){return p.avg || 0 })
-                            .top(Infinity)
-                            .filter(function(p){ 
-                                return !isNaN(p.value.avg);
-                            })
-                            .map(function (ADT){
-                                return {
-                                    "label":ADT.key,
-                                    "value":ADT.value.avg,
-                                    "color":AdtScale(ADT.value.avg)
-                                }
-                            })
+                                .ADT
+                                .top(Infinity)
+                                .filter(function(p){ 
+                                    return !isNaN(p.value.avg);
+                                })
+                                .sort(function(a,b){
+                                    return b.value.avg-a.value.avg;
+                                })
+                                .map(function (ADT){
+                                    return {
+                                        "label":ADT.key,
+                                        "value":ADT.value.avg,
+                                        "color":AdtScale(ADT.value.avg)
+                                    }
+                                })
                         }]
                     )
                     .call(chart);
