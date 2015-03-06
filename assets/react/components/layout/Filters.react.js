@@ -144,7 +144,7 @@ var Filters = React.createClass({
         var classes = this._getClasses();
 
 
-        if(currenYear !== 'All'){ currenYear = '20'+currenYear; }
+        if(currentYear !== 'All'){ currenYear = '20'+currentYear; }
 
         return (
         	<section className="widget ui-sortable no-padding" style={{background:'none'}}>
