@@ -27,7 +27,9 @@ var Filters = React.createClass({
     getInitialState: function() {
         return {
             classByMonth : StateWideStore.getClassByMonth(),
-            currentYear: null
+            currentYear: null,
+            currentClass: null,
+            currentMonth:null
         }
     },
 
@@ -55,8 +57,20 @@ var Filters = React.createClass({
 
     _setYearFilter:function(e){
         console.log(e.target.getAttribute('value'))
-        this.setState({currenYear:e.target.getAttribute('value')})
+        this.setState({currentYear:e.target.getAttribute('value')})
         ClientActionsCreator.filterYear(e.target.getAttribute('value'));
+    },
+
+    _setMonthFilter:function(e){
+        console.log(e.target.getAttribute('value'))
+        this.setState({currentMonth:e.target.getAttribute('value')})
+        ClientActionsCreator.filterMonth(e.target.getAttribute('value'));
+    },
+
+    _setClassFilter:function(e){
+        console.log(e.target.getAttribute('value'))
+        this.setState({currentClass:e.target.getAttribute('value')})
+        ClientActionsCreator.filterClass(e.target.getAttribute('value'));
     },
 
     _getYears : function(){
@@ -76,15 +90,42 @@ var Filters = React.createClass({
         return;
     },
 
-     _getMonths : function(){
+    _getMonths : function(){
         var scope = this;
 
         if(this.state.classByMonth.getGroup('month')){
 
-            var output = this.state.classByMonth.getGroup('month').top(Infinity).map(function(month,i){
+            var output = this.state.classByMonth.getGroup('month')
+            .top(Infinity)
+            .sort(function(a,b){
+                return +b.key-+a.key
+            })
+            .map(function(month,i){
 
 
-                return (<li rel="1" key={i}><a tabIndex="-1" onClick={scope._setmonthFilter} value={month.key} className="">{month.key}</a></li>)
+                return (<li rel="1" key={i}><a tabIndex="-1" onClick={scope._setMonthFilter} value={month.key} className="">{month.key}</a></li>)
+                //console.log('test',year)
+
+            })
+            return output;
+        }
+        return;
+    },
+
+    _getClasses : function(){
+        var scope = this;
+
+        if(this.state.classByMonth.getGroup('class')){
+
+            var output = this.state.classByMonth.getGroup('class')
+            .top(Infinity)
+            .sort(function(a,b){
+                return +b.key-+a.key
+            })
+            .map(function(vclass,i){
+
+
+                return (<li rel="1" key={i}><a tabIndex="-1" onClick={scope._setClassFilter} value={vclass.key} className="">Class {vclass.key}</a></li>)
                 //console.log('test',year)
 
             })
@@ -95,9 +136,14 @@ var Filters = React.createClass({
 
     render: function() {
         var scope = this;
-        var currenYear = this.state.currenYear || 'All';
+        var currentYear = this.state.currentYear || 'All';
+        var currentMonth = this.state.currentMonth || 'All';
+        var currentClass = this.state.currentClass || 'All';
         var years = this._getYears()
         var months = this._getMonths();
+        var classes = this._getClasses();
+
+
         if(currenYear !== 'All'){ currenYear = '20'+currenYear; }
 
         return (
@@ -109,7 +155,7 @@ var Filters = React.createClass({
                             <div className="btn-group bootstrap-select col-md-12">
                             	<button className="btn dropdown-toggle clearfix btn-primary btn-lg btn-block" 
                                     data-toggle="dropdown" id="simple-big" tabIndex="-1" aria-expanded="false">
-                                    <span className="filter-option">{currenYear}</span>&nbsp;<i className="fa fa-caret-down"></i>
+                                    <span className="filter-option">{currentYear}</span>&nbsp;<i className="fa fa-caret-down"></i>
                                 </button>
                             	<ul className="dropdown-menu" role="menu" >
                             		<li rel="0"><a tabIndex="-1" onClick={scope._setYearFilter} value={null}>All</a></li>
@@ -120,7 +166,11 @@ var Filters = React.createClass({
                         <label className="control-label centered" style={labelStyle} ><strong>Months</strong></label>
                         <div className="controls form-group">
                             <div className="btn-group bootstrap-select col-md-12">
-                            	<button className="btn dropdown-toggle clearfix btn-primary btn-lg btn-block" data-toggle="dropdown" id="simple-big" tabIndex="-1" aria-expanded="false"><span className="filter-option">Combined</span>&nbsp;<i className="fa fa-caret-down"></i></button>
+                            	<button className="btn dropdown-toggle clearfix btn-primary btn-lg btn-block" 
+                                    data-toggle="dropdown" id="simple-big" tabIndex="-1" 
+                                    aria-expanded="false">
+                                    <span className="filter-option">{currentMonth}</span>&nbsp;<i className="fa fa-caret-down"></i>
+                                </button>
                             	<ul className="dropdown-menu" role="menu" >
                             		<li rel="0"><a tabIndex="-1" onClick={scope._setYearFilter} value={null}>All</a></li>
                                     {months}
@@ -130,11 +180,14 @@ var Filters = React.createClass({
                         <label className="control-label centered" style={labelStyle} ><strong>ClassName</strong></label>
                         <div className="controls form-group">
                             <div className="btn-group bootstrap-select col-md-12">
-                            	<button className="btn dropdown-toggle clearfix btn-primary btn-lg btn-block" data-toggle="dropdown" id="simple-big" tabIndex="-1" aria-expanded="false"><span className="filter-option">All</span>&nbsp;<i className="fa fa-caret-down"></i></button>
+                            	<button className="btn dropdown-toggle clearfix btn-primary btn-lg btn-block" 
+                                    data-toggle="dropdown" id="simple-big" tabIndex="-1" 
+                                    aria-expanded="false">
+                                    <span className="filter-option">{currentClass}</span>&nbsp;<i className="fa fa-caret-down"></i>
+                                </button>
                             	<ul className="dropdown-menu" role="menu" >
-                            		<li rel="0"><a tabIndex="-1" href="#" className="">Class 1</a></li>
-                            		<li rel="1"><a tabIndex="-1" href="#" className="">Class 2</a></li>
-                            		<li rel="2"><a tabIndex="-1" href="#" className="">Class 3</a></li>
+                                    <li rel="0"><a tabIndex="-1" onClick={scope._setClassFilter} value={null}>All</a></li>
+                            		{classes}
                             	</ul>
                             </div>               
                         </div>

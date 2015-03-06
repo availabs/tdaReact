@@ -1,15 +1,19 @@
-var crossfilter = require('crossfilter');
-var i = 0;
+// --stores
+var StationStore = require('../../stores/StationStore')
+
+// -- utils
+ 	crossfilter = require('crossfilter');
+
 function reduceAddAvg() {
   return function(p,v) {
   	if(v['numDays'] && v['numDays'] > 0 ){
 	  	++p.count
-	    p.sum += +parseInt(+v['f0_']/v['numDays']);
-	    p.avg = p.sum/p.count;
+	    p.sum += Math.round(+v['f0_']/v['numDays']);
+	    p.avg = p.sum/(p.count/13); //13 is the number of classes
 
 	    ++p.monthCount[+v['month']-1]
-	    p.monthSum[+v['month']-1] +=  +parseInt(+v['f0_']/v['numDays']);
-	    p.monthAvg[+v['month']-1] = Math.round(p.monthSum[+v['month']-1]/p.monthCount[+v['month']-1]);
+	    p.monthSum[+v['month']-1] +=  Math.round(+v['f0_']/v['numDays']);
+	    p.monthAvg[+v['month']-1] = Math.round(p.monthSum[+v['month']-1]/(p.monthCount[+v['month']-1]/13));
 	}
 	return p;
   };
@@ -20,12 +24,12 @@ function reduceRemoveAvg() {
   	if(v['numDays'] && v['numDays'] > 0 ){
 	
 	    --p.count
-	    p.sum -= parseInt(+v['f0_']/v['numDays']);
-	    p.avg = p.sum/p.count;
+	    p.sum -= Math.round(+v['f0_']/v['numDays']);
+	    p.avg = p.sum/(p.count/13);//13 is the number of classes
 
 	    --p.monthCount[+v['month']-1]
-	    p.monthSum[+v['month']-1] -=  +parseInt(v['f0_']/v['numDays']);
-	    p.monthAvg[+v['month']-1] = Math.round(p.monthSum[+v['month']-1]/p.monthCount[+v['month']-1]);
+	    p.monthSum[+v['month']-1] -= Math.round(v['f0_']/v['numDays']);
+	    p.monthAvg[+v['month']-1] = Math.round(p.monthSum[+v['month']-1]/(p.monthCount[+v['month']-1]/13));
 	}
     return p;
   };
@@ -60,13 +64,37 @@ module.exports  = {
 
 			
 		if(dataset !== currentDataSet){
-
 			console.log('class By Month Init',dataset,currentDataSet,data.length);
+			var stationData = {};
+			StationStore.getStateStations(dataset).forEach(function(d){
+				stationData[d.properties.station_id] = d.properties;
+			});
+			//console.log('before data',data.length,data);
+			var total_data = data.map(function(d){
+				d.func_class_code = stationData[d.station_id].func_class_code;
+				d.posted_sign_route_num = parseInt(stationData[d.station_id].posted_sign_route_num);
+				var normalForm = [];
+				for(var i = 1; i <= 13; i++){
+					var row = {}
+					Object.keys(d).forEach(function(key){
+						if(key[0] !== 'f'){
+							row[key] = d[key];
+						}
+					})
+					row['class'] = i;
+					row['f0_'] = +d['f'+i+'_'];
+					normalForm.push(row);
+				}
+				return normalForm;
+			});
+			var total_data = [].concat.apply([],total_data);
+			//console.log('after data',total_data.length,total_data);
+			
 			console.time('CBM crossFIlterData')
 			currentDataSet = dataset;
 
 			
-			classData = crossfilter(data);
+			classData = crossfilter(total_data);
 			all = classData.groupAll(),
 			
 
@@ -81,6 +109,9 @@ module.exports  = {
 
 			dimensions['month'] = classData.dimension(function(d){ return +d.month });
 			groups['month'] = dimensions['month'].group().reduceCount();
+
+			dimensions['class'] = classData.dimension(function(d){ return +d.class });
+			groups['class'] = dimensions['class'].group().reduceCount();
 
 
 			groups['ADT'] = dimensions['ADT']

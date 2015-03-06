@@ -48,8 +48,7 @@ module.exports = {
   
   },
 
-  filterVClass: function(vclass){
-  
+  filterClass: function(vclass){
     AppDispatcher.handleViewAction({
       type: ActionTypes.FILTER_VCLASS,
       vclass:vclass

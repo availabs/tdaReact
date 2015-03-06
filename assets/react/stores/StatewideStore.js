@@ -35,6 +35,18 @@ function _filterYear(year){
   ClassByMonthFilter.getDimension('year').filter(year);
 }
 
+function _filterMonth(data){
+  //ClassByDayFilter.getDimension('year').filter(year);
+  ClassByMonthFilter.getDimension('month').filter(data);
+}
+
+
+function _filterClass(data){
+  //ClassByDayFilter.getDimension('year').filter(year);
+  ClassByMonthFilter.getDimension('class').filter(data);
+}
+
+
 function _filterStations(stations){
   ClassByMonthFilter.getDimension('stationId').filterFunction(function(d){
     //console.log('filter stations',stations.indexOf(d),d)
@@ -117,6 +129,16 @@ StatewideStore.dispatchToken = AppDispatcher.register(function(payload) {
 
     case ActionTypes.FILTER_YEAR:
       _filterYear(action.year);
+      StatewideStore.emitChange();
+    break;
+
+    case ActionTypes.FILTER_MONTH:
+      _filterMonth(action.month);
+      StatewideStore.emitChange();
+    break;
+
+    case ActionTypes.FILTER_VCLASS:
+      _filterClass(action.vclass);
       StatewideStore.emitChange();
     break;
 
