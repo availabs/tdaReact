@@ -94,7 +94,7 @@ var GraphContainer = React.createClass({
         	<section className="widget large" style={{ background:'none'}}>
                 <header>
                     <h4>
-                        {this.props.selectedState}
+                        {this.props.selectedState} {this.props.groupKey}
                     </h4>
                     
                 </header>
