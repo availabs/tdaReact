@@ -153,10 +153,8 @@ StatewideStore.dispatchToken = AppDispatcher.register(function(payload) {
     break;
 
     case ActionTypes.TMG_CLASS_BYMONTH:
-      //console.log('---------------------------StatewideStore Action1',action.type);
       _classbyMonth[action.fips] = action.data;
       StatewideStore.emitChange();
-      //console.log('StatewideStore Action----------------------------',action.type);
     break;
 
      case ActionTypes.CBM_INITIALIZED:

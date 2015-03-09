@@ -6,11 +6,11 @@
  *.
  */
 
-var io = require('./sails.io.js')(),
-  ServerActionCreators = require('../../actions/ServerActionsCreator'),
-  d3 = require('d3'),
-
-  AgencyStore = require('../../stores/AgencyStore');
+//var io =                    require('./sails.io.js')();
+var ServerActionCreators =    require('../../actions/ServerActionsCreator'),
+    d3 =                      require('d3'),
+    fips2state =              require('../data/fips2state'),
+    AgencyStore =             require('../../stores/AgencyStore');
     
 
 module.exports = {
@@ -49,6 +49,17 @@ module.exports = {
     var postData ={database:AgencyStore.getSelectedAgency().datasource,fips:fips};
     d3.json('/tmgClass/byMonth').post(JSON.stringify(postData),function(err,data){
       ServerActionCreators.getClassByMonth(data,fips);
+    });
+  },
+  
+  //---------------------------------------------------
+  // HPMS Data Routes
+  //---------------------------------------------------
+  getHpms : function(fips){
+    console.log('SAILSWEBAPI / getHpms',fips)
+    var state = fips2state[fips].name.replace(/\s/g,'').toLowerCase()+'2012';
+    d3.json('/hpms/'+state,function(err,data){
+      ServerActionCreators.getHpms(data,fips);
     });
   },
 

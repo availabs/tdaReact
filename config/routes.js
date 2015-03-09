@@ -33,6 +33,11 @@ module.exports.routes = {
   //------------------------------
   // Data Routes
   //------------------------------
-  '/tmgClass/byDay' :'TmGClassController.byDay'
+
+  // -- Class  Data
+  '/tmgClass/byDay' :'TmGClassController.byDay',
+  '/tmgClass/byMonth' :'TmGClassController.byMonth',
   
+  // -- Hpms Data
+  '/hpms/:state' : 'HpmsController.getStateData'
 };

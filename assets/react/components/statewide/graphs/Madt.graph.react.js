@@ -11,43 +11,24 @@ var React = require('react'),
     colorRange = colorbrewer.RdBu[5],
     AdtScale = d3.scale.quantile().domain([0,70000]).range(colorRange);
 
-function getStatefromStores(){
-    return {
-        selectedState : StateWideStore.getSelectedState(),
-        classByMonth : StateWideStore.getClassByMonth()
-    }
-};
-
 var GraphContainer = React.createClass({
-    getInitialState: function() {
-        return getStatefromStores();
+    
+    getDefaultProps:function(){
+        return {
+            height: 300,
+            classByMonth:StateWideStore.getClassByMonth()
+        }
     },
     
-    componentDidMount: function() {
-
-        StateWideStore.addChangeListener(this._onChange);
-        
-    },
-    
-    componentWillUnmount: function() {
-        StateWideStore.removeChangeListener(this._onChange);
-    },
-    
-    _onChange:function(){
-        
-        this.setState(getStatefromStores());
+    _updateGraph: function(){
         var scope = this;
-        this.updateGraph();
-    },
-    updateGraph: function(){
-        var scope = this;
-        if(Object.keys(this.state.classByMonth.getDimensions()).length > 0){
+        if(Object.keys(this.props.classByMonth.getDimensions()).length > 0){
 
-            var stationADT = scope.state.classByMonth.getGroups()
+            var stationADT = scope.props.classByMonth.getGroups()
                 .ADT.order(function(p){return p.avg})
                 .top(Infinity)
 
-             var data = scope.state.classByMonth.getGroups()
+             var data = scope.props.classByMonth.getGroups()
                     .ADT.order(function(p){return p.avg || 0})
                     .top(Infinity)
                     .filter(function(p){ 
@@ -90,7 +71,7 @@ var GraphContainer = React.createClass({
                     .datum(
                         
                             
-                            scope.state.classByMonth.getGroups()
+                            scope.props.classByMonth.getGroups()
                             .ADT.order(function(p){return p.avg})
                             .top(Infinity)
                             .map(function (ADT){
@@ -122,11 +103,12 @@ var GraphContainer = React.createClass({
         var widgetStyle = {
             background:'none'
         }
+        this._updateGraph();
         return (
         	<section className="widget large" style={{ background:'none'}}>
                 <header>
                     <h4>
-                        {this.state.selectedState}
+                        {this.props.selectedState}
                     </h4>
                     
                 </header>

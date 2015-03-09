@@ -64,12 +64,20 @@ module.exports.connections = {
   // Run:
   // npm install sails-postgresql
   //
- lorPostgress: {
+  lorPostgress: {
     adapter: 'sails-postgresql',
     host: '169.226.142.154',//'lor.availabs.org',
     user: 'postgres',
     password: 'transit',
     database: 'wimClient'
+  },
+  hpms:{
+    module: 'sails-postgresql',
+    host: 'lor.availabs.org',
+    user: 'postgres',
+    database:'HPMS',
+    port: 5432,
+    pool: true
   }
 
 

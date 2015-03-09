@@ -79,11 +79,7 @@ var Filters = React.createClass({
         if(this.state.classByMonth.getGroup('year')){
 
             var output = this.state.classByMonth.getGroup('year').top(Infinity).map(function(year,i){
-
-
                 return (<li rel="1" key={i}><a tabIndex="-1" onClick={scope._setYearFilter} value={year.key} className="">20{year.key}</a></li>)
-                console.log('test',year)
-
             })
             return output;
         }
@@ -101,11 +97,7 @@ var Filters = React.createClass({
                 return +b.key-+a.key
             })
             .map(function(month,i){
-
-
-                return (<li rel="1" key={i}><a tabIndex="-1" onClick={scope._setMonthFilter} value={month.key} className="">{month.key}</a></li>)
-                //console.log('test',year)
-
+                return (<li rel="1" key={i} value={month.key}><a tabIndex="-1" onClick={scope._setMonthFilter} value={month.key} className="">{month.key}</a></li>)
             })
             return output;
         }
@@ -123,11 +115,7 @@ var Filters = React.createClass({
                 return +b.key-+a.key
             })
             .map(function(vclass,i){
-
-
-                return (<li rel="1" key={i}><a tabIndex="-1" onClick={scope._setClassFilter} value={vclass.key} className="">Class {vclass.key}</a></li>)
-                //console.log('test',year)
-
+                return (<li rel="1" key={i} value={vclass.key} ><a tabIndex="-1" onClick={scope._setClassFilter} value={vclass.key} className="">Class {vclass.key}</a></li>)
             })
             return output;
         }
@@ -136,6 +124,7 @@ var Filters = React.createClass({
 
     render: function() {
         var scope = this;
+        //console.log('FILTERS/ render',this.state.currentYear)
         var currentYear = this.state.currentYear || 'All';
         var currentMonth = this.state.currentMonth || 'All';
         var currentClass = this.state.currentClass || 'All';
@@ -144,7 +133,7 @@ var Filters = React.createClass({
         var classes = this._getClasses();
 
 
-        if(currentYear !== 'All'){ currenYear = '20'+currentYear; }
+        if(currentYear !== 'All'){ currentYear = '20'+currentYear; }
 
         return (
         	<section className="widget ui-sortable no-padding" style={{background:'none'}}>
@@ -172,7 +161,7 @@ var Filters = React.createClass({
                                     <span className="filter-option">{currentMonth}</span>&nbsp;<i className="fa fa-caret-down"></i>
                                 </button>
                             	<ul className="dropdown-menu" role="menu" >
-                            		<li rel="0"><a tabIndex="-1" onClick={scope._setYearFilter} value={null}>All</a></li>
+                            		<li rel="0"><a tabIndex="-1" onClick={scope._setMonthFilter} value={null}>All</a></li>
                                     {months}
                             	</ul>
                             </div>               

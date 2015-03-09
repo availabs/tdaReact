@@ -31,6 +31,7 @@ module.exports = {
       fips: fips
     })
   },
+  
   getClassByMonth : function(data,fips){
     AppDispatcher.handleServerAction({
       type: ActionTypes.TMG_CLASS_BYMONTH,
@@ -38,7 +39,18 @@ module.exports = {
       fips: fips
     })
   },
-  
+
+  //------------------------------------
+  // Hpms Data
+  //------------------------------------
+  getHpms : function(data,fips){
+    AppDispatcher.handleServerAction({
+      type: ActionTypes.RECEIEVE_STATE_HPMS,
+      data: data,
+      fips: fips
+    })
+  },
+
   //------------------------------------
   // User
   //------------------------------------

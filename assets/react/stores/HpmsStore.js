@@ -14,10 +14,10 @@ var AppDispatcher = require('../dispatcher/AppDispatcher'),
     CHANGE_EVENT = 'change',
 
     SailsWebApi = require('../utils/api/SailsWebApi'),
-    ClassByDayFilter = require('../utils/dataFilters/classByDayFilter.js');
+    hpmsFilter = require('../utils/dataFilters/hpmsFilter.js');
 
 var _selectedState = null,
-    _classbyDay = {};
+    _hpms = {};
 
 function _setState(fips){
   //console.log('HpmsStore / _setState ',fips)
@@ -25,7 +25,7 @@ function _setState(fips){
 }
 
 function _filterYear(year){
-  ClassByDayFilter.getDimension('year').filter(year);
+  hpmsFilter.getDimension('year').filter(year);
 }
 
 var HpmsStore = assign({}, EventEmitter.prototype, {
@@ -50,24 +50,24 @@ var HpmsStore = assign({}, EventEmitter.prototype, {
     return _selectedState;
   },
 
-  getClassByDay:function(){
+  getStateData:function(){
     
     //if data is loaded send it
-    //console.log('HpmsStore / getClassByDay',_selectedState);
-    if(_classbyDay[_selectedState] && _classbyDay[_selectedState] !== 'loading' ){
-      ClassByDayFilter.init(_classbyDay[_selectedState],_selectedState);
-      return ClassByDayFilter;
+    //console.log('HpmsStore / gethpms',_selectedState);
+    if(_hpms[_selectedState] && _hpms[_selectedState] !== 'loading' ){
+      hpmsFilter.init(_hpms[_selectedState],_selectedState);
+      return hpmsFilter;
     }
     
     //if data hasn't start started loading, load it 
-    if(_classbyDay[_selectedState] !== 'loading'){
-      SailsWebApi.getClassByDay(_selectedState);
-      _classbyDay[_selectedState] = 'loading';
+    if(_selectedState && _hpms[_selectedState] !== 'loading'){
+      SailsWebApi.getHpms(_selectedState);
+      _hpms[_selectedState] = 'loading';
     }
 
     //if requested data isn't loaded send most recent data
     // may want to rethink this
-    return ClassByDayFilter;
+    return hpmsFilter;
   }
 
 
@@ -89,8 +89,9 @@ HpmsStore.dispatchToken = AppDispatcher.register(function(payload) {
       HpmsStore.emitChange();
     break;
 
-    case ActionTypes.TMG_CLASS_BYDAY:
-      _classbyDay[action.fips] = action.data;
+    case ActionTypes.RECEIEVE_STATE_HPMS:
+     
+      _hpms[action.fips] = action.data;
       HpmsStore.emitChange();
     break;
 

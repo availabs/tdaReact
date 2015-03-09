@@ -5,7 +5,7 @@ var React = require('react'),
     nv = require('../../../utils/dependencies/nvd3'), 
 
     //-- Stores
-    StateWideStore = require('../../../stores/StatewideStore'),
+    HpmsStore = require('../../../stores/HpmsStore'),
 
     //-- Utils
     colorRange = colorbrewer.RdBu[5],
@@ -19,7 +19,8 @@ var GraphContainer = React.createClass({
     getDefaultProps:function(){
         return {
             height: 300,
-            classByMonth:StateWideStore.getClassByMonth()
+            hpmsData:HpmsStore.getStateData(),
+            groupKey:'type_vdt'
         }
     },
 
@@ -27,17 +28,20 @@ var GraphContainer = React.createClass({
     _updateGraph: function(){
         var scope = this;
         
+        if(Object.keys(scope.props.hpmsData.getDimensions()).length > 0){
 
-        if(Object.keys(scope.props.classByMonth.getDimensions()).length > 0){
-
-
-            var stationADT = scope.props.classByMonth.getGroups()
-                .ADT.order(function(p){return p.avg})
+            var stationADT = scope.props.hpmsData.getGroups()[scope.props.groupKey].order(function(p){return p.value})
                 .top(Infinity)
+
+            console.log('HpmsType / updateGraph',
+                scope.props.hpmsData,
+                stationADT
+            );
+            
 
 
             AdtScale.domain(stationADT.map(function(ADT){
-                return ADT.value.avg;
+                return ADT.value;
             }));
             //console.log('draw graph');
             //var colorScale = d3.scale.quantile
@@ -51,24 +55,21 @@ var GraphContainer = React.createClass({
                   .transitionDuration(350)
                   .showXAxis(false);
                 
-                d3.select('#adtchart svg')
+                d3.select("#hpmschart_"+scope.props.groupKey+' svg')
                     .datum(
                         [{
-                            key:"ADT",
-                            values:scope.props.classByMonth.getGroups()
-                                .ADT
+                            key:"type_vdt",
+                            values:scope.props.hpmsData.getGroups()[scope.props.groupKey]
                                 .top(Infinity)
-                                .filter(function(p){ 
-                                    return !isNaN(p.value.avg);
-                                })
+                                
                                 .sort(function(a,b){
-                                    return b.value.avg-a.value.avg;
+                                    return b.value-a.value;
                                 })
                                 .map(function (ADT){
                                     return {
                                         "label":ADT.key,
-                                        "value":ADT.value.avg,
-                                        "color":AdtScale(ADT.value.avg)
+                                        "value":ADT.value,
+                                        "color":AdtScale(ADT.value)
                                     }
                                 })
                         }]
@@ -81,12 +82,14 @@ var GraphContainer = React.createClass({
             });
        }
     },
+
     render: function() {
         var svgStyle = {
           height: this.props.height+'px',
           width: '100%'
         };
         this._updateGraph();
+        var id = "hpmschart_"+this.props.groupKey;
         return (
         	<section className="widget large" style={{ background:'none'}}>
                 <header>
@@ -96,7 +99,7 @@ var GraphContainer = React.createClass({
                     
                 </header>
                 <div className="body">
-                    <div id="adtchart">
+                    <div id={id}>
                         <svg style={svgStyle}></svg>
                     </div>
                 </div>

@@ -28,7 +28,6 @@ module.exports = {
 
     //---STATIONS--------------------------------------------
     RECEIVE_STATIONS:null,
-
     RECEIVE_AGENCYS:null,
     
     //-------User--------------------------------------------
@@ -37,7 +36,8 @@ module.exports = {
 
     //-------Data--------------------------------------------
     TMG_CLASS_BYDAY: null,
-    TMG_CLASS_BYMONTH: null
+    TMG_CLASS_BYMONTH: null,
+    RECEIEVE_STATE_HPMS:null
 
   }),
 
