@@ -69,14 +69,15 @@ module.exports.connections = {
     host: '169.226.142.154',//'lor.availabs.org',
     user: 'postgres',
     password: 'transit',
-    database: 'wimClient'
+    database: 'wimClient',
+    pool: true
   },
   hpms:{
-    module: 'sails-postgresql',
+    adapter: 'sails-postgresql',
     host: 'lor.availabs.org',
     user: 'postgres',
     database:'HPMS',
-    port: 5432,
+    password: 'transit',
     pool: true
   }
 
