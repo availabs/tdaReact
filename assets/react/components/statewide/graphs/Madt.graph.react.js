@@ -3,13 +3,15 @@ var React = require('react'),
     d3 = require('d3'),
     colorbrewer = require('colorbrewer'),
     nv = require('../../../utils/dependencies/nvd3'), 
+    fips2state = require('../../../utils/data/fips2state'),
 
     //-- Stores
     StateWideStore = require('../../../stores/StatewideStore'),
 
     //-- Utils
     colorRange = colorbrewer.RdBu[5],
-    AdtScale = d3.scale.quantile().domain([0,70000]).range(colorRange);
+    AdtScale = d3.scale.quantile().domain([0,70000]).range(colorRange),
+    months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
 var GraphContainer = React.createClass({
     
@@ -61,7 +63,15 @@ var GraphContainer = React.createClass({
                   .showLegend(false)
                   .useInteractiveGuideline(false)       //Don't show tooltips
                   .transitionDuration(350)
-                  .showXAxis(false);
+                  .showXAxis(true);
+
+                chart.xAxis     //Chart x-axis settings
+                    .axisLabel('Months')
+                    .tickFormat(function(d){
+                        return months[d];
+                    })
+               
+
 
                 
                 d3.select('#madtchart_'+scope.props.index+' svg')
@@ -76,7 +86,7 @@ var GraphContainer = React.createClass({
                             })
                             .map(function (ADT){
                                 return {
-                                    "key":ADT.key,
+                                    "key":(ADT.key),
                                     "values":ADT.value.monthAvg.map(function(d,i){ 
                                         var value = d.reduce(function(a,b){ return a+b}) || 0;
                                         if(scope.props.graphType === 'season'){
@@ -102,6 +112,7 @@ var GraphContainer = React.createClass({
     },
 
     render: function() {
+        var scope = this;
         var svgStyle = {
           height: '300px',
           width: '100%'
@@ -112,12 +123,24 @@ var GraphContainer = React.createClass({
         this._updateGraph();
         
         var id = "madtchart_"+this.props.index;
+        var headerStyle = {
+            backgroundColor:'none',
+            width:'100%',
+            padding:'5px',
+            marginLeft:'-10px',
+            fontWeight:'700',
+            display: Object.keys(scope.props.classByMonth.getDimensions()).length > 0 ? 'block' : 'none'
+        }
+
+        var state = fips2state[this.props.selectedState] ? fips2state[this.props.selectedState].name : '';
+        var title = state;
+            title += this.props.graphType === 'count' ?  ' Monthly Average Daily Traffic' : ' MADT / AADT';
         
         return (
         	<section className="widget large" style={{ background:'none'}}>
                 <header>
-                    <h4>
-                        {this.props.selectedState}
+                    <h4 style={headerStyle}>
+                        {title}
                     </h4>
                     
                 </header>

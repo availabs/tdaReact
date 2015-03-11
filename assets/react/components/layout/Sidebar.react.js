@@ -67,8 +67,9 @@ var Sidebar = React.createClass({
         });
 
         return (
-          	<nav id="sidebar" className="sidebar nav-collapse collapse">
-                <ul id="side-nav" className="side-nav">
+          	<nav id="sidebar" className="sidebar nav-collapse collapse"
+                data-spy="affix" data-offset-top="60" >
+                <ul id="side-nav" className="side-nav" >
                 	{menus}
             	</ul>
                 <Filters />

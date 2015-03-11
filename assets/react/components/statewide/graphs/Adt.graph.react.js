@@ -2,7 +2,8 @@
 var React = require('react'),
     d3 = require('d3'),
     colorbrewer = require('colorbrewer'),
-    nv = require('../../../utils/dependencies/nvd3'), 
+    nv = require('../../../utils/dependencies/nvd3'),
+    fips2state = require('../../../utils/data/fips2state'),
 
     //-- Stores
     StateWideStore = require('../../../stores/StatewideStore'),
@@ -12,6 +13,9 @@ var React = require('react'),
     AdtScale = d3.scale.quantile().domain([0,70000]).range(colorRange);
 
 
+var removeLabels = function(){
+    d3.selectAll('#adtchart svg .nv-x .tick text').text('')
+}
 
 var GraphContainer = React.createClass({
 
@@ -53,11 +57,16 @@ var GraphContainer = React.createClass({
                 var chart = nv.models.discreteBarChart()
                   .x(function(d) { return d.label })    //Specify the data accessors.
                   .y(function(d) { return d.value })
-                  .staggerLabels(true)    //Too many bars and not enough room? Try staggering labels.
+                  .staggerLabels(false)    //Too many bars and not enough room? Try staggering labels.
                   .tooltips(true)        //Don't show tooltips
                   .showValues(false)       //...instead, show the bar value right on top of each bar.
                   .transitionDuration(350)
-                  .showXAxis(false);
+                  .showXAxis(true);
+
+                chart.xAxis     //Chart x-axis settings
+                    .axisLabel('Stations')
+                    
+
                 
                 d3.select('#adtchart svg')
                     .datum(
@@ -83,24 +92,40 @@ var GraphContainer = React.createClass({
                         }]
                     )
                     .call(chart);
-
+                removeLabels();
                 nv.utils.windowResize(chart.update);
-
+                nv.utils.windowResize(removeLabels);
+                
                 return chart;
             });
+            
        }
+       
     },
     render: function() {
+        var scope = this;
+        this._updateGraph();
         var svgStyle = {
           height: this.props.height+'px',
           width: '100%'
-        };
-        this._updateGraph();
+        },
+        headerStyle = {
+            backgroundColor:'none',
+            width:'100%',
+            padding:'5px',
+            marginLeft:'-10px',
+            fontWeight:'700',
+            display: Object.keys(scope.props.classByMonth.getDimensions()).length > 0 ? 'block' : 'none'
+        }
+
+        var state = fips2state[this.props.selectedState] ? fips2state[this.props.selectedState].name : '';
+        var title = state +' Annual Average Daily Traffic';
+        
         return (
         	<section className="widget large" style={{ background:'none'}}>
                 <header>
-                    <h4>
-                        {this.props.selectedState}
+                    <h4 style={headerStyle}>
+                        {title}
                     </h4>
                     
                 </header>

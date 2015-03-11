@@ -268,15 +268,15 @@ var StateWideMap = React.createClass({
                         
                     }
                 });
-                if (feature.properties) {
-                    var popupString = '<div class="popup">';
-                            for (var k in feature.properties) {
-                                var v = feature.properties[k];
-                                popupString += k + ': ' + v + '<br />';
-                            }
-                            popupString += '</div>';
-                    layer.bindPopup(popupString);
-                }
+                // if (feature.properties) {
+                //     var popupString = '<div class="popup">';
+                //             for (var k in feature.properties) {
+                //                 var v = feature.properties[k];
+                //                 popupString += k + ': ' + v + '<br />';
+                //             }
+                //             popupString += '</div>';
+                //     layer.bindPopup(popupString);
+                // }
             }
         });
         stationLayer.addTo(map);
