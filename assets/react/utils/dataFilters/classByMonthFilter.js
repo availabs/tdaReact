@@ -6,14 +6,21 @@ var StationStore = require('../../stores/StationStore')
 
 function reduceAddAvg() {
   return function(p,v) {
-  	if(v['numDays'] && v['numDays'] > 0 ){
+  	if(v['numDays'] && v['numDays'] > 0 && +v['class'] >=1 && +v['class'] <= 13 && +v['month'] >=1 && +v['month'] <= 12){
 	  	++p.count
 	    p.sum += Math.round(+v['f0_']/v['numDays']);
 	    p.avg = p.sum/(p.count/13); //13 is the number of classes
 
-	    ++p.monthCount[+v['month']-1]
-	    p.monthSum[+v['month']-1] +=  Math.round(+v['f0_']/v['numDays']);
-	    p.monthAvg[+v['month']-1] = Math.round(p.monthSum[+v['month']-1]/(p.monthCount[+v['month']-1]/13));
+	   
+	    ++p.monthCount[+v['month']-1][+v['class']-1]
+	    p.monthSum[+v['month']-1][+v['class']-1] +=  Math.round(+v['f0_']/v['numDays']);
+	    p.monthAvg[+v['month']-1][+v['class']-1] =  Math.round(p.monthSum[+v['month']-1][+v['class']-1]/(p.monthCount[+v['month']-1][+v['class']-1])) || 0;
+
+	    
+	    ++p.classCount[+v['class']-1]
+	    p.classSum[+v['class']-1] +=  Math.round(+v['f0_']/v['numDays']) || 0;
+	    p.classAvg[+v['class']-1] = Math.round(p.classSum[+v['class']-1]/(p.classCount[+v['class']-1])) || 0;
+		
 	}
 	return p;
   };
@@ -21,15 +28,20 @@ function reduceAddAvg() {
 
 function reduceRemoveAvg() {
   return function(p,v) {
-  	if(v['numDays'] && v['numDays'] > 0 ){
+  	if(v['numDays'] && v['numDays'] > 0 && +v['class'] >=1 && +v['class'] <= 13 && +v['month'] >=1 && +v['month'] <= 12){
 	
 	    --p.count
 	    p.sum -= Math.round(+v['f0_']/v['numDays']);
 	    p.avg = p.sum/(p.count/13);//13 is the number of classes
+	    
+	    --p.monthCount[+v['month']-1][+v['class']-1]
+	    p.monthSum[+v['month']-1][+v['class']-1] -=  Math.round(+v['f0_']/v['numDays']);
+	    p.monthAvg[+v['month']-1][+v['class']-1] = Math.round(p.monthSum[+v['month']-1][+v['class']-1]/(p.monthCount[+v['month']-1][+v['class']-1])) || 0;
 
-	    --p.monthCount[+v['month']-1]
-	    p.monthSum[+v['month']-1] -= Math.round(v['f0_']/v['numDays']);
-	    p.monthAvg[+v['month']-1] = Math.round(p.monthSum[+v['month']-1]/(p.monthCount[+v['month']-1]/13));
+        --p.classCount[+v['class']-1]
+	    p.classSum[+v['class']-1] -= Math.round(v['f0_']/v['numDays']) || 0;
+	    p.classAvg[+v['class']-1] = Math.round(p.classSum[+v['class']-1]/(p.classCount[+v['class']-1])) || 0;
+
 	}
     return p;
   };
@@ -38,9 +50,13 @@ function reduceRemoveAvg() {
 function reduceInitAvg() {
   return {
   			count:0, sum:0, avg:0,
-  			monthSum: [0,0,0,0,0,0,0,0,0,0,0,0],
-  			monthCount: [0,0,0,0,0,0,0,0,0,0,0,0],
-  			monthAvg:  [0,0,0,0,0,0,0,0,0,0,0,0]
+  			classSum: [0,0,0,0,0,0,0,0,0,0,0,0,0],
+  			classCount: [0,0,0,0,0,0,0,0,0,0,0,0,0],
+  			classAvg:  [0,0,0,0,0,0,0,0,0,0,0,0,0],
+
+  			monthSum: [0,0,0,0,0,0,0,0,0,0,0,0].map(function(d){ return [0,0,0,0,0,0,0,0,0,0,0,0,0] }),
+  			monthCount: [0,0,0,0,0,0,0,0,0,0,0,0].map(function(d){ return [0,0,0,0,0,0,0,0,0,0,0,0,0] }),
+  			monthAvg:  [0,0,0,0,0,0,0,0,0,0,0,0].map(function(d){ return [0,0,0,0,0,0,0,0,0,0,0,0,0] })
   		};
 }
 
@@ -71,8 +87,10 @@ module.exports  = {
 			});
 			//console.log('before data',data.length,data);
 			var total_data = data.map(function(d){
-				d.func_class_code = stationData[d.station_id].func_class_code;
-				d.posted_sign_route_num = parseInt(stationData[d.station_id].posted_sign_route_num);
+				if(stationData[d.station_id]){
+					d.func_class_code = stationData[d.station_id].func_class_code || 0;
+					d.posted_sign_route_num = parseInt(stationData[d.station_id].posted_sign_route_num) || 0;
+				}
 				var normalForm = [];
 				for(var i = 1; i <= 13; i++){
 					var row = {}

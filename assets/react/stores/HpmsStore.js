@@ -25,7 +25,7 @@ function _setState(fips){
 }
 
 function _filterYear(year){
-  hpmsFilter.getDimension('year').filter(year);
+  //hpmsFilter.getDimension('year').filter(year);
 }
 
 var HpmsStore = assign({}, EventEmitter.prototype, {
@@ -84,10 +84,10 @@ HpmsStore.dispatchToken = AppDispatcher.register(function(payload) {
       HpmsStore.emitChange();
     break;
 
-    case ActionTypes.FILTER_YEAR:
-      _filterYear(action.year);
-      HpmsStore.emitChange();
-    break;
+    // case ActionTypes.FILTER_YEAR:
+    //   _filterYear(action.year);
+    //   HpmsStore.emitChange();
+    // break;
 
     case ActionTypes.RECEIEVE_STATE_HPMS:
      

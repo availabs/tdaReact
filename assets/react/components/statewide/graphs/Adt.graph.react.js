@@ -32,12 +32,20 @@ var GraphContainer = React.createClass({
 
 
             var stationADT = scope.props.classByMonth.getGroups()
-                .ADT.order(function(p){return p.avg})
+                .ADT.order(function(p){return p.classAvg.reduce( function(a,b){ return a+b}) })
                 .top(Infinity)
+                .filter(function(p){ 
+                    var value = p.value.classAvg.reduce( function(a,b){ return a+b});
+                    return !isNaN(value) && value > 0;
+                });
 
+           // console.log(
+           //      'update graph',
+           //      stationADT
+           //  )
 
             AdtScale.domain(stationADT.map(function(ADT){
-                return ADT.value.avg;
+                return ADT.value.classAvg.reduce( function(a,b){ return a+b});
             }));
             //console.log('draw graph');
             //var colorScale = d3.scale.quantile
@@ -59,16 +67,17 @@ var GraphContainer = React.createClass({
                                 .ADT
                                 .top(Infinity)
                                 .filter(function(p){ 
-                                    return !isNaN(p.value.avg);
+                                    var value = p.value.classAvg.reduce( function(a,b){ return a+b});
+                                    return !isNaN(value) && value > 0;
                                 })
                                 .sort(function(a,b){
-                                    return b.value.avg-a.value.avg;
+                                    return b.value.classAvg.reduce( function(a,b){ return a+b})-a.value.classAvg.reduce( function(a,b){ return a+b});
                                 })
                                 .map(function (ADT){
                                     return {
                                         "label":ADT.key,
-                                        "value":ADT.value.avg,
-                                        "color":AdtScale(ADT.value.avg)
+                                        "value":ADT.value.classAvg.reduce( function(a,b){ return a+b}),
+                                        "color":AdtScale(ADT.value.classAvg.reduce( function(a,b){ return a+b}))
                                     }
                                 })
                         }]

@@ -33,12 +33,7 @@ var GraphContainer = React.createClass({
             var stationADT = scope.props.hpmsData.getGroups()[scope.props.groupKey].order(function(p){return p.value})
                 .top(Infinity)
 
-            console.log('HpmsType / updateGraph',
-                scope.props.hpmsData,
-                stationADT
-            );
             
-
 
             AdtScale.domain(stationADT.map(function(ADT){
                 return ADT.value;
@@ -61,17 +56,20 @@ var GraphContainer = React.createClass({
                             key:"type_vdt",
                             values:scope.props.hpmsData.getGroups()[scope.props.groupKey]
                                 .top(Infinity)
-                                
                                 .sort(function(a,b){
                                     return b.value-a.value;
                                 })
-                                .map(function (ADT){
-                                    return {
-                                        "label":ADT.key,
-                                        "value":ADT.value,
-                                        "color":AdtScale(ADT.value)
+                                .map(function (ADT,i){
+                                    if(i>0 && i < 30){
+                                        return {
+                                            "label":ADT.key,
+                                            "value":ADT.value,
+                                            "color":AdtScale(ADT.value)
+                                        }
                                     }
+                                    return;
                                 })
+                                .filter(function(d){ return d; })
                         }]
                     )
                     .call(chart);

@@ -16,9 +16,7 @@ var GraphContainer = React.createClass({
     getDefaultProps:function(){
         return {
             height: 300,
-            classByMonth:StateWideStore.getClassByMonth(),
-            graphType:'count',
-            index:0
+            classByMonth:StateWideStore.getClassByMonth()
         }
     },
     
@@ -38,9 +36,12 @@ var GraphContainer = React.createClass({
                     })
                     .map(function(p,i){
                         if(p.value.monthAvg.length > 12){
+                            
                             p.value.monthAvg =  p.value.monthAvg.filter(function(d,i){
                                 return i < 12 && !isNaN(d);
                             })
+                            
+                        
                         }
                         return p.value.monthAvg.reduce(function(a,b){ return a+b})
                     });
@@ -64,7 +65,7 @@ var GraphContainer = React.createClass({
                   .showXAxis(false);
 
                 
-                d3.select('#madtchart_'+scope.props.index+' svg')
+                d3.select('#madtchart svg')
                     .datum(
                         
                             
@@ -72,6 +73,7 @@ var GraphContainer = React.createClass({
                             .ADT.order(function(p){return p.avg})
                             .top(Infinity)
                             .filter(function(d){ 
+                                //console.log(d)
                                 return d.value.avg  
                             })
                             .map(function (ADT){
@@ -79,13 +81,7 @@ var GraphContainer = React.createClass({
                                     "key":ADT.key,
                                     "values":ADT.value.monthAvg.map(function(d,i){ 
                                         var value = d.reduce(function(a,b){ return a+b}) || 0;
-                                        if(scope.props.graphType === 'season'){
-                                            value = value / ADT.value.classAvg.reduce( function(a,b){ return a+b})
-                                        }
-                                        if(value === Infinity){
-                                            value = 0
-                                        }
-                                        return {month:i,y:value}
+                                        return {month:i,y:value} 
                                     }),
                                     "color":AdtScale(ADT.value.avg || 0)
                                 }
@@ -110,9 +106,6 @@ var GraphContainer = React.createClass({
             background:'none'
         }
         this._updateGraph();
-        
-        var id = "madtchart_"+this.props.index;
-        
         return (
         	<section className="widget large" style={{ background:'none'}}>
                 <header>
@@ -122,7 +115,7 @@ var GraphContainer = React.createClass({
                     
                 </header>
                 <div className="body">
-                    <div id={id} >
+                    <div id="madtchart">
                         <svg style={svgStyle}></svg>
                     </div>
                 </div>

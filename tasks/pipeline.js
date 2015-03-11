@@ -17,8 +17,6 @@
 var cssFilesToInject = [
   'styles/white/application.css',
   'bower_components/leaflet/dist/leaflet.css',
-  'styles/availmap.css',
-  'styles/mapbox-gl.css',
   'styles/custom.css',
   
 ];

@@ -56,6 +56,7 @@ var StateIndex = React.createClass({
         return (
             <div className="content container">
                 <div className="row">
+                
                     <div className="col-md-8">
                         <section className="widget whitesmoke no-padding">
                             <div className="body no-margin">
@@ -67,10 +68,18 @@ var StateIndex = React.createClass({
                         <AdtGraph  classByMonth={this.state.classByMonth} selectedState={this.state.selectedState} />
                     </div>
                     <div className="col-md-4">
-                        <MadtGraph  classByMonth={this.state.classByMonth} selectedState={this.state.selectedState}/>
+                        <MadtGraph  classByMonth={this.state.classByMonth} selectedState={this.state.selectedState} index='0' />
                     </div>
                     
                 </div>
+                
+                <div className="row">
+                    <h2> Seasonality</h2>
+                    <div className="col-md-6">
+                        <MadtGraph classByMonth={this.state.classByMonth} selectedState={this.state.selectedState} graphType='season' index='1' />
+                    </div>
+                </div>
+
                 <div className="row">
                     <div className="col-md-6">
                         <HpmsTypeGraph  hpmsData={this.state.hpmsData} selectedState={this.state.selectedState} groupKey='type_vdt' />
