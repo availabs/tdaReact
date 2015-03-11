@@ -36,7 +36,7 @@ var ToolTip = React.createClass({
 			minWidth:'100px',
 			// width:this.props.size.width,
 			// height:this.props.size.height,
-			zIndex:100
+			zIndex:1000
 		
 		}
 		headerStyle = {
