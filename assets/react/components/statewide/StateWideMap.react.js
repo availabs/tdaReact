@@ -14,7 +14,7 @@ var React = require('react'),
     ClientActionsCreator = require('../../actions/ClientActionsCreator'),
 
     // -- Utils
-    L =                 require('../../utils/dependencies/leaflet.7.3.min'),
+    L =                 require('../../utils/dependencies/leaflet.8.0.min'),
     d3 =                require('d3'),
     topojson =          require('topojson'),
     colorbrewer =       require('colorbrewer'),
@@ -95,11 +95,16 @@ var StateWideMap = React.createClass({
                         click: scope.stateClick,
                         mouseover: function(e){
                             var layer = e.target;
+                            //console.log(layer);
                             if(layer._path.className.baseVal.split(' ').indexOf('active_geo') < 0){
                                 layer.setStyle({
                                     stroke:false,
                                     fillOpacity:0.3
                                 });
+                            }
+                            
+                            if (!L.Browser.ie && !L.Browser.opera) {
+                                layer.bringToFront();
                             }
 
                         },
@@ -188,8 +193,13 @@ var StateWideMap = React.createClass({
             var scope = this,
                 newState = this.state;
 
-        
-            map.fitBounds(e.target._bounds);
+            var bounds= d3.geo.bounds(e.target.feature)
+            
+            console.log('target 2',
+                d3.geo.bounds(e.target.feature)
+            )
+
+            map.fitBounds([bounds[1].reverse(),bounds[0].reverse()]);
             var d = e.target.feature;
             
             d3.select('.active_geo').attr('fill','#3388ff').classed('active_geo',false);
