@@ -78,14 +78,8 @@ var StateIndex = React.createClass({
                         <MadtGraph  classByMonth={this.state.classByMonth} selectedState={this.state.selectedState} index='0' />
 
                         <MadtGraph classByMonth={this.state.classByMonth} selectedState={this.state.selectedState} graphType='season' index='1' />
-
-                        <HpmsTypeGraph  hpmsData={this.state.hpmsData} selectedState={this.state.selectedState} groupKey='type_vdt' />
-
-                        <HpmsTypeGraph  hpmsData={this.state.hpmsData} selectedState={this.state.selectedState} groupKey='type_length' />
-
+                        
                         <HpmsTypeGraph  hpmsData={this.state.hpmsData} selectedState={this.state.selectedState} groupKey='route_vdt' />
-
-                        <HpmsTypeGraph  hpmsData={this.state.hpmsData} selectedState={this.state.selectedState} groupKey='route_length' />
 
                     </div>
                    

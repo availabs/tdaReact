@@ -1,4 +1,4 @@
-L = require('../../utils/dependencies/leaflet.min');
+L = require('../../utils/dependencies/leaflet');
     
 
 module.exports=(function() {

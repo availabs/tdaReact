@@ -59,7 +59,7 @@ var GraphContainer = React.createClass({
             nv.addGraph(function() {
                 var chart = nv.models.lineChart()
                   .x(function(d) { return d.month })    //Specify the data accessors.
-                  .y(function(d) { return d.y })
+                  .y(function(d) { return +d.y })
                   .showLegend(false)
                   .useInteractiveGuideline(false)       //Don't show tooltips
                   .transitionDuration(350)
@@ -95,7 +95,7 @@ var GraphContainer = React.createClass({
                                         if(value === Infinity){
                                             value = 0
                                         }
-                                        return {month:i,y:value}
+                                        return {month:i,y:+value}
                                     }),
                                     "color":AdtScale(ADT.value.avg || 0)
                                 }

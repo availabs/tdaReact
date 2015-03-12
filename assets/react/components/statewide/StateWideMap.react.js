@@ -14,7 +14,7 @@ var React = require('react'),
     ClientActionsCreator = require('../../actions/ClientActionsCreator'),
 
     // -- Utils
-    L =                 require('../../utils/dependencies/leaflet.8.0.min'),
+    L =                 require('../../utils/dependencies/leaflet'),
     d3 =                require('d3'),
     topojson =          require('topojson'),
     colorbrewer =       require('colorbrewer'),
@@ -95,18 +95,12 @@ var StateWideMap = React.createClass({
                         click: scope.stateClick,
                         mouseover: function(e){
                             var layer = e.target;
-                            //console.log(layer);
                             if(layer._path.className.baseVal.split(' ').indexOf('active_geo') < 0){
                                 layer.setStyle({
                                     stroke:false,
                                     fillOpacity:0.3
                                 });
                             }
-                            
-                            if (!L.Browser.ie && !L.Browser.opera) {
-                                layer.bringToFront();
-                            }
-
                         },
                         mouseout: function(e){
                              var layer = e.target;
