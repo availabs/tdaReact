@@ -132,9 +132,7 @@ var GraphContainer = React.createClass({
             display: Object.keys(scope.props.classByMonth.getDimensions()).length > 0 ? 'block' : 'none'
         }
 
-        var state = fips2state[this.props.selectedState] ? fips2state[this.props.selectedState].name : '';
-        var title = state;
-            title += this.props.graphType === 'count' ?  ' Monthly Average Daily Traffic' : ' MADT / AADT';
+        var title = this.props.graphType === 'count' ?  ' Monthly Average Daily Traffic' : ' Seasonal Adjustment Factor (MADT / AADT) ';
         
         return (
         	<section className="widget large" style={{ background:'none'}}>

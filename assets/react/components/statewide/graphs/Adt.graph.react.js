@@ -118,8 +118,7 @@ var GraphContainer = React.createClass({
             display: Object.keys(scope.props.classByMonth.getDimensions()).length > 0 ? 'block' : 'none'
         }
 
-        var state = fips2state[this.props.selectedState] ? fips2state[this.props.selectedState].name : '';
-        var title = state +' Annual Average Daily Traffic';
+        var title = 'Annual Average Daily Traffic';
         
         return (
         	<section className="widget large" style={{ background:'none'}}>

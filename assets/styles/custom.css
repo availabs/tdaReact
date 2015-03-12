@@ -129,3 +129,11 @@ Unified Station ID highlight Styles
 }
 
 #map{box-shadow: 5px 5px 5px #aaa;}
+
+@media (min-width: 768px) {
+  .mapaffix{
+    position: fixed;
+    top: 60px;
+    width: 40%;
+  }
+}

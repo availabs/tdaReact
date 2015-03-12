@@ -24157,8 +24157,8 @@ a.text-gray-lighter:hover {
   -moz-box-sizing: content-box;
   box-sizing: content-box;
   position: fixed;
-  left: 25px;
-  top: 12px;
+  left:40px;
+  top: 9px;
   z-index: 1;
 }
 @media (min-height: 940px) {
@@ -24189,7 +24189,7 @@ a.text-gray-lighter:hover {
   top: 60px;
   color: white;
   z-index: 1;
-  margin: 0px 0 0 25px;
+  margin: 70px 0 0 25px;
   font-weight: 300;
 }
 @media (min-height: 940px) {

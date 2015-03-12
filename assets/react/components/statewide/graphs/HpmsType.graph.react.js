@@ -88,11 +88,44 @@ var GraphContainer = React.createClass({
         };
         this._updateGraph();
         var id = "hpmschart_"+this.props.groupKey;
+        var headerStyle = {
+            backgroundColor:'none',
+            width:'100%',
+            padding:'5px',
+            marginLeft:'-10px',
+            fontWeight:'700',
+            display: Object.keys(this.props.hpmsData.getDimensions()).length > 0 ? 'block' : 'none'
+        }
+
+        var title = this.props.graphType === 'count' ?  ' Monthly Average Daily Traffic' : ' Seasonal Adjustment Factor (MADT / AADT) ';
+        switch(this.props.groupKey) {
+
+            case 'type_vdt':
+              title = 'HPMS VMT by Road Type';
+            break;
+
+            case 'type_length':
+              title = 'HPMS Total Length of Road Type';
+            break;
+
+            case 'route_vdt':
+              title = 'HPMS VMT by Route';
+            break;
+
+            case 'route_length':
+              title = 'HPMS Total Length of Route';
+            break;
+
+            default:
+              // do nothing
+          }
+
+
         return (
         	<section className="widget large" style={{ background:'none'}}>
                 <header>
-                    <h4>
-                        {this.props.selectedState} {this.props.groupKey}
+                    <h4 style={headerStyle}>
+                        {title}
                     </h4>
                     
                 </header>

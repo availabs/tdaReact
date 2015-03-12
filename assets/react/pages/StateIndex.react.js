@@ -51,18 +51,16 @@ var StateIndex = React.createClass({
     },
     
     render: function() {
-        var mapStyle ={
-            position: 'fixed',
-            top: '60px',
-            width: '40%'
-        };
+        // var mapStyle ={
+           
+        // };
         
         return (
             <div className="content container">
                 <div className="row">
                 
                     <div className="col-md-6" >
-                        <section className="widget whitesmoke no-padding" style={mapStyle} >
+                        <section className="widget whitesmoke no-padding mapaffix"  >
                             <div className="body no-margin">
                                 <StateWideMap />
                             </div>
