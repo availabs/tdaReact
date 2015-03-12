@@ -50,6 +50,10 @@ var StateIndex = React.createClass({
         });
     },
     
+    //----------------------------------------------------------------------------------------------------------------
+    // Render Components
+    //----------------------------------------------------------------------------------------------------------------
+
     render: function() {
         // var mapStyle ={
            
@@ -93,34 +97,6 @@ var StateIndex = React.createClass({
         );
     },
 
-    // <div className="row">
-    //     <h2> Seasonality</h2>
-    //     <div className="col-md-6">
-    //         <MadtGraph  classByMonth={this.state.classByMonth} selectedState={this.state.selectedState} index='0' />
-    //     </div>
-    //     <div className="col-md-6">
-           
-    //     </div>
-
-    // </div>
-
-    // <div className="row">
-    //     <div className="col-md-6">
-    //         <HpmsTypeGraph  hpmsData={this.state.hpmsData} selectedState={this.state.selectedState} groupKey='type_vdt' />
-    //     </div>
-    //      <div className="col-md-6">
-    //         <HpmsTypeGraph  hpmsData={this.state.hpmsData} selectedState={this.state.selectedState} groupKey='type_length' />
-    //     </div>
-    //      <div className="col-md-6">
-    //         <HpmsTypeGraph  hpmsData={this.state.hpmsData} selectedState={this.state.selectedState} groupKey='route_vdt' />
-    //     </div>
-    //      <div className="col-md-6">
-    //         <HpmsTypeGraph  hpmsData={this.state.hpmsData} selectedState={this.state.selectedState} groupKey='route_length' />
-    //     </div>
-    // </div>
-    //----------------------------------------------------------------------------------------------------------------
-    // Render Components
-    //----------------------------------------------------------------------------------------------------------------
     
     
 

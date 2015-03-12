@@ -43,7 +43,7 @@ module.exports = {
   },
   getClassByMonth : function(fips){
     if(!AgencyStore.getSelectedAgency()){
-      console.log('Error: No Agency Datasource Selected');
+      //console.log('Error: No Agency Datasource Selected');
       return []
     }
     var postData ={database:AgencyStore.getSelectedAgency().datasource,fips:fips};
@@ -56,7 +56,6 @@ module.exports = {
   // HPMS Data Routes
   //---------------------------------------------------
   getHpms : function(fips){
-    console.log('SAILSWEBAPI / getHpms',fips)
     var state = fips2state[fips].name.replace(/\s/g,'').toLowerCase()+'2012';
     d3.json('/hpms/'+state,function(err,data){
       ServerActionCreators.getHpms(data,fips);

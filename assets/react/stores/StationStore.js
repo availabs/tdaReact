@@ -25,13 +25,21 @@ function _addStations(rawData) {
 
 
     if(station.longitude.length > 1){
+      
 
-     
+      if(station.longitude.toString().substr(0,1) == '0'){
+        station.longitude = station.longitude.toString().substr(1,station.longitude.toString().length)
+      }
 
-      if ( /^1/.test(station.longitude.toString()) ) {  station.longitude = station.longitude.toString().replace(/\s+/g, '').replace(/^(1\d\d)/, '-$1.'); }
-      else { station.longitude = station.longitude.replace(/\s+/g, '').replace(/^(\d\d)/, '-$1.'); }
+      if ( /^1/.test(station.longitude.toString()) ) {  
+        station.longitude = station.longitude.toString().replace(/\s+/g, '').replace(/^(1\d\d)/, '-$1.'); 
+      }
+      else { 
+        station.longitude = station.longitude.replace(/\s+/g, '').replace(/^(\d\d)/, '-$1.'); 
+      }
+      
       station.latitude = station.latitude.replace(/\s+/g, '').replace(/^(\d\d)/, '$1.');
-     
+      
       
       var feature = {type:"Feature",properties:station,geometry:{type:"Point",coordinates:[+station.longitude,+station.latitude]}}
               
@@ -94,12 +102,10 @@ StationStore.dispatchToken = AppDispatcher.register(function(payload) {
   switch(action.type) {
 
     case ActionTypes.RECEIVE_STATIONS:
-      //console.log('StationStore / receieve_stations')
+      console.log('StationStore / receieve_stations')
       _addStations(action.data);
       StationStore.emitChange();
     break;
-
-    
 
     default:
       // do nothing
