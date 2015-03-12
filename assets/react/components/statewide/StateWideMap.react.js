@@ -80,7 +80,6 @@ var StateWideMap = React.createClass({
                   data = topojson.feature(data, data.objects[key]);
                 } 
             }
-            console.log('got state data',map,data)
             
             stateLayer = L.geoJson(data, {
                 style: function (feature) {
@@ -92,22 +91,15 @@ var StateWideMap = React.createClass({
                 },
                 onEachFeature: function (feature, layer) {
                     hpmsData.push(feature.properties.AADT);
-                    console.log('on each feature add')
                     layer.on({
                         click: scope.stateClick,
                         mouseover: function(e){
                             var layer = e.target;
-                            console.log('hover2')
-                            
                             if(layer._path.className.baseVal.split(' ').indexOf('active_geo') < 0){
                                 layer.setStyle({
                                     stroke:false,
                                     fillOpacity:0.3
                                 });
-                            }
-
-                            if (!L.Browser.ie && !L.Browser.opera) {
-                                layer.bringToFront();
                             }
 
                         },
@@ -122,7 +114,8 @@ var StateWideMap = React.createClass({
 
 
                 }
-            }).addTo(map);
+            })
+            stateLayer.addTo(map);
             //hpmsMap.init(map);
         });
     },
@@ -190,7 +183,7 @@ var StateWideMap = React.createClass({
     // Map Actions
     //---------------------------------------------------------------------------------------------------------------
     stateClick: function(e){
-        console.log(e);
+        //console.log(e);
         if (e.originalEvent.ctrlKey) {
             var scope = this,
                 newState = this.state;
