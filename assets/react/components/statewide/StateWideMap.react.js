@@ -95,15 +95,17 @@ var StateWideMap = React.createClass({
                         click: scope.stateClick,
                         mouseover: function(e){
                             var layer = e.target;
-                            console.log('hover',layer._path.className.baseVal.split(' '))
-                            if (!L.Browser.ie && !L.Browser.opera) {
-                                layer.bringToFront();
-                            }
-                            if(layer._path.className.baseVal.split(' ').indexOf('active_geo') < 0){
+                            console.log('hover2')
+                            
+                            //if(layer._path.className.baseVal.split(' ').indexOf('active_geo') < 0){
                                 layer.setStyle({
                                     stroke:false,
                                     fillOpacity:0.3
                                 });
+                            //}
+
+                            if (!L.Browser.ie && !L.Browser.opera) {
+                                layer.bringToFront();
                             }
 
                         },
