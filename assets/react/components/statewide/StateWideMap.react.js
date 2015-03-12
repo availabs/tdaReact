@@ -80,7 +80,7 @@ var StateWideMap = React.createClass({
                   data = topojson.feature(data, data.objects[key]);
                 } 
             }
-            
+            console.log('got state data',data)
             stateLayer = L.geoJson(data, {
                 style: function (feature) {
                   return {
@@ -97,12 +97,12 @@ var StateWideMap = React.createClass({
                             var layer = e.target;
                             console.log('hover2')
                             
-                            //if(layer._path.className.baseVal.split(' ').indexOf('active_geo') < 0){
+                            if(layer._path.className.baseVal.split(' ').indexOf('active_geo') < 0){
                                 layer.setStyle({
                                     stroke:false,
                                     fillOpacity:0.3
                                 });
-                            //}
+                            }
 
                             if (!L.Browser.ie && !L.Browser.opera) {
                                 layer.bringToFront();
