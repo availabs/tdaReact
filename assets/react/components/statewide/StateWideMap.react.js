@@ -189,9 +189,6 @@ var StateWideMap = React.createClass({
 
             var bounds= d3.geo.bounds(e.target.feature)
             
-            console.log('target 2',
-                d3.geo.bounds(e.target.feature)
-            )
 
             map.fitBounds([bounds[1].reverse(),bounds[0].reverse()]);
             var d = e.target.feature;
