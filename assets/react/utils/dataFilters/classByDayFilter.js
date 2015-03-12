@@ -58,8 +58,8 @@ module.exports  = {
 			
 		if(dataset !== currentDataSet){
 
-			console.log('classFilter Init',dataset,currentDataSet,data.length);
-			console.time('crossFIlterData')
+			// console.log('classFilter Init',dataset,currentDataSet,data.length);
+			// console.time('crossFIlterData')
 			currentDataSet = dataset;
 
 			
@@ -86,12 +86,12 @@ module.exports  = {
 				.reduce(reduceAddAvg('f0_'), reduceRemoveAvg('f0_'), reduceInitAvg);
 
 			initialized = true;
-			console.timeEnd('crossFIlterData')
-			console.log(
-				'stations group init',
-				dimensions['ADT']
-					.group( function (d,i){ return d.substr(0,6) })
-			);
+			// console.timeEnd('crossFIlterData')
+			// console.log(
+			// 	'stations group init',
+			// 	dimensions['ADT']
+			// 		.group( function (d,i){ return d.substr(0,6) })
+			// );
 		}
 	},
 	getDimension:function(dim){

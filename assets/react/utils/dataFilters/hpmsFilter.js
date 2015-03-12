@@ -18,8 +18,8 @@ module.exports  = {
 			
 		if(dataset !== currentDataSet){
 
-			console.log('classFilter Length Init',dataset,currentDataSet,data.length);
-			console.time('crossFIlterHpmsData')
+			// console.log('classFilter Length Init',dataset,currentDataSet,data.length);
+			// console.time('crossFIlterHpmsData')
 			currentDataSet = dataset;
 
 			
@@ -48,7 +48,7 @@ module.exports  = {
 
 
 			initialized = true;
-			console.timeEnd('crossFIlterHpmsData')
+			//console.timeEnd('crossFIlterHpmsData')
 		}
 	},
 	getDimension:function(dim){

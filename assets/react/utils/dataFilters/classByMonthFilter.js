@@ -108,7 +108,7 @@ module.exports  = {
 			var total_data = [].concat.apply([],total_data);
 			//console.log('after data',total_data.length,total_data);
 			
-			console.time('CBM crossFIlterData')
+			//console.time('CBM crossFIlterData')
 			currentDataSet = dataset;
 
 			
@@ -139,7 +139,7 @@ module.exports  = {
 			
 
 			initialized = true;
-			console.timeEnd('CBM crossFIlterData')
+			//console.timeEnd('CBM crossFIlterData')
 		}
 
 	},
