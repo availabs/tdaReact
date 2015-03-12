@@ -95,6 +95,7 @@ var StateWideMap = React.createClass({
                         click: scope.stateClick,
                         mouseover: function(e){
                             var layer = e.target;
+                            console.log('hover',layer._path.className.baseVal.split(' '))
                             if (!L.Browser.ie && !L.Browser.opera) {
                                 layer.bringToFront();
                             }
