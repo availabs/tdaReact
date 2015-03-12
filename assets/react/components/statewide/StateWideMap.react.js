@@ -14,7 +14,7 @@ var React = require('react'),
     ClientActionsCreator = require('../../actions/ClientActionsCreator'),
 
     // -- Utils
-    L =                 require('../../utils/dependencies/leaflet.min'),
+    L =                 require('../../utils/dependencies/leaflet.7.3.min'),
     d3 =                require('d3'),
     topojson =          require('topojson'),
     colorbrewer =       require('colorbrewer'),
