@@ -22,6 +22,8 @@ var _selectedState = null,
     _classbyMonth = {},
     _filters={
       year:null,
+      month:null,
+      class:null,
       stations:[]
     };
 
@@ -33,21 +35,26 @@ function _setState(fips){
 function _filterYear(year){
   //ClassByDayFilter.getDimension('year').filter(year);
   ClassByMonthFilter.getDimension('year').filter(year);
+  _filters.year = year;
 }
 
 function _filterMonth(data){
   //ClassByDayFilter.getDimension('year').filter(year);
   ClassByMonthFilter.getDimension('month').filter(data);
+  _filters.month = data;
 }
 
 
 function _filterClass(data){
   //ClassByDayFilter.getDimension('year').filter(year);
   ClassByMonthFilter.getDimension('class').filter(data);
+  _filters.class = data;
 }
 
 
 function _filterStations(stations){
+  _filters.stations = stations;
+  
   ClassByMonthFilter.getDimension('stationId').filterFunction(function(d){
     //console.log('filter stations',stations.indexOf(d),d)
     return stations.indexOf(d) >= 0;
@@ -110,6 +117,10 @@ var StatewideStore = assign({}, EventEmitter.prototype, {
     //if requested data isn't loaded send most recent data
     // may want to rethink this
     return ClassByMonthFilter;
+  },
+
+  activeFilters:function(){
+    return _filters
   }
 
 

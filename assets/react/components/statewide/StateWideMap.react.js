@@ -95,6 +95,9 @@ var StateWideMap = React.createClass({
                         click: scope.stateClick,
                         mouseover: function(e){
                             var layer = e.target;
+                            if (!L.Browser.ie && !L.Browser.opera) {
+                                layer.bringToFront();
+                            }
                             if(layer._path.className.baseVal.split(' ').indexOf('active_geo') < 0){
                                 layer.setStyle({
                                     stroke:false,

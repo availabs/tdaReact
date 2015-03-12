@@ -19,6 +19,7 @@ function updateClassByMonth(){
 
     return {
         classByMonth : StateWideStore.getClassByMonth(),
+        filters: StateWideStore.activeFilters()
     };
 }
 
@@ -27,6 +28,7 @@ var Filters = React.createClass({
     getInitialState: function() {
         return {
             classByMonth : StateWideStore.getClassByMonth(),
+            filters: StateWideStore.activeFilters(),
             currentYear: null,
             currentClass: null,
             currentMonth:null
@@ -215,9 +217,25 @@ var Filters = React.createClass({
 
                         </div>
                     </div>
+                    {this._activeStations()}
                 </fieldset>
     	 	</section>
         );
+    },
+    _activeStations:function(){
+      
+        if(this.state.filters.stations.length == 0){
+            return <span />;
+        }
+        var stations  = this.state.filters.stations.map(function(st){
+            return <div>{st}</div>
+        })
+        return (
+            <div>
+            <h4> Active Stations <span className="pull-right"></h4>
+            {stations}
+            </div>
+        )
     }
 });
 

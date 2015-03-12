@@ -29,8 +29,8 @@ module.exports = {
             'count(1) as numSegments, '+
             'sum(aadt_vn) as totalAADT, '+
             'avg(aadt_vn) as avgAADT, '+
-            'sum(aadt_vn * shape_leng) as VDT, '+
-            'sum(shape_leng) as totalLength '+
+            'sum(aadt_vn * shape_leng*52.80) as VDT, '+
+            'sum(shape_leng*52.80) as totalLength '+
           'FROM '+state+' '+
           'group by f_system_v,route_numb '+
           'order by f_system_v,route_numb  asc ';
