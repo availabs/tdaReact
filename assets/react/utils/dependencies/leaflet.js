@@ -1395,6 +1395,7 @@ L.Projection.SphericalMercator = {
 	R: 6378137,
 
 	project: function (latlng) {
+		//if(!latlng.lat){ return; }
 		var d = Math.PI / 180,
 		    max = 1 - 1E-15,
 		    sin = Math.max(Math.min(Math.sin(latlng.lat * d), max), -max);

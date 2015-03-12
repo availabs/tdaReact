@@ -390,7 +390,7 @@ L.TileLayer.Vector = L.TileLayer.extend({
 
     onRemove: function (map) {
         // unload tiles (L.TileLayer only calls _reset in onAdd)
-        this._reset();
+        //this._reset();
         map.removeLayer(this.vectorLayer);
 
         L.TileLayer.prototype.onRemove.call(this, map);
