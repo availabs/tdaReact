@@ -3006,10 +3006,9 @@ L.GridLayer = L.Layer.extend({
 
 	_removeTile: function (key) {
 		var tile = this._tiles[key];
-		if (!tile ) { return; }
-		if(!tile.el){
-		return;}
-		 console.log('_removeTile',tile)
+		if ( !tile ) { return; }
+		if( !tile.el ) { return; }
+		 
 		L.DomUtil.remove(tile.el);
 
 		delete this._tiles[key];
@@ -3281,7 +3280,6 @@ L.TileLayer = L.GridLayer.extend({
 		var i, tile;
 
 		for (i in this._tiles) {
-			console.log('_abortLoading',this._tiles[i])
 			if(this._tiles[i].el){
 				tile = this._tiles[i].el;
 
