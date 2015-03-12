@@ -190,7 +190,7 @@ var StateWideMap = React.createClass({
     // Map Actions
     //---------------------------------------------------------------------------------------------------------------
     stateClick: function(e){
-        //console.log(e);
+        console.log(e);
         if (e.originalEvent.ctrlKey) {
             var scope = this,
                 newState = this.state;
