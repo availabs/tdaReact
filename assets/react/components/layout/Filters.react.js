@@ -232,7 +232,7 @@ var Filters = React.createClass({
         })
         return (
             <div>
-            <h4> Active Stations <span className="pull-right"></h4>
+            <h4> Active Stations <span className="pull-right">clear</span></h4>
             {stations}
             </div>
         )
