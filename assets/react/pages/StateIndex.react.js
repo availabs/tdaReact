@@ -81,6 +81,8 @@ var StateIndex = React.createClass({
                         
                         <HpmsTypeGraph  hpmsData={this.state.hpmsData} selectedState={this.state.selectedState} groupKey='route_vdt' />
 
+                        <HpmsTypeGraph  hpmsData={this.state.hpmsData} selectedState={this.state.selectedState} groupKey='route_length' />
+
                     </div>
                    
                     

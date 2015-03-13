@@ -63,7 +63,7 @@ function _filterStations(stations){
   if(!stations){
     ClassByMonthFilter.getDimension('stationId').filter(null);
     _filters.stations = [];
-  }else{
+  }else if(stations.length > 0){
 
     _filters.stations = stations;
     ClassByMonthFilter.getDimension('stationId').filterFunction(function(d){
