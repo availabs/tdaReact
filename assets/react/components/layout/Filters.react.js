@@ -230,12 +230,20 @@ var Filters = React.createClass({
         var stations  = this.state.filters.stations.map(function(st){
             return <div>{st}</div>
         })
+        var clearStyle ={
+            fontSize:'0.9em',
+            color:'rgb(146, 197, 222)',
+            cursor:'pointer'
+        }
         return (
             <div>
-            <h4> Active Stations <span className="pull-right">clear</span></h4>
+            <h4> Active Stations <span className="pull-right" onClick={this._clearStationFilter} style={clearStyle}>clear</span></h4>
             {stations}
             </div>
         )
+    },
+    _clearStationFilter:function(){
+        ClientActionsCreator.filterStations(false);
     }
 });
 

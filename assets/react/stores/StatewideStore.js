@@ -29,6 +29,13 @@ var _selectedState = null,
 
 function _setState(fips){
   //console.log('StatewideStore / _setState ',fips)
+  //reset filters
+  _filters={
+      year:null,
+      month:null,
+      class:null,
+      stations:[]
+  };
   _selectedState = fips;
 }
 
@@ -53,12 +60,17 @@ function _filterClass(data){
 
 
 function _filterStations(stations){
-  _filters.stations = stations;
-  
-  ClassByMonthFilter.getDimension('stationId').filterFunction(function(d){
-    //console.log('filter stations',stations.indexOf(d),d)
-    return stations.indexOf(d) >= 0;
-  });
+  if(!stations){
+    ClassByMonthFilter.getDimension('stationId').filter(null);
+    _filters.stations = [];
+  }else{
+
+    _filters.stations = stations;
+    ClassByMonthFilter.getDimension('stationId').filterFunction(function(d){
+      //console.log('filter stations',stations.indexOf(d),d)
+      return stations.indexOf(d) >= 0;
+    });
+  }
 }
 
 var StatewideStore = assign({}, EventEmitter.prototype, {
