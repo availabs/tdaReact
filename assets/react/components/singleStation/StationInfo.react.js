@@ -9,23 +9,14 @@ var React = require('react'),
 var StationInfo = React.createClass({
 	
     
-    render:function(){
-      	var scope = this;
-    	var svgStyle = {
-          height: '100%',
-          width: '100%'
-        },
-        
-        titleStyle = {
-            'left': '114.5px',
-            'top': '84px'
-        };
-        console.log('stationInfo',this.props.stationInfo)
-        // <div className="visits">15866<br/> visits </div>
-    	return(
-    		<section className="widget large">
-                <div className="body">
-                   <table className="table" style={{'marginTop': '-10px'}}>
+    renderTable:function(){
+        if(!this.props.stationInfo.posted_route_sign){
+            return (
+                <span />
+            )
+        }
+        return (
+            <table className="table" style={{'marginTop': '-10px'}}>
                         <tr>
                             <td>Route</td>
                             <td>{stnCardMeta.posted_route_sign_abbr[this.props.stationInfo.posted_route_sign]+'-'+ parseInt(this.props.stationInfo.posted_sign_route_num)}</td>
@@ -56,6 +47,26 @@ var StationInfo = React.createClass({
                         </tr>
                         
                     </table>
+
+        )
+    },
+    render:function(){
+      	var scope = this;
+    	var svgStyle = {
+          height: '100%',
+          width: '100%'
+        },
+        
+        titleStyle = {
+            'left': '114.5px',
+            'top': '84px'
+        };
+        console.log('stationInfo',this.props.stationInfo)
+        // <div className="visits">15866<br/> visits </div>
+    	return(
+    		<section className="widget large">
+                <div className="body">
+                   {this.renderTable()}
                 </div>
             </section>	
     	)
