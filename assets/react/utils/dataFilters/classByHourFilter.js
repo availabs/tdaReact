@@ -88,8 +88,10 @@ module.exports  = {
 			dimensions['single_day'] = classData.dimension(function(d){
 				return d.year+'_'+d.month+'_'+d.day;
 			})
-			groups['average_daily_traffic'] = dimensions['single_day'].group()
-				.reduce(reduceAddAvg('f0_'), reduceRemoveAvg('f0_'), reduceInitAvg);
+			groups['average_daily_traffic'] = dimensions['single_day'].group().reduceSum(function(d){
+				return d['f0_'];
+			});
+				//.reduce(reduceAddAvg('f0_'), reduceRemoveAvg('f0_'), reduceInitAvg);
 
 			dimensions['stationId'] = classData.dimension(function(d){ return d.station_id });
 			groups['stationId'] = dimensions['stationId'].group().reduceCount();

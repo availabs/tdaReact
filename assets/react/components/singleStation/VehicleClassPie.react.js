@@ -20,7 +20,7 @@ var React = require('react'),
     $gray = "#666",
     $white = "#fff",
     $textColor = $gray,
-    COLOR_VALUES = [$red, $orange, $green, $blue, $teal, $redDark],
+     COLOR_VALUES = [$green, $teal, $redDark,  $blue, $red, $orange  ],
 
     //actions
     ClientActionsCreator = require('../../actions/ClientActionsCreator');
@@ -130,7 +130,7 @@ var VehicleClassPie = React.createClass({
             'left': '114.5px',
             'top': '84px'
         };
-         console.log('render pie',this.processData(),this.props.stationData)
+        //console.log('render pie',this.processData(),this.props.stationData)
         this.renderGraph();
       	// <div className="visits">15866<br/> visits </div>
     	return(

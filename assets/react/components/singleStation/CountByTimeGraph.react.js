@@ -20,7 +20,7 @@ var React = require('react'),
     $gray = "#666",
     $white = "#fff",
     $textColor = $gray,
-    COLOR_VALUES = [$red, $orange, $green, $blue, $teal, $redDark];;
+    COLOR_VALUES = [$green, $teal, $redDark,  $blue, $red, $orange  ];
 
 
 
@@ -51,7 +51,7 @@ var RouteTotalGraph = React.createClass({
                         values: scope.props.stationData.getGroup('average_daily_traffic').top(Infinity).map(function(time){
                             return {
                                 key:time.key,
-                                value:time.value.avg*mult
+                                value:time.value*mult
                             }
                         })
                     }
@@ -105,9 +105,7 @@ var RouteTotalGraph = React.createClass({
                     })
                     d.values = Object.keys(sums).map(function(key){
                         sums[key].value = Math.round(sums[key].sum/sums[key].count) || 0;
-                        if(isNaN(sums[key].value)){
-                            console.log('isNaN',sums,sums[key].value)
-                        }
+                        
                         return sums[key];
                     }).sort(function(a,b){
                         return +a.key - +b.key
@@ -134,7 +132,7 @@ var RouteTotalGraph = React.createClass({
         return [{key:'none',values:[]}]
 		
 	},
-    renderGraph:function(){
+    renderGraph:function(timeName){
         var scope = this;
         if(scope.props.stationData.initialized){
             nv.addGraph(function(){
@@ -148,12 +146,13 @@ var RouteTotalGraph = React.createClass({
                         .transitionDuration(350)
                         .stacked(true)
                         .showControls(false)
-                        .showLegend(false)
+                        .showLegend(false);
 
+                     chart.xAxis
+                        .axisLabel(timeName)
 
                     d3.select('#routeTotalGraph svg')
                         .datum(scope.processData().map(function(d){
-                            console.log(d);
                             if( scope.props.filters.classGroups.indexOf(d.key) > -1){
                                 d.values = d.values.map(function(v){
                                     v.value = 0;
@@ -173,22 +172,45 @@ var RouteTotalGraph = React.createClass({
     },
 
     render:function(){
-      console.log('render graph',this.processData(),this.props.stationData)
+      //console.log('render graph',this.processData(),this.props.stationData)
     	var scope = this;
     	var svgStyle = {
-          height: this.props.height+'px',
+          height: '100%',
           width: '100%'
+        };
+
+        var timeName = 'Year',
+            timeFor = '',
+            avg = 'Average'
+        if(scope.props.filters.year){
+            timeName = 'Month'
+            timeFor = ' for ' +scope.props.filters.year
         }
-        this.renderGraph();
-      	
+        if(scope.props.filters.month){
+            timeName = 'Day'
+            var yearName = 'All Years'
+            if(scope.props.filters.year){ yearName = scope.props.filters.year;}
+            timeFor = ' for '+scope.props.filters.month +' '+yearName;
+            avg = '';
+        }
+        this.renderGraph(timeName);
+
+
     	return(
-    		<div id="routeTotalGraph">
-                {this.props.filters}
-    			<svg style={svgStyle}/>
-                
-    		</div>	
+    		<section className="widget large" style={{background:'none'}}>
+                <header>
+                    <h4><i className="fa fa-bar-chart-o"></i> {avg} Daily Traffic by {timeName} {timeFor}
+                        <small  className="hidden-xs"></small>
+                   
+                    </h4>
+                </header>
+                <div id="routeTotalGraph" className="body chart">
+                    <svg style={svgStyle}/>
+                </div>
+            </section>	
     	)
     }
+   
 });
 
 module.exports = RouteTotalGraph;

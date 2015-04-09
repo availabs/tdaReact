@@ -17,7 +17,7 @@ var React = require('react'),
     $gray = "#666",
     $white = "#fff",
     $textColor = $gray,
-    COLOR_VALUES = [$red, $orange, $green, $blue, $teal, $redDark];
+    COLOR_VALUES = [$green, $teal, $redDark,  $blue, $red, $orange,  ];
     nv = require('../../utils/dependencies/nvd3.js');
 
 
@@ -91,12 +91,13 @@ var AvgHourGraph = React.createClass({
                         .transitionDuration(350)
                         .stacked(true)
                         .showControls(false)
-                        .showLegend(false)
-
+                        .showLegend(false)  
+                    
+                    chart.xAxis
+                        .axisLabel('Hour')
 
                     d3.select('#AvgHourGraph svg')
                         .datum(scope.processData().map(function(d){
-                            console.log(d);
                             if( scope.props.filters.classGroups.indexOf(d.key) > -1){
                                 d.values = d.values.map(function(v){
                                     v.value = 0;
@@ -116,20 +117,38 @@ var AvgHourGraph = React.createClass({
     },
 
     render:function(){
-      console.log('render avg hour graph',this.processData(),this.props.stationData)
+      //console.log('render avg hour graph',this.processData(),this.props.stationData)
     	var scope = this;
     	var svgStyle = {
-          height: this.props.height+'px',
+          height: '100%',
           width: '100%'
         }
         this.renderGraph();
       	
+         var timeName = 'Year',
+            timeFor = '',
+            avg = 'Average'
+        if(scope.props.filters.year){
+            timeName = 'Month'
+            timeFor = ' for ' +scope.props.filters.year
+        }
+        if(scope.props.filters.month){
+            timeName = 'Day'
+            timeFor = ' for '+scope.props.filters.month +' '+scope.props.filters.year;
+            avg = '';
+        }
     	return(
-    		<div id="AvgHourGraph">
-                
-    			<svg style={svgStyle}/>
-                
-    		</div>	
+            <section className="widget large" style={{background:'none'}}>
+                <header>
+                    <h4><i className="fa fa-bar-chart-o"></i> Average Hourly Traffic {timeFor}
+                        <small  className="hidden-xs"></small>
+                    </h4>
+                </header>
+                <div id="AvgHourGraph" className="body chart">
+                    <svg style={svgStyle}/>
+                </div>
+            </section>
+    		
     	)
     }
 });
