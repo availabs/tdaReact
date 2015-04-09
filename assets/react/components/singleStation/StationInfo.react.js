@@ -10,7 +10,7 @@ var StationInfo = React.createClass({
 	
     
     renderTable:function(){
-        if(!this.props.stationInfo.posted_route_sign){
+        if(!this.props.stationInfo){
             return (
                 <span />
             )
