@@ -16,7 +16,7 @@ var React = require('react'),
 
 //  --- Pages
     StateIndex = require('./pages/StateIndex.react'),
-    PageTwo = require('./pages/page_two.react'),
+    SingleStation = require('./pages/SingleStation.react'),
     UserAdmin = require('./pages/UserAdmin.react')
 
 // --- Server API
@@ -28,8 +28,8 @@ sailsWebApi.initAdmin(window.User);
 //  --- Routes 
 var routes = (
   <Route name="app" path="/" handler={App}>
-    <Route name="one" handler={StateIndex}/>
-    <Route name="two" handler={PageTwo}/>
+    <Route name="stateIndex" handler={StateIndex}/>
+    <Route name="singleStation" path="station/:fips/:stationId" handler={SingleStation}/>
     <Route name="userAdmin" path="admin/users"  handler={UserAdmin} />
     <DefaultRoute handler={StateIndex}/>
   </Route>

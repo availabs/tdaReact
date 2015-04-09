@@ -22,6 +22,7 @@ module.exports = {
 		// console.log(req.param('database'))
 		// res.send({'status':'updated'});
 	},
+	
 	auth: function(req, res, next) {
 
 		// Check for username and password in params sent via the form, if none
@@ -83,7 +84,7 @@ module.exports = {
 				// Log user in
 				req.session.authenticated = true;
 				req.session.User = user;
-				//req.session.database = 'allWim';
+				req.session.Datasource = 'allWim';
 
 				// Change status to online
 				user.online = true;
@@ -109,6 +110,7 @@ module.exports = {
 			//console.log(agency)
 		});
 	},
+
 	logout: function(req, res, next) {
 
 		User.findOne(req.session.User.id, function foundUser(err, user) {
@@ -146,6 +148,7 @@ module.exports = {
 			}
 		});
 	},
+
 	login:function(req,res){
 		res.view();
 	}

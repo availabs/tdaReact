@@ -1,6 +1,7 @@
 'use strict';
 
 var React = require('react'),
+    Router = require('react-router'),
     
     
     // -- Stores
@@ -34,6 +35,10 @@ var map = null,
 
 var StateWideMap = React.createClass({
     
+    contextTypes: {
+        router: React.PropTypes.func
+    },
+
     getDefaultProps: function() {
         return {
             height: 700
@@ -244,6 +249,12 @@ var StateWideMap = React.createClass({
                     click: function(e){
                         //console.log('station_click',e.target.feature.properties);
                     },
+                    
+                    dblclick: function(e){
+                        console.log('dbl click',feature.properties.station_id);
+                        scope.context.router.transitionTo('singleStation', {stationId: feature.properties.station_id,fips:feature.properties.state_fips});
+                    },
+
                     mouseover: function(e){
                         //e.target.setStyle({stroke:true,weight:3});
                         d3.selectAll('.station_'+e.target.feature.properties.station_id).classed('highlighted-station',true);

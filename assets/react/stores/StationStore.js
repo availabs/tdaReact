@@ -13,7 +13,9 @@ var AppDispatcher = require('../dispatcher/AppDispatcher'),
     ActionTypes = Constants.ActionTypes,
     CHANGE_EVENT = 'change';
 
-var _selectedStations = [],
+var _selectedStation = null,
+    _selectedState = null,
+    _selectedStations = [],
     _stations = {};
 
 function _addStations(rawData) {
@@ -91,6 +93,12 @@ var StationStore = assign({}, EventEmitter.prototype, {
     return _stations;
   },
 
+  getSelectedStation:function(){
+    if(_stations[_selectedState]){
+      return _stations[_selectedState][_selectedStation];
+    }
+    return {};
+  }
 
  
 
@@ -100,6 +108,12 @@ StationStore.dispatchToken = AppDispatcher.register(function(payload) {
   var action = payload.action;
   
   switch(action.type) {
+
+    case ActionTypes.SET_SELECTED_STATION:
+      _selectedStation = action.Id;
+      _selectedState = action.fips
+      StationStore.emitChange();
+    break;
 
     case ActionTypes.RECEIVE_STATIONS:
       //console.log('StationStore / receieve_stations')

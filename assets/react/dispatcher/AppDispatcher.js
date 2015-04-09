@@ -1,14 +1,9 @@
 var Dispatcher = require('flux').Dispatcher;
+var assign = require('object-assign');
 
-var copyProperties = require('react/lib/copyProperties');
+var AppDispatcher = assign(new Dispatcher(), {
 
-var AppDispatcher = copyProperties(new Dispatcher(), {
-
-  /**
-   * @param {object} action The details of the action, including the action's
-   * type and additional data coming from the server.
-   */
-  handleServerAction: function(action) {
+   handleServerAction: function(action) {
     var payload = {
       source: 'SERVER_ACTION',
       action: action
@@ -17,15 +12,16 @@ var AppDispatcher = copyProperties(new Dispatcher(), {
   },
 
   /**
-   * @param {object} action The details of the action, including the action's
-   * type and additional data coming from the view.
+   * A bridge function between the views and the dispatcher, marking the action
+   * as a view action.  Another variant here could be handleServerAction.
+   * @param  {object} action The data coming from the view.
    */
+
   handleViewAction: function(action) {
-    var payload = {
+    this.dispatch({
       source: 'VIEW_ACTION',
       action: action
-    };
-    this.dispatch(payload);
+    });
   }
 
 });

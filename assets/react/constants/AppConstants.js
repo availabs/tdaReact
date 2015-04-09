@@ -13,6 +13,7 @@ module.exports = {
     CREATE_USER:null,
     SET_SELECTED_AGENCY:null,
     SET_SELECTED_STATE:null,
+    SET_SELECTED_STATION:null,
     CBM_INITIALIZED:null,
 
     // -- Filters
@@ -37,6 +38,7 @@ module.exports = {
     //-------Data--------------------------------------------
     TMG_CLASS_BYDAY: null,
     TMG_CLASS_BYMONTH: null,
+    TMG_CLASS_BYHOUR:null,
     RECEIEVE_STATE_HPMS:null
 
   }),

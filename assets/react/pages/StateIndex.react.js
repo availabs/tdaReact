@@ -73,6 +73,7 @@ var StateIndex = React.createClass({
                 
 
                     <div className="col-md-6">
+                    
                         <AdtGraph  classByMonth={this.state.classByMonth} selectedState={this.state.selectedState} />
 
                         <MadtGraph  classByMonth={this.state.classByMonth} selectedState={this.state.selectedState} index='0' />

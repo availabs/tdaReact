@@ -12,9 +12,6 @@ module.exports.routes = {
   //-------------------------------
   // User controller 
   //-------------------------------
-
-
-
   '/landing': 'LandingController.index', //Landing View
   '/': 'LandingController.flux', //Main Flux App
 
@@ -34,10 +31,14 @@ module.exports.routes = {
   // Data Routes
   //------------------------------
 
+  // -- Set Datasource  
+
   // -- Class  Data
-  '/tmgClass/byDay' :'TmGClassController.byDay',
-  '/tmgClass/byMonth' :'TmGClassController.byMonth',
+  '/tmgClass/byDay' : 'TmGClassController.byDay',
+  '/tmgClass/byMonth' : 'TmGClassController.byMonth',
+  '/tmgClass/byHour' : 'TmGClassController.byHour',
   
   // -- Hpms Data
   '/hpms/:state' : 'HpmsController.getStateData'
+
 };

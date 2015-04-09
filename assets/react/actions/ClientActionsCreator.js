@@ -30,6 +30,16 @@ module.exports = {
   
   },
 
+  setSelectedStation:function(id,fips){
+    
+    AppDispatcher.handleViewAction({
+      type: ActionTypes.SET_SELECTED_STATION,
+      Id:id,
+      fips:fips
+    })
+  
+  },
+
   filterYear : function(year){
   
     AppDispatcher.handleViewAction({
