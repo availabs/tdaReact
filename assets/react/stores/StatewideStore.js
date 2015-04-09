@@ -48,8 +48,10 @@ function _setStation(stationId,fips){
       year:null,
       month:null,
       class:null,
-      stations:[]
+      stations:[],
+      classGroups:[]
   };
+
   _selectedStation = stationId;
   _selectedState = fips;
 }
@@ -75,8 +77,24 @@ function _filterMonth(data){
 
 function _filterClass(data){
   //ClassByDayFilter.getDimension('year').filter(year);
+
   ClassByMonthFilter.getDimension('class').filter(data);
   _filters.class = data;
+}
+
+function _filterClassGroup(data){
+  //ClassByDayFilter.getDimension('year').filter(year);
+
+  if(_filters.classGroups.indexOf(data) === -1){
+    _filters.classGroups.push(data)
+  }else{
+    _filters.classGroups.splice(_filters.classGroups.indexOf(data),1)
+  }
+
+  ClassByHourFilter.getDimension('classGroup').filterFunction(function(d){
+    return _filters.classGroups.indexOf(d.classGroup) > -1
+  });
+  
 }
 
 
@@ -213,7 +231,11 @@ StatewideStore.dispatchToken = AppDispatcher.register(function(payload) {
       _filterClass(action.vclass);
       StatewideStore.emitChange();
     break;
-
+     case ActionTypes.FILTER_VCLASS_GROUP:
+      _filterClassGroup(action.classGroup);
+      StatewideStore.emitChange();
+    break;
+    
     case ActionTypes.FILTER_STATIONS:
       _filterStations(action.stations);
       StatewideStore.emitChange();

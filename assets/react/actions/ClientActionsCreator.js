@@ -66,6 +66,16 @@ module.exports = {
   
   },
 
+
+  filterClassGroup: function(data){
+    AppDispatcher.handleViewAction({
+      type: ActionTypes.FILTER_VCLASS_GROUP,
+      classGroup:data
+    })
+  
+  },
+
+
   filterStations: function(stations){
   
     AppDispatcher.handleViewAction({

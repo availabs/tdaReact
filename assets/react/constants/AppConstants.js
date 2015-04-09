@@ -20,6 +20,7 @@ module.exports = {
     FILTER_YEAR:null,
     FILTER_MONTH:null,
     FILTER_VCLASS:null,
+    FILTER_VCLASS_GROUP:null,
     FILTER_STATIONS:null,
 
     //-------------------------------------------------------

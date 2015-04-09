@@ -6,7 +6,21 @@ var React = require('react'),
     d3 = require('d3'),
     colorbrewer = require('colorbrewer'),
     colorRange = colorbrewer.Paired[12],
-    nv = require('../../utils/dependencies/nvd3.js');
+    nv = require('../../utils/dependencies/nvd3.js'),
+    $lime = "#8CBF26",
+    $red = "#e5603b",
+    $redDark = "#d04f4f",
+    $blue = "#6a8da7",
+    $green = "#56bc76",
+    $orange = "#eac85e",
+    $pink = "#E671B8",
+    $purple = "#A700AE",
+    $brown = "#A05000",
+    $teal = "#4ab0ce",
+    $gray = "#666",
+    $white = "#fff",
+    $textColor = $gray,
+    COLOR_VALUES = [$red, $orange, $green, $blue, $teal, $redDark];;
 
 
 
@@ -19,11 +33,13 @@ var RouteTotalGraph = React.createClass({
       }
     },
     processData:function() {
-		var scope = this;  
+		var scope = this,
+            classGrouping = 'classGroup';
+
         if(scope.props.stationData.initialized()){
             
-            var dailyTraffic = scope.props.stationData.getGroup('class').top(Infinity).map(function(vclass,i){
-                scope.props.stationData.getDimension('class').filter(vclass.key);
+            var dailyTraffic = scope.props.stationData.getGroup(classGrouping).top(Infinity).map(function(vclass,i){
+                scope.props.stationData.getDimension(classGrouping).filter(vclass.key);
                 return scope.props.stationData.getGroup('dir').top(Infinity).map(function(dir,i){
                     scope.props.stationData.getDimension('dir').filter(dir.key);
                     var mult = 1;
@@ -31,7 +47,7 @@ var RouteTotalGraph = React.createClass({
                         mult = -1;
                     }
                     return {
-                        key:'Class '+vclass.key,
+                        key:vclass.key,
                         values: scope.props.stationData.getGroup('average_daily_traffic').top(Infinity).map(function(time){
                             return {
                                 key:time.key,
@@ -46,7 +62,7 @@ var RouteTotalGraph = React.createClass({
                         dirSet[0].values.push(d);
                     })
                 }
-                dirSet[0].color = colorRange[i];
+                //dirSet[0].color = colorRange[i];
                 dirSet[0].values.sort(function(a,b){
                     return b.key - a.key;
                 });
@@ -55,7 +71,7 @@ var RouteTotalGraph = React.createClass({
                 // }
                 return dirSet[0];
             }).sort(function(a,b){
-                return a.key.split(' ')[1] - b.key.split(' ')[1];
+                return a.key.split(' ')[0] - b.key.split(' ')[0];
             });
            
             if(!scope.props.filters.month){
@@ -123,18 +139,30 @@ var RouteTotalGraph = React.createClass({
         if(scope.props.stationData.initialized){
             nv.addGraph(function(){
                     var chart = nv.models.multiBarChart()
-                      .x(function(d) { return d.key })    //Specify the data accessors.
-                      .y(function(d) { return d.value })
-                      //.staggerLabels(true)    //Too many bars and not enough room? Try staggering labels.
-                      .tooltips(true)        //Don't show tooltips
-                      //.showValues(false)       //...instead, show the bar value right on top of each bar.
-                      .transitionDuration(350)
-                      .stacked(true)
-                          .showControls(false)
+                        .x(function(d) { return d.key })    //Specify the data accessors.
+                        .y(function(d) { return d.value })
+                        .color(COLOR_VALUES)
+                        //.staggerLabels(true)    //Too many bars and not enough room? Try staggering labels.
+                        .tooltips(true)        //Don't show tooltips
+                        //.showValues(false)       //...instead, show the bar value right on top of each bar.
+                        .transitionDuration(350)
+                        .stacked(true)
+                        .showControls(false)
+                        .showLegend(false)
 
 
                     d3.select('#routeTotalGraph svg')
-                        .datum(scope.processData())
+                        .datum(scope.processData().map(function(d){
+                            console.log(d);
+                            if( scope.props.filters.classGroups.indexOf(d.key) > -1){
+                                d.values = d.values.map(function(v){
+                                    v.value = 0;
+                                    return v;
+                                })    
+                            }
+                            
+                            return d; 
+                        }))
                         .call(chart);
 
                  

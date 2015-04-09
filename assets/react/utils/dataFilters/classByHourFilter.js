@@ -60,6 +60,14 @@ module.exports  = {
 						}
 					})
 					row['class'] = i;
+					if(i < 5){
+						row['classGroup'] = '1 - Personal Vehicle';
+					}else if(i < 10){
+						row['classGroup'] = '2 - Single Unit Truck'
+					}else{
+						row['classGroup'] = '3 - Tractor Trailer'
+					}
+
 					row['f0_'] = +d['f'+i+'_'];
 					normalForm.push(row);
 				}
@@ -115,6 +123,13 @@ module.exports  = {
 			dimensions['class'] = classData.dimension(function(d){ return +d.class });
 			groups['class'] = dimensions['class'].group().reduceCount();
 			groups['classSum'] = dimensions['class'].group().reduceSum(function(d){
+				return d['f0_'];
+			});
+
+
+			dimensions['classGroup'] = classData.dimension(function(d){ return d.classGroup });
+			groups['classGroup'] = dimensions['classGroup'].group().reduceCount();
+			groups['classGroupSum'] = dimensions['classGroup'].group().reduceSum(function(d){
 				return d['f0_'];
 			});
 
