@@ -14,7 +14,8 @@ var AppDispatcher = require('../dispatcher/AppDispatcher'),
     CHANGE_EVENT = 'change';
 
 var _selectedAgency = 1,
-    _agencies = {};
+    _agencies = {},
+    _default = {datasource:'allWim'};
 
 function _addAgencies(rawData) {
   //console.log('stores/AgencyStore/_addUsers',rawData);
@@ -58,8 +59,10 @@ var AgencyStore = assign({}, EventEmitter.prototype, {
   },
 
   getSelectedAgency:function(){
-    return _agencies[_selectedAgency];
-  }
+    return _agencies[_selectedAgency] ?  _agencies[_selectedAgency] : _default;
+  },
+
+
 
 });
 

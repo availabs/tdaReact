@@ -29,6 +29,7 @@ module.exports = {
   //--------------------------------------------------
   // Class Data Routes
   //--------------------------------------------------
+  
   getClassByDay : function(fips){
     if(!AgencyStore.getSelectedAgency()){
       //console.log('Error: No Agency Datasource Selected');
@@ -41,6 +42,7 @@ module.exports = {
     });
 
   },
+
   getClassByMonth : function(fips){
     if(!AgencyStore.getSelectedAgency()){
       //console.log('Error: No Agency Datasource Selected');
@@ -49,6 +51,20 @@ module.exports = {
     var postData ={database:AgencyStore.getSelectedAgency().datasource,fips:fips};
     d3.json('/tmgClass/byMonth').post(JSON.stringify(postData),function(err,data){
       ServerActionCreators.getClassByMonth(data,fips);
+    });
+  },
+
+  getClassByHour : function(stationId,fips){
+    if(!AgencyStore.getSelectedAgency()){
+      console.log('Error: No Agency Datasource Selected');
+      return []
+    }
+
+    var postData ={database:AgencyStore.getSelectedAgency().datasource,stationId:stationId,fips:fips};
+    d3.json('/tmgClass/byHour').post(JSON.stringify(postData),function(err,data){
+      if(err){console.log('classbyHour error',err)}
+      //console.log('getClassByHour',data)
+      ServerActionCreators.getClassByHour(data,stationId,fips);
     });
   },
   

@@ -15,11 +15,15 @@ var AppDispatcher = require('../dispatcher/AppDispatcher'),
 
     SailsWebApi = require('../utils/api/SailsWebApi'),
     ClassByDayFilter = require('../utils/dataFilters/classByDayFilter.js'),
-    ClassByMonthFilter = require('../utils/dataFilters/classByMonthFilter.js');
+    ClassByMonthFilter = require('../utils/dataFilters/classByMonthFilter.js'),
+    ClassByHourFilter = require('../utils/dataFilters/classByHourFilter.js');
 
 var _selectedState = null,
     _classbyDay = {},
     _classbyMonth = {},
+    _selectedStation = null,
+    _selectedState = null,
+    _classbyHour = {},
     _filters={
       year:null,
       month:null,
@@ -28,8 +32,6 @@ var _selectedState = null,
     };
 
 function _setState(fips){
-  //console.log('StatewideStore / _setState ',fips)
-  //reset filters
   _filters={
       year:null,
       month:null,
@@ -39,23 +41,60 @@ function _setState(fips){
   _selectedState = fips;
 }
 
+function _setStation(stationId,fips){
+  //console.log('StationStore / _setState ',fips)
+  //reset filters
+  _filters={
+      year:null,
+      month:null,
+      class:null,
+      stations:[],
+      classGroups:[]
+  };
+
+  _selectedStation = stationId;
+  _selectedState = fips;
+}
+
 function _filterYear(year){
   //ClassByDayFilter.getDimension('year').filter(year);
   ClassByMonthFilter.getDimension('year').filter(year);
+  if(ClassByHourFilter.initialized()){
+    ClassByHourFilter.getDimension('year').filter(year);
+  }
   _filters.year = year;
 }
 
 function _filterMonth(data){
   //ClassByDayFilter.getDimension('year').filter(year);
   ClassByMonthFilter.getDimension('month').filter(data);
+  if(ClassByHourFilter.initialized()){
+    ClassByHourFilter.getDimension('month').filter(data);
+  }
   _filters.month = data;
 }
 
 
 function _filterClass(data){
   //ClassByDayFilter.getDimension('year').filter(year);
+
   ClassByMonthFilter.getDimension('class').filter(data);
   _filters.class = data;
+}
+
+function _filterClassGroup(data){
+  //ClassByDayFilter.getDimension('year').filter(year);
+
+  if(_filters.classGroups.indexOf(data) === -1){
+    _filters.classGroups.push(data)
+  }else{
+    _filters.classGroups.splice(_filters.classGroups.indexOf(data),1)
+  }
+
+  ClassByHourFilter.getDimension('classGroup').filterFunction(function(d){
+    return _filters.classGroups.indexOf(d.classGroup) > -1
+  });
+  
 }
 
 
@@ -93,6 +132,29 @@ var StatewideStore = assign({}, EventEmitter.prototype, {
 
   getSelectedState:function(){
     return _selectedState;
+  },
+
+  getSelectedStation:function(){
+    return _selectedStation;
+  },
+
+  getClassByHour:function(){
+    //if data is loaded send it
+    if(_classbyHour[_selectedStation] && _classbyHour[_selectedStation] !== 'loading' ){
+      ClassByHourFilter.init(_classbyHour[_selectedStation],_selectedStation);
+      return ClassByHourFilter;
+    }
+    
+    //if data hasn't start started loading, load it 
+    if(_classbyHour[_selectedStation] !== 'loading'){
+      console.log('load',_selectedStation,_selectedState)
+      SailsWebApi.getClassByHour(_selectedStation,_selectedState);
+      _classbyHour[_selectedStation] = 'loading';
+    }
+
+    //if requested data isn't loaded send most recent data
+    // may want to rethink this
+    return ClassByHourFilter;
   },
 
   getClassByDay:function(){
@@ -150,6 +212,11 @@ StatewideStore.dispatchToken = AppDispatcher.register(function(payload) {
       StatewideStore.emitChange();
     break;
 
+     case ActionTypes.SET_SELECTED_STATION:
+      _setStation(action.Id,action.fips);
+      StatewideStore.emitChange();
+    break;
+
     case ActionTypes.FILTER_YEAR:
       _filterYear(action.year);
       StatewideStore.emitChange();
@@ -164,9 +231,18 @@ StatewideStore.dispatchToken = AppDispatcher.register(function(payload) {
       _filterClass(action.vclass);
       StatewideStore.emitChange();
     break;
-
+     case ActionTypes.FILTER_VCLASS_GROUP:
+      _filterClassGroup(action.classGroup);
+      StatewideStore.emitChange();
+    break;
+    
     case ActionTypes.FILTER_STATIONS:
       _filterStations(action.stations);
+      StatewideStore.emitChange();
+    break;
+
+    case ActionTypes.TMG_CLASS_BYHOUR:
+      _classbyHour[action.stationId] = action.data;
       StatewideStore.emitChange();
     break;
 
@@ -180,7 +256,7 @@ StatewideStore.dispatchToken = AppDispatcher.register(function(payload) {
       StatewideStore.emitChange();
     break;
 
-     case ActionTypes.CBM_INITIALIZED:
+    case ActionTypes.CBM_INITIALIZED:
       StatewideStore.emitChange();
     break;
 

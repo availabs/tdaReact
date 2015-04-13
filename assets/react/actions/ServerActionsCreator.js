@@ -24,6 +24,15 @@ module.exports = {
   //------------------------------------
   // TMG Class
   //------------------------------------
+  getClassByHour : function(data,stationId,fips){
+    AppDispatcher.handleServerAction({
+      type: ActionTypes.TMG_CLASS_BYHOUR,
+      data: data,
+      stationId: stationId,
+      fips:fips
+    })
+  },
+
   getClassByDay : function(data,fips){
     AppDispatcher.handleServerAction({
       type: ActionTypes.TMG_CLASS_BYDAY,

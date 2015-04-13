@@ -18,6 +18,52 @@ var bigQuery = googleapis.bigquery('v2');
 
 module.exports = {
 	
+	byHour:function(req,res){
+		var database = req.param('database'),
+ 			station = req.param('stationId'),
+ 			fips = req.param('fips')
+ 			output = {};
+
+ 		fileCache.checkCache({datasource:database,type:'stationClassByHour',typeId:fips+station},function(data){
+ 			//console.log('find cache',data);
+ 			if(data){
+ 				console.log('cache sucess');
+ 				console.time('send cache');
+ 				res.send(data)
+ 				console.timeEnd('send cache');
+ 			}else{
+			    var sql = 'SELECT '+ 
+				  'station_id,dir,year,month,day,hour, '+
+				  'sum(total_vol),sum(class1),sum(class2),'+
+				  'sum(class3),sum(class4),sum(class5),sum(class6),'+
+				  'sum(class7),sum(class8),sum(class9),sum(class10),sum(class11),sum(class12),sum(class13) '+
+				  "FROM [tmasWIM12."+database+"Class] where state_fips = '"+fips+"' and station_id = '"+station+"' "+
+				  'group by station_id,dir,year,month,day,hour '+
+				  'order by station_id,dir,year,month,day,hour ';
+				
+				//console.log('by hour',sql)
+				BQuery(sql,function(data){
+
+					var fullData = data.rows.map(function(row,index){
+						var outrow = {}
+						
+						data.schema.fields.forEach(function(field,i){
+							outrow[field.name] = row.f[i].v;
+						});
+						return outrow;
+					});
+					console.time('send Data');
+					res.json(fullData);
+					console.timeEnd('send Data');
+					console.log('caching');
+					fileCache.addData({datasource:database,type:'stationClassByHour',typeId:fips+station},fullData);
+				});
+
+			}
+ 	
+		});
+	},
+
 	byMonth:function(req,res){
 		var database = req.param('database'),
  			fips = req.param('fips'),
