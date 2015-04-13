@@ -27,7 +27,7 @@ var GraphContainer = React.createClass({
     _updateGraph: function(){
         var scope = this;
         if(Object.keys(this.props.classByMonth.getDimensions()).length > 0){
-
+            
             var stationADT = scope.props.classByMonth.getGroups()
                 .ADT.order(function(p){return p.avg})
                 .top(Infinity)
@@ -47,10 +47,16 @@ var GraphContainer = React.createClass({
                         return p.value.monthAvg.reduce(function(a,b){ return a+b})
                     });
                    
+            console.log(
+                'update graph',
+                stationADT
+            )
+
             // console.log(
             //     'update graph',
-            //     stationADT
+            //     data
             // )
+
 
             AdtScale.domain(stationADT.map(function(ADT){
                 return ADT.value.avg;

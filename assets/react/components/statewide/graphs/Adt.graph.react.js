@@ -46,7 +46,10 @@ var GraphContainer = React.createClass({
            // console.log(
            //      'update graph',
            //      stationADT
+                
+                
            //  )
+           
 
             AdtScale.domain(stationADT.map(function(ADT){
                 return ADT.value.classAvg.reduce( function(a,b){ return a+b});
