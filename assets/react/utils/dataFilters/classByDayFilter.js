@@ -1,3 +1,7 @@
+// --stores
+var StationStore = require('../../stores/StationStore')
+
+// --utils
 var crossfilter = require('crossfilter');
 
 function reduceAddAvg() {
@@ -55,7 +59,6 @@ module.exports  = {
 
 	init:function(data,dataset){
 
-			
 		if(dataset !== currentDataSet){
 
 			// console.log('classFilter Init',dataset,currentDataSet,data.length);
@@ -80,7 +83,7 @@ module.exports  = {
 
 			//dimensions['year'] = classData.dimension(function(d){ return d.year });
 
-
+			
 			groups['ADT'] = dimensions['ADT']
 				.group( function (d,i){ return d.substr(0,6) })
 				.reduce(reduceAddAvg('f0_'), reduceRemoveAvg('f0_'), reduceInitAvg);

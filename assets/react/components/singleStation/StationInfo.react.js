@@ -61,7 +61,7 @@ var StationInfo = React.createClass({
             'left': '114.5px',
             'top': '84px'
         };
-        console.log('stationInfo',this.props.stationInfo)
+        //console.log('stationInfo',this.props.stationInfo)
         // <div className="visits">15866<br/> visits </div>
     	return(
     		<section className="widget large">
