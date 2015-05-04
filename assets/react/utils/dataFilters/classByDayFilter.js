@@ -55,7 +55,7 @@ module.exports  = {
 
 	init:function(data,dataset){
 
-			
+		
 		if(dataset !== currentDataSet){
 
 			// console.log('classFilter Init',dataset,currentDataSet,data.length);

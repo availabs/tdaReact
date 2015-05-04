@@ -32,7 +32,7 @@ module.exports = {
   
   getClassByDay : function(fips){
     if(!AgencyStore.getSelectedAgency()){
-      console.log('Error: No Agency Datasource Selected');
+      //console.log('Error: No Agency Datasource Selected');
       return []
     }
     var url = '/tmgClass/byDay';
