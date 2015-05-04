@@ -91,7 +91,7 @@ module.exports = {
   // Sails Rest Route
   //---------------------------------------------------
   create: function(type,data){
-    d3.xhr('/'+type).post(JSON.stringify(data),function(err,resData){
+    d3.json('/'+type).post(JSON.stringify(data),function(err,resData){
       //ToDo Check for Errors and Throw Error Case
       //console.log('utils/sailsWebApi/createUser',resData);
       //add new user back to store through 
@@ -108,7 +108,8 @@ module.exports = {
 
 
   update: function(type,data){
-    io.socket.put('/'+type+'/'+data.id,data,function(resData){
+    d3.json('/'+type+'/'+data.id)
+    .send('PUT',JSON.stringify(data),function(err,resData){
       //ToDo Check for Errors and Throw Error Case
       console.log('utils/sailsWebApi/updateData',resData);
 
@@ -118,7 +119,8 @@ module.exports = {
   },
 
   delete: function(type,id){
-    io.socket.delete('/'+type+'/'+id,function(resData){
+    d3.json('/'+type+'/'+id)
+    .send('DELETE',function(err,resData){
       //ToDo Check for Errors and Throw Error Case
       console.log('utils/sailsWebApi/delete',resData,id);
 

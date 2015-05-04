@@ -18,6 +18,9 @@ var bigQuery = googleapis.bigquery('v2');
 
 module.exports = {
 	
+
+
+	
 	byHour:function(req,res){
 		var database = req.param('database'),
  			station = req.param('stationId'),

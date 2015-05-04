@@ -30,6 +30,13 @@ module.exports = {
   
   },
 
+  selectUser:function(id){
+    AppDispatcher.handleViewAction({
+      type: ActionTypes.SELECT_USER,
+      userID:id
+    })
+  },
+
   setSelectedStation:function(id,fips){
     
     AppDispatcher.handleViewAction({

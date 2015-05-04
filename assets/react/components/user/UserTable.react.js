@@ -4,13 +4,14 @@ var React = require('react'),
     // -- Components 
     
     // -- Action Creators
-    SailsWebApi = require('../../utils/api/SailsWebApi');
+    SailsWebApi = require('../../utils/api/SailsWebApi'),
+    ClientActionsCreator = require('../../actions/ClientActionsCreator');
     
 
 var UserRow = React.createClass({
     
-     _onClick: function(id){
-        //UserActionsCreator.selectUser(this.props.user.id);
+     _onClick: function(){
+        ClientActionsCreator.selectUser(this.props.user.id);
         //console.log('clicked');
     },
 
