@@ -1,4 +1,4 @@
-ca// --stores
+// --stores
 var StationStore = require('../../stores/StationStore')
 
 // --utils
@@ -34,11 +34,11 @@ function reduceRemoveAvg() {
 
 function reduceInitAvg() {
   return {
-		count:0, sum:0, avg:0,
-		monthSum: [0,0,0,0,0,0,0,0,0,0,0,0],
-		monthCount: [0,0,0,0,0,0,0,0,0,0,0,0],
-		monthAvg:  [0,0,0,0,0,0,0,0,0,0,0,0]
-	};
+  			count:0, sum:0, avg:0,
+  			monthSum: [0,0,0,0,0,0,0,0,0,0,0,0],
+  			monthCount: [0,0,0,0,0,0,0,0,0,0,0,0],
+  			monthAvg:  [0,0,0,0,0,0,0,0,0,0,0,0]
+  		};
 }
 
 function orderValue(p) {

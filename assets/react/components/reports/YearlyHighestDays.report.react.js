@@ -99,8 +99,9 @@ var tableContainer = React.createClass({
           total_: 0
         }
     },
+
     renderTable: function(){
-        if(!this.props.stationData.initialized() || !this.props.stationInfo){
+        if(!this.props.stationData || !this.props.stationData.initialized() || !this.props.stationInfo){
             return (
                 <span />
             )
@@ -374,44 +375,17 @@ function getMonth(month){
 }
 
     function getDir(dir){
-          if(dir == 0){
-            return "EW/SENW"
-          }
-          else if(dir == 1){
-            return "North"
-          }
-          else if(dir == 2){
-            return "Northeast"
-          }
-          else if(dir == 3){
-            return "East"
-          }
-          else if(dir == 4){
-            return "Southeast"
-          }
-          else if(dir == 5){
-            return "South"
-          }
-          else if(dir == 6){
-            return "Southwest"
-          }
-          else if(dir == 7){
-            return "West"
-          }
-          else if(dir == 8){
-            return "Northwest"
-          }
-          else{
-            return "NS/NESW"
-          }
-        }
+      var  directions = ["EW/SENW","North","Northeast","East","Southeast","South","Southwest","West","Northwest"];
+      return directions[dir] ? directions[dir] : "NS/NESW";
+    }
 
-        function compareVolDay(a, b) {
-            return b.Total - a.Total
-        }
-        function compareVolHour(a, b) {
-            return b.HourVol - a.HourVol 
-        }
+    function compareVolDay(a, b) {
+        return b.Total - a.Total
+    }
+
+    function compareVolHour(a, b) {
+        return b.HourVol - a.HourVol 
+    }
 
 
 module.exports = tableContainer;

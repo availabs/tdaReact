@@ -7,7 +7,6 @@ var React = require('react'),
     AdtGraph = require('../components/statewide/graphs/Adt.graph.react'),
     MadtGraph = require('../components/statewide/graphs/Madt.graph.react'),
     HpmsTypeGraph = require('../components/statewide/graphs/HpmsType.graph.react'),
-    YearlyHighestDays = require('../components/reports/YearlyHighestDays.report.react'),
     
     
     StateWideMap =require('../components/statewide/StateWideMap.react'),
@@ -88,7 +87,7 @@ var StateIndex = React.createClass({
 
                         <HpmsTypeGraph  hpmsData={this.state.hpmsData} selectedState={this.state.selectedState} groupKey='route_length' />
 
-                        <YearlyHighestDays classByDay={this.state.classByDay} selectedState={this.state.selectedState} />
+                        
 
                     </div>
                    

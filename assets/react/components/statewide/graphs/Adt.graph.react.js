@@ -7,6 +7,7 @@ var React = require('react'),
 
     //-- for making the chart
     ChartBuilder = require('../../charts/chartMaker.react.js'),
+    DataTable = require('../../utils/DataTable.react'),
 
     //-- Stores
     StateWideStore = require('../../../stores/StatewideStore'),
@@ -31,6 +32,32 @@ var GraphContainer = React.createClass({
     },
 
 
+    _processData:function(){
+        var scope = this;
+        if(Object.keys(scope.props.classByMonth.getDimensions()).length > 0){
+
+            var stationADT= scope.props.classByMonth.getGroups()
+                                .ADT
+                                .top(Infinity)
+                                .filter(function(p){ 
+                                    var value = p.value.classAvg.reduce( function(a,b){ return a+b});
+                                    return !isNaN(value) && value > 0;
+                                })
+                                .sort(function(a,b){
+                                    return b.value.classAvg.reduce( function(a,b){ return a+b})-a.value.classAvg.reduce( function(a,b){ return a+b});
+                                })
+                                .map(function (ADT){
+                                    return {
+                                        "label":ADT.key,
+                                        "value":ADT.value.classAvg.reduce( function(a,b){ return a+b}),
+                                        "color":AdtScale(ADT.value.classAvg.reduce( function(a,b){ return a+b}))
+                                    }
+                                })
+            return stationADT
+        }
+        return []
+    },
+
     _updateGraph: function(){
         var scope = this;
         
@@ -46,19 +73,13 @@ var GraphContainer = React.createClass({
                     return !isNaN(value) && value > 0;
                 });
 
-           // console.log(
-           //      'update graph',
-           //      stationADT
-                
-                
-           //  )
+        
            
 
             AdtScale.domain(stationADT.map(function(ADT){
                 return ADT.value.classAvg.reduce( function(a,b){ return a+b});
             }));
-            //console.log('draw graph');
-            //var colorScale = d3.scale.quantile
+            
             nv.addGraph(function() {
                 var chart = nv.models.discreteBarChart()
                   .x(function(d) { return d.label })    //Specify the data accessors.
@@ -105,16 +126,7 @@ var GraphContainer = React.createClass({
                 return chart;
             });
         
-            return(
-
-                    <div>
-                    
-                        <ChartBuilder  chartData={stationADT} />
-
-                    </div>
-
-                )
-
+           
        }
        
     },
@@ -131,25 +143,35 @@ var GraphContainer = React.createClass({
             marginLeft:'-10px',
             fontWeight:'700',
             display: Object.keys(scope.props.classByMonth.getDimensions()).length > 0 ? 'block' : 'none'
-        }
-
-        var title = 'Annual Average Daily Traffic';
+        }, 
+        title = 'Annual Average Daily Traffic';
         
+
+        console.log('_processData',this._processData())
         return (
-        	<section className="widget large" style={{ background:'none'}}>
-                <header>
-                    <h4 style={headerStyle}>
-                        {title}
-                    </h4>
-                    
-                </header>
-                <div className="body">
-                    <div id="adtchart">
-                        <svg style={svgStyle}></svg>
+            <div>
+            	<section className="widget large" style={{ background:'none'}}>
+                    <header>
+                        <h4 style={headerStyle}>
+                            {title}
+                        </h4>
+                        
+                    </header>
+                    <div className="body">
+                        <div id="adtchart">
+                            <svg style={svgStyle}></svg>
+                        </div>
+                        {this._updateGraph()}
+                        
                     </div>
-                    {this._updateGraph()}
+                </section>
+                <div>
+                    <DataTable data={this._processData()} columns={ [
+                        {key:'label', name:'Station ID'},
+                        {key:'value', name:'AADT'}
+                    ]} />
                 </div>
-            </section>
+            </div>
         );
     }
 });

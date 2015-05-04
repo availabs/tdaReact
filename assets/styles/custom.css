@@ -148,3 +148,91 @@ Unified Station ID highlight Styles
     
   }
 }
+
+/********************************
+datatable
+********************************/
+.backgrid-paginator > ul {
+  font-weight: 400;
+  display: inline-block;
+  padding-left: 0;
+  margin: 18px 0;
+  border-radius: 3px;
+}
+/* line 520, ../../src/sass/_override-custom-libs.scss */
+.backgrid-paginator > ul > li {
+  display: inline;
+}
+/* line 522, ../../src/sass/_override-custom-libs.scss */
+.backgrid-paginator > ul > li > a,
+.backgrid-paginator > ul > li > span {
+  position: relative;
+  float: left;
+  line-height: 1.428571429;
+  text-decoration: none;
+  color: #666666;
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  margin: 0 2px;
+}
+/* line 534, ../../src/sass/_override-custom-libs.scss */
+.backgrid-paginator > ul > li > a > .fa-lg,
+.backgrid-paginator > ul > li > span > .fa-lg {
+  position: relative;
+  top: -1px;
+}
+/* line 540, ../../src/sass/_override-custom-libs.scss */
+.backgrid-paginator > ul > li:first-child > a,
+.backgrid-paginator > ul > li:first-child > span {
+  margin-left: 0;
+}
+/* line 549, ../../src/sass/_override-custom-libs.scss */
+.backgrid-paginator > ul > li > a:hover, .backgrid-paginator > ul > li > a:focus,
+.backgrid-paginator > ul > li > span:hover,
+.backgrid-paginator > ul > li > span:focus {
+  color: #666666;
+  background-color: #eeeeee;
+  border-color: transparent;
+}
+/* line 559, ../../src/sass/_override-custom-libs.scss */
+.backgrid-paginator > ul > .active > a, .backgrid-paginator > ul > .active > a:hover, .backgrid-paginator > ul > .active > a:focus,
+.backgrid-paginator > ul > .active > span,
+.backgrid-paginator > ul > .active > span:hover,
+.backgrid-paginator > ul > .active > span:focus {
+  z-index: 2;
+  color: #666666;
+  background-color: #eeeeee;
+  border-color: transparent;
+  cursor: default;
+}
+/* line 571, ../../src/sass/_override-custom-libs.scss */
+.backgrid-paginator > ul > .disabled > span,
+.backgrid-paginator > ul > .disabled > span:hover,
+.backgrid-paginator > ul > .disabled > span:focus,
+.backgrid-paginator > ul > .disabled > a,
+.backgrid-paginator > ul > .disabled > a:hover,
+.backgrid-paginator > ul > .disabled > a:focus {
+  color: gray;
+  background-color: transparent;
+  border-color: transparent;
+  cursor: not-allowed;
+}
+/* line 5, ../../../bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap/mixins/_pagination.scss */
+.backgrid-paginator > ul > li > a,
+.backgrid-paginator > ul > li > span {
+  padding: 4px 10px;
+  font-size: 12px;
+}
+/* line 11, ../../../bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap/mixins/_pagination.scss */
+.backgrid-paginator > ul > li:first-child > a,
+.backgrid-paginator > ul > li:first-child > span {
+  border-bottom-left-radius: 3px;
+  border-top-left-radius: 3px;
+}
+/* line 17, ../../../bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap/mixins/_pagination.scss */
+.backgrid-paginator > ul > li:last-child > a,
+.backgrid-paginator > ul > li:last-child > span {
+  border-bottom-right-radius: 3px;
+  border-top-right-radius: 3px;
+}
