@@ -5,6 +5,9 @@ var React = require('react'),
     nv = require('../../../utils/dependencies/nvd3'),
     fips2state = require('../../../utils/data/fips2state'),
 
+    //-- for making the chart
+    ChartBuilder = require('../../charts/chartMaker.react.js'),
+
     //-- Stores
     StateWideStore = require('../../../stores/StatewideStore'),
 
@@ -98,13 +101,22 @@ var GraphContainer = React.createClass({
                 
                 return chart;
             });
-            
+        
+            return(
+
+                    <div>
+                    
+                        <ChartBuilder  chartData={stationADT} />
+
+                    </div>
+
+                )
+
        }
        
     },
     render: function() {
         var scope = this;
-        this._updateGraph();
         var svgStyle = {
           height: this.props.height+'px',
           width: '100%'
@@ -132,6 +144,7 @@ var GraphContainer = React.createClass({
                     <div id="adtchart">
                         <svg style={svgStyle}></svg>
                     </div>
+                    {this._updateGraph()}
                 </div>
             </section>
         );

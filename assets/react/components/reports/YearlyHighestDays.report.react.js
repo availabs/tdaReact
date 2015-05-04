@@ -42,6 +42,39 @@ var tableContainer = React.createClass({
         })
         
     },
+    makeRow: function(index,AADT){
+            if(index >= 0){
+
+
+                return(
+                        <tr>
+                          <td style={{background:'#B8B8B8'}}>({index+1})</td>
+                          <td>{this.state.DailyVol[index].Date}</td>
+                          <td>{this.state.parsedData[this.indexSearch(this.state.DailyVol[index].Date,"Day")].DoW}</td>
+                          <td>{AADT}</td>
+                          <td>{this.state.DailyVol[index].Total}</td>
+                          <td>{((this.state.DailyVol[index].Total/AADT)*100).toFixed(2)}%</td>
+                          <td>{this.state.parsedData[this.indexSearch(this.state.DailyVol[index].Date,"Day")].hour}</td>
+                          <td>{this.state.parsedData[this.indexSearch(this.state.DailyVol[index].Date,"Day")].HourVol}</td>
+                          <td>{((this.state.parsedData[this.indexSearch(this.state.DailyVol[index].Date,"Day")].HourVol/this.state.DailyVol[index].Total)*100).toFixed(2)}%</td>
+                          <td>{((this.state.parsedData[this.indexSearch(this.state.DailyVol[index].Date,"Day")].HourVol/AADT)*100).toFixed(2)}%</td>
+                          <td>{this.state.parsedData[this.indexSearch(this.state.DailyVol[index].Date,"Day")].Direction}</td>
+                          <td>{this.state.parsedData[this.indexSearch(this.state.DailyVol[index].Date,"Day")].PeakHourVol}</td>
+                          <td>{this.state.parsedData[this.indexSearch(this.state.DailyVol[index].Date,"Day")].PerPeakHour}%</td>
+                          <td>{((this.state.parsedData[this.indexSearch(this.state.DailyVol[index].Date,"Day")].PeakHourVol/this.state.DailyVol[index].Total)*100).toFixed(2)}%</td>
+                          <td>{((this.state.parsedData[this.indexSearch(this.state.DailyVol[index].Date,"Day")].PeakHourVol/AADT)*100).toFixed(2)}</td>
+                        </tr>
+                )        
+            }
+    },
+    indexSearch: function(index,kind){
+        if(kind === "Date"){
+            return this.state.DailyVol.map(function(el) {return el.Date;}).indexOf(index)  
+        }
+        else if(kind === "Day"){
+            return this.state.parsedData.map(function(el) {return el.Date;}).indexOf(index)
+        }
+    },
     decrementIndex: function(){
         
         if(this.state._index > 0){
@@ -67,7 +100,7 @@ var tableContainer = React.createClass({
         }
     },
     renderTable: function(){
-        if(!this.props.stationData){
+        if(!this.props.stationData.initialized() || !this.props.stationInfo){
             return (
                 <span />
             )
@@ -100,26 +133,27 @@ var tableContainer = React.createClass({
         /*Below segment of code is what handles the data management. It only runs
           when the page is loaded or the filters are changed. 
           Has extra conditional logic to prevent extra runs.*/
-        if(scope.state.parsedData.length < 1){
+            
+        if(scope.props.stationData.initialized() && ((scope.state.yearFilter !== scope.props.filters.year) || scope.state.monthFilter !== scope.props.filters.month) ){
+            
             scope.state.yearFilter = scope.props.filters.year
             scope.state.monthFilter = scope.props.filters.month
-        }
-        
-        if(scope.props.stationData.initialized() && ((scope.state.yearFilter !== scope.props.filters.yearFilter) || scope.state.monthFilter !== scope.props.filters.monthFilter) ){
+            
             var x = 0
             //Data management below
             
             var total = 0           
             var temp = null
-            scope.state.parsedData = []
-            scope.state.DailyVol = []
+            scope.state.parsedData.splice(0,scope.state.parsedData.length)
+            scope.state.DailyVol.splice(0,scope.state.DailyVol.length)
 
             //This segment of the code is the same as the old report table code just with
             //the new variables switched in
 
+            
             scope.props.stationData.getDimension('stationId').top(Infinity).forEach(function(row){
                     
-                    total += parseInt(row.f0_)
+                    total = parseInt(row.f0_) + total
                     if(parseInt(row.year) < 10){
                         row.year = "0"+row.year
                     }
@@ -143,11 +177,11 @@ var tableContainer = React.createClass({
                         temp = row
                         scope.state.parsedData.push({'Date':row.month+'/'+row.day+'/'+row.year,'hour':row.hour,'DoW':getDOW(row.year,row.month,row.day),'Direction':getDir(parseInt(row.dir)),'HourVol':parseInt(row.f0_),'PeakHourVol':parseInt(row.f0_),'PerPeakHour':"100"})  
                     }
-                    if(indexSearch(row.month+'/'+row.day+'/'+row.year,"Date") == -1){
+                    if(scope.indexSearch(row.month+'/'+row.day+'/'+row.year,"Date") == -1){
                         scope.state.DailyVol.push({'Date':row.month+'/'+row.day+'/'+row.year,'Total':parseInt(row.f0_)})
                     }
                     else{
-                        scope.state.DailyVol[indexSearch(row.month+'/'+row.day+'/'+row.year,"Date")].Total += parseInt(row.f0_)
+                        scope.state.DailyVol[scope.indexSearch(row.month+'/'+row.day+'/'+row.year,"Date")].Total += parseInt(row.f0_)
                     }
                     if(scope.state.minDate === ""){
                         scope.state.minDate = {"month":parseInt(row.month),"day":parseInt(row.day),"date":row.month+'/'+row.day+'/'+row.year}
@@ -177,18 +211,13 @@ var tableContainer = React.createClass({
             
         }
        if(scope.props.stationData.getDimension('stationId').top(Infinity).length >0){
-
+                console.log(scope.state.total_,scope.state.DailyVol.length)
                 if(scope.state.DailyVol.length > 0){
                     var AADT = parseInt((scope.state.total_/scope.state.DailyVol.length).toFixed(0))
                 }
                 else{
                     var AADT = 0
                 }
-                $('#reportTable tbody').html('')
-                $('#reportTableData').html('')
-                $('#reportTable tbody').append('<tr><th colspan=2><strong>Date Range: '+scope.state.minDate.date+' - '+scope.state.maxDate.date+'</strong></th><th colspan=2><strong>Station Direction: '+scope.state.dir1+scope.state.dir2+'</strong></th></tr>')
-                $('#reportTableData').append('<tbody><tr><td rowspan="2" colspan="2" style="vertical-align:bottom;text-align:center;background:#B8B8B8">Date</td><td rowspan="2" style="vertical-align:bottom;text-align:center;background:#B8B8B8">Day of Week</td><td rowspan="2" style="vertical-align:bottom;text-align:right;background:#B8B8B8">AADT</td><td colspan ="2" style="text-align:center;background:#B8B8B8">Daily Data</td><td colspan="4" style="text-align:center;background:#B8B8B8">Peak Hour</td><td colspan="5" style="text-align:center;background:#B8B8B8">Peak Directional Data</td></tr><tr><td style="text-align:right;background:#B8B8B8">Daily Vol</td><td style="text-align:right;background:#B8B8B8">% AADT</td><td style="text-align:right;background:#B8B8B8">Hour</td><td style="text-align:right;background:#B8B8B8">Hr Vol</td><td style="text-align:right;background:#B8B8B8">% Daily Vol</td><td style="text-align:right;background:#B8B8B8">% AADT</td><td style="text-align:center;background:#B8B8B8">Dir</td><td style="text-align:right;background:#B8B8B8">Hr Vol</td><td style="text-align:right;background:#B8B8B8">% Peak Hr</td><td style="text-align:right;background:#B8B8B8">%Daily Vol</td><td style="text-align:right;background:#B8B8B8">% AADT</td></tr></tbody>')
-                var appendString = ""
                 
                 this.state.DailyVol.sort(compareVolDay)
                 this.state.parsedData.sort(compareVolHour)
@@ -198,41 +227,46 @@ var tableContainer = React.createClass({
                 else{
                    var endPoint = (10*this.state._index) + 10
                 }
-                
+                var rowHolder = []
                 for(var x = (10*this.state._index);x<endPoint;x++){
-        
-                    appendString = appendString + '<tr><td style="background:#B8B8B8">'+(x+1)+
-                                                  '</td><td>'+this.state.DailyVol[x].Date+
-                                                  '</td><td>'+this.state.parsedData[indexSearch(this.state.DailyVol[x].Date,"Day")].DoW+
-                                                  '</td><td>'+AADT+
-                                                  '</td><td>'+this.state.DailyVol[x].Total+
-                                                  '</td><td>'+((this.state.DailyVol[x].Total/AADT)*100).toFixed(2)+
-                                                  '%</td><td>'+this.state.parsedData[indexSearch(this.state.DailyVol[x].Date,"Day")].hour+
-                                                  '</td><td>'+this.state.parsedData[indexSearch(this.state.DailyVol[x].Date,"Day")].HourVol+
-                                                  '</td><td>'+((this.state.parsedData[indexSearch(this.state.DailyVol[x].Date,"Day")].HourVol/this.state.DailyVol[x].Total)*100).toFixed(2)+
-                                                  '%</td><td>'+((this.state.parsedData[indexSearch(this.state.DailyVol[x].Date,"Day")].HourVol/AADT)*100).toFixed(2)+
-                                                  '%</td><td>'+this.state.parsedData[indexSearch(this.state.DailyVol[x].Date,"Day")].Direction+
-                                                  '</td><td>'+this.state.parsedData[indexSearch(this.state.DailyVol[x].Date,"Day")].PeakHourVol+
-                                                  '</td><td>'+this.state.parsedData[indexSearch(this.state.DailyVol[x].Date,"Day")].PerPeakHour+
-                                                  '%</td><td>'+((this.state.parsedData[indexSearch(this.state.DailyVol[x].Date,"Day")].PeakHourVol/this.state.DailyVol[x].Total)*100).toFixed(2)+
-                                                  '%</td><td>'+((this.state.parsedData[indexSearch(this.state.DailyVol[x].Date,"Day")].PeakHourVol/AADT)*100).toFixed(2)+
-                                                  '</td></tr>'
+                    rowHolder.push(this.makeRow(x,AADT))
+                    
                 }
                 
-                $("#reportTableData tbody").append(appendString)
+                return(
+
+                    <tbody>
+                        <tr>
+                            <td rowSpan="2" colSpan="2" style={{verticaAlign: 'bottom',textAlign: 'center', background: '#B8B8B8'}}>Date</td>
+                            <td rowSpan="2" style={{verticalAlign: 'bottom',textAlign: 'center', background: '#B8B8B8'}}>Day of Week</td>
+                            <td rowSpan="2" style={{verticalAlign:'bottom',textAlign:'right',background:'#B8B8B8'}}>AADT</td>
+                            <td colSpan ="2" style={{textAlign:'center',background:'#B8B8B8'}}>Daily Data</td>
+                            <td colSpan="4" style={{textAlign:'center',background:'#B8B8B8'}}>Peak Hour</td>
+                            <td colSpan="5" style={{textAlign:'center',background:'#B8B8B8'}}>Peak Directional Data</td>
+                        </tr>
+                        <tr>
+                            <td style={{textAlign:'right',background:'#B8B8B8'}}>Daily Vol</td>
+                            <td style={{textAlign:'right',background:'#B8B8B8'}}>% AADT</td>
+                            <td style={{textAlign:'right',background:'#B8B8B8'}}>Hour</td>
+                            <td style={{textAlign:'right',background:'#B8B8B8'}}>Hr Vol</td>
+                            <td style={{textAlign:'right',background:'#B8B8B8'}}>% Daily Vol</td>
+                            <td style={{textAlign:'right',background:'#B8B8B8'}}>% AADT</td>
+                            <td style={{textAlign:'right',background:'#B8B8B8'}}>Dir</td>
+                            <td style={{textAlign:'right',background:'#B8B8B8'}}>Hr Vol</td>
+                            <td style={{textAlign:'right',background:'#B8B8B8'}}>% Peak Hr</td>
+                            <td style={{textAlign:'right',background:'#B8B8B8'}}>%Daily Vol</td>
+                            <td style={{textAlign:'right',background:'#B8B8B8'}}>% AADT</td>
+                        </tr>
+                        <tr>
+                            {rowHolder}
+                        </tr>
+                    </tbody>
+
+                )
 
             }
-       function indexSearch(index,kind){
-            if(kind === "Date"){
-                return scope.state.DailyVol.map(function(el) {return el.Date;}).indexOf(index)  
-            }
-            else if(kind === "Day"){
-                return scope.state.parsedData.map(function(el) {return el.Date;}).indexOf(index)
-            }
-        }
        
     },
-
     render: function() {
         var scope = this;
         var svgStyle = {
@@ -250,6 +284,7 @@ var tableContainer = React.createClass({
 
         var title = 'Yearly Highest Days Report';
         //console.log(this.props)       
+        
         return (
         	<section className="widget large" style={{ background:'none'}}>
                 <header>
