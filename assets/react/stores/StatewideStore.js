@@ -161,6 +161,7 @@ var StatewideStore = assign({}, EventEmitter.prototype, {
     //if data is loaded send it
     if(_classbyDay[_selectedState] && _classbyDay[_selectedState] !== 'loading' ){
       ClassByDayFilter.init(_classbyDay[_selectedState],_selectedState);
+      
       return ClassByDayFilter;
     }
     

@@ -58,7 +58,8 @@ var StationInfo = React.createClass({
     },
     render:function(){
       	var scope = this;
-    	console.log('Station Info',this.processData(),this.props.stationData)
+    	//console.log('Station InfoA',this.processData())
+        //console.log('Station InfoB',this.props.stationData)
         // <div className="visits">15866<br/> visits </div>
     	return(
     		<section className="widget large">
