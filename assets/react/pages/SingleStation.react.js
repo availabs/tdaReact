@@ -17,8 +17,10 @@ var React = require('react'),
     CountByTimeGraph = require('../components/singleStation/CountByTimeGraph.react'),
     AvgHourGraph = require('../components/singleStation/AvgHourGraph.react'),
     VehicleClassPie = require('../components/singleStation/VehicleClassPie.react'),
-    StationInfo = require('../components/singleStation/StationInfo.react')
+    StationInfo = require('../components/singleStation/StationInfo.react'),
+    YearlyHighestDays = require('../components/reports/YearlyHighestDays.report.react'),
     AdtChangeReport = require('../components/singleStation/AdtChangeReport.react');
+
 
 var SingleStation = React.createClass({
     mixins: [Router.State],
@@ -99,6 +101,12 @@ var SingleStation = React.createClass({
                             
                         <AvgHourGraph stationData={this.state.stationdData} filters={this.state.filters} />                       
                         
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col-lg-12">
+                            
+                        <YearlyHighestDays stationData={this.state.stationdData} filters={this.state.filters} stationInfo={this.state.selectedStationMeta.properties} />
                     </div>
                 </div>
             </div>
