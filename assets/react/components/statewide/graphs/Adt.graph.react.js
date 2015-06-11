@@ -147,7 +147,7 @@ var GraphContainer = React.createClass({
         title = 'Annual Average Daily Traffic';
         
 
-        console.log('_processData',this._processData())
+        //console.log('_processData',this._processData())
         return (
             <div>
             	<section className="widget large" style={{ background:'none'}}>

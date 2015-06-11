@@ -71,6 +71,7 @@ var SingleStation = React.createClass({
             selectedStationMeta:StationStore.getSelectedStation()
         })
     },
+    
     renderData:function(){
         return (
             <div>

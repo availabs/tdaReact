@@ -10,8 +10,7 @@ var AppDispatcher = require('../dispatcher/AppDispatcher'),
     CHANGE_EVENT = 'change';
 
 var SailsWebApi = require('../utils/api/SailsWebApi');
-    console.log('begining AgencyStore',SailsWebApi);
-
+    
 var _selectedAgency = 1,
     _agencies = {},
     _default = {datasource:'allWim',name:'TMAS'},

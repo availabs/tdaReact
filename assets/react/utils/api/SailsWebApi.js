@@ -17,12 +17,12 @@ function listenToSockets(sessionUser){
   var io = require('./sails.io.js')();
 
   io.socket.on("job_created", function(e){
-    console.log('job_created',e)
+    //console.log('job_created',e)
     ServerActionCreators.receiveData('job',[e])
   });
 
   io.socket.on("job_updated", function(e){
-    console.log('job_updated',e)
+    //console.log('job_updated',e)
     ServerActionCreators.receiveData('job',e)
   });
 

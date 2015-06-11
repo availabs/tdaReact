@@ -149,7 +149,7 @@ var StatewideStore = assign({}, EventEmitter.prototype, {
     
     //if data hasn't start started loading, load it 
     if(_classbyHour[_selectedStation] !== 'loading'){
-      console.log('load',_selectedStation,_selectedState),
+      //console.log('load',_selectedStation,_selectedState),
 
       SailsWebApi.getClassByHour(_selectedStation,_selectedState,AgencyStore.getSelectedAgency());
       _classbyHour[_selectedStation] = 'loading';
