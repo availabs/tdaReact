@@ -153,7 +153,7 @@ var StatewideStore = assign({}, EventEmitter.prototype, {
 
       SailsWebApi.getClassByHour(_selectedStation,_selectedState,AgencyStore.getSelectedAgency());
       _classbyHour[_selectedStation] = 'loading';
-      ClassByHourFilter.init([],_selectedStation);
+      ClassByHourFilter.init('reset',_selectedStation);
     }
 
     //if requested data isn't loaded send most recent data

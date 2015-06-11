@@ -38,8 +38,10 @@ module.exports  = {
 
 	init:function(data,dataset){
 
-			
-		if(dataset !== currentDataSet){
+		if(data === 'reset'){
+			initialized = false
+		}			
+		else if(dataset !== currentDataSet){
 			//console.log('class By Month Init',dataset,currentDataSet,data.length);
 			var stationData = {};
 			StationStore.getStateStations(dataset).forEach(function(d){
