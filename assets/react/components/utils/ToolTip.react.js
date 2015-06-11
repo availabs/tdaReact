@@ -34,8 +34,7 @@ var ToolTip = React.createClass({
 			paddingLeft:'5',
 			borderTop:'5px solid black',
 			minWidth:'100px',
-			// width:this.props.size.width,
-			// height:this.props.size.height,
+			borderRadius:'4px',
 			zIndex:1000
 		
 		}

@@ -79,6 +79,15 @@ module.exports = {
       Id:id
     })
   },
+
+  getDataOverview:function(data,id,dataType){
+    AppDispatcher.handleServerAction({
+      type: ActionTypes.GET_DATA_OVERVIEW,
+      data:data,
+      dataType:dataType,
+      id:id
+    })
+  },
   
   //------------------------------------
   // CRUD Handlers

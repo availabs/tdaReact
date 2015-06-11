@@ -14,6 +14,7 @@ var AppDispatcher = require('../dispatcher/AppDispatcher'),
     CHANGE_EVENT = 'change',
 
     SailsWebApi = require('../utils/api/SailsWebApi'),
+    AgencyStore = require('./AgencyStore'),
     ClassByDayFilter = require('../utils/dataFilters/classByDayFilter.js'),
     ClassByMonthFilter = require('../utils/dataFilters/classByMonthFilter.js'),
     ClassByHourFilter = require('../utils/dataFilters/classByHourFilter.js');
@@ -148,7 +149,7 @@ var StatewideStore = assign({}, EventEmitter.prototype, {
     //if data hasn't start started loading, load it 
     if(_classbyHour[_selectedStation] !== 'loading'){
       console.log('load',_selectedStation,_selectedState)
-      SailsWebApi.getClassByHour(_selectedStation,_selectedState);
+      SailsWebApi.getClassByHour(_selectedStation,_selectedState,AgencyStore.getSelectedAgency());
       _classbyHour[_selectedStation] = 'loading';
     }
 
@@ -167,7 +168,7 @@ var StatewideStore = assign({}, EventEmitter.prototype, {
     
     //if data hasn't start started loading, load it 
     if(_classbyDay[_selectedState] !== 'loading'){
-      SailsWebApi.getClassByDay(_selectedState);
+      SailsWebApi.getClassByDay(_selectedState,AgencyStore.getSelectedAgency());
       _classbyDay[_selectedState] = 'loading';
     }
 
@@ -185,7 +186,7 @@ var StatewideStore = assign({}, EventEmitter.prototype, {
     }
     
     if(_classbyMonth[_selectedState] !== 'loading'){
-      SailsWebApi.getClassByMonth(_selectedState);
+      SailsWebApi.getClassByMonth(_selectedState,AgencyStore.getSelectedAgency());
       _classbyMonth[_selectedState] = 'loading';
     }
 

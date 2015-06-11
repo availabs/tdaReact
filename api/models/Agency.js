@@ -11,10 +11,9 @@ module.exports = {
   	name:"STRING",
   	datasource:"STRING",
   	users:{
-            collection: 'User',
-            via: 'agency',
-            dominant:true
-        },
+        collection: 'User',
+        via: 'agency'
+    },
     settings:"ARRAY",
   	
   }

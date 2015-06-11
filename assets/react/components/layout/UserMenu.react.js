@@ -26,6 +26,63 @@ var Header = React.createClass({
     _onChange :function(){
         this.setState(getSessionUserfromStore());
     },
+    
+    _renderUserAdmin :function(){
+        
+        if(this.state.sessionUser.sysadmin){
+
+            return(
+                <li role="presentation">            
+                    <Link to="userAdmin">
+                        <i className="fa fa-calendar"></i>
+                        User Admin
+                    </Link>
+                </li>
+            )
+
+        }else if(this.state.sessionUser.admin){
+
+            return(
+                <li role="presentation">      
+                    <Link to="userAdmin">
+                        <i className="fa fa-calendar"></i>
+                        User Admin
+                    </Link>
+                </li>
+            )
+        
+        }
+        return ( <span /> )
+    },
+    _renderDataSources :function(){
+        
+        if(this.state.sessionUser.sysadmin){
+
+            return(
+                <li role="presentation">
+                    <Link to="datasourceList">
+                        <i className="fa fa-inbox"></i>
+                        Data Management
+                    </Link>
+                </li>
+            )
+
+        }else if(this.state.sessionUser.admin){
+
+            var agencyId = this.state.sessionUser.agency[0] ? this.state.sessionUser.agency[0].id : 7;
+            
+            return(
+                <li role="presentation">
+                    <Link to="datasourceSingle" params={{agencyId:agencyId}}> 
+                        <i className="fa fa-inbox"></i>
+                        Data Management
+                    </Link>
+                </li>
+            )
+        }
+        return ( <span /> )
+    },
+
     render: function() {
         
         return (
@@ -47,20 +104,8 @@ var Header = React.createClass({
                             </a>
                         </a>
                     </li>
-                    <li role="presentation">
-                      
-                            <Link to="userAdmin">
-                                <i className="fa fa-calendar"></i>
-                                User Admin
-                            </Link>
-                        
-                    </li>
-                    <li role="presentation">
-                        <a href="#" className="link">
-                            <i className="fa fa-inbox"></i>
-                            Inbox
-                        </a>
-                    </li>
+                    {this._renderUserAdmin()}
+                    {this._renderDataSources()}
                 </ul>
             </li>
                         

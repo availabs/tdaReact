@@ -48,7 +48,7 @@ module.exports = {
 		// Try to find the user by there username address. 
 		// findOneByusername() is a dynamic finder in that it searches the model by a particular attribute.
 		// User.findOneByusername(req.param('username')).done(function(err, user) {
-		User.findOneByUsername(req.param('username'), function foundUser(err, user) {
+		User.findOneByUsername(req.param('username')).populate('agency').exec(function foundUser(err, user) {
 			if (err) return next(err);
 
 			// If no user is found...
@@ -92,12 +92,12 @@ module.exports = {
 					if (err) return next(err);
 
 					// Inform other sockets (e.g. connected sockets that are subscribed) that this user is now logged in
-					User.publishUpdate(user.id, {
-						loggedIn: true,
-						id: user.id,
-						name: user.name,
-						action: ' has logged in.'
-					});
+					// User.publishUpdate(user.id, {
+					// 	loggedIn: true,
+					// 	id: user.id,
+					// 	name: user.name,
+					// 	action: ' has logged in.'
+					// });
 
 					//Redirect to their profile page (e.g. /views/user/show.ejs)
 					res.redirect('/');

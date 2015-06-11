@@ -1,5 +1,6 @@
 'use strict';
-var React = require('react');
+var React = require('react'),
+	Link =	 require('react-router').Link;
 
 var DataTable = React.createClass({
  	
@@ -23,8 +24,12 @@ var DataTable = React.createClass({
 		var cursor = this.state.pageLength*this.state.currentPage;
 
 		var headerRow = scope.props.columns.map(function(col){
+			var style = {};
+			if(col.type == 'link'){
+				style={textAlign:'center'}
+			}
 			return (
-				<th>
+				<th style={style}>
 					{col.name}
 				</th>
 			)
@@ -39,6 +44,20 @@ var DataTable = React.createClass({
 						return (
 							<td data-key={rowValue}>
 								<button data-key={rowValue} className='btn btn-default' data-toggle="modal" data-target={col.target} data-backdrop="false">{col.name}</button>
+							</td>
+						)
+					}
+					if(col.type === 'link'){
+						var params = {};
+						for(var key in col.params){
+							params[key] = row[col.params[key]]
+						}
+						//console.log('params',params);
+						return (
+							<td data-key={rowValue} style={{textAlign:'center'}}>
+								<Link data-key={rowValue} to={col.target} params={params}>
+									{col.content}
+								</Link>
 							</td>
 						)
 					}

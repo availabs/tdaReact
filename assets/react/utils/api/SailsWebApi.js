@@ -9,11 +9,26 @@
 //var io =                    require('./sails.io.js')();
 var ServerActionCreators =    require('../../actions/ServerActionsCreator'),
     d3 =                      require('d3'),
-    fips2state =              require('../data/fips2state'),
-    AgencyStore =             require('../../stores/AgencyStore');
-    
+    fips2state =              require('../data/fips2state');
 
-module.exports = {
+
+function listenToSockets(sessionUser){
+  
+  var io = require('./sails.io.js')();
+
+  io.socket.on("job_created", function(e){
+    console.log('job_created',e)
+    ServerActionCreators.receiveData('job',[e])
+  });
+
+  io.socket.on("job_updated", function(e){
+    console.log('job_updated',e)
+    ServerActionCreators.receiveData('job',e)
+  });
+
+}  
+
+var api = {
 
   initAdmin: function(user){
 
@@ -23,6 +38,7 @@ module.exports = {
     this.read('user');
     this.read('agency');
     this.readStations();
+    listenToSockets();
     
   
   },
@@ -30,42 +46,52 @@ module.exports = {
   // Class Data Routes
   //--------------------------------------------------
   
-  getClassByDay : function(fips){
-    if(!AgencyStore.getSelectedAgency()){
-      //console.log('Error: No Agency Datasource Selected');
+  getClassByDay : function(fips,agency){
+    if(!agency){
       return []
     }
     var url = '/tmgClass/byDay';
-    var postData = {database:AgencyStore.getSelectedAgency().datasource,fips:fips};
+    var postData = {database:agency.datasource,fips:fips};
     d3.json(url).post(JSON.stringify(postData),function(err,data){
      ServerActionCreators.getClassByDay(data,fips);
     });
 
   },
 
-  getClassByMonth : function(fips){
-    if(!AgencyStore.getSelectedAgency()){
+  getClassByMonth : function(fips,agency){
+    if(!agency){
       //console.log('Error: No Agency Datasource Selected');
       return []
     }
-    var postData ={database:AgencyStore.getSelectedAgency().datasource,fips:fips};
+    var postData ={database:agency.datasource,fips:fips};
     d3.json('/tmgClass/byMonth').post(JSON.stringify(postData),function(err,data){
       ServerActionCreators.getClassByMonth(data,fips);
     });
   },
 
-  getClassByHour : function(stationId,fips){
-    if(!AgencyStore.getSelectedAgency()){
-      console.log('Error: No Agency Datasource Selected');
+  getClassByHour : function(stationId,fips,agency){
+    if(!agency){
       return []
     }
 
-    var postData ={database:AgencyStore.getSelectedAgency().datasource,stationId:stationId,fips:fips};
+    var postData ={database:agency.datasource,stationId:stationId,fips:fips};
     d3.json('/tmgClass/byHour').post(JSON.stringify(postData),function(err,data){
       if(err){console.log('classbyHour error',err)}
       //console.log('getClassByHour',data)
       ServerActionCreators.getClassByHour(data,stationId,fips);
     });
+  },
+
+  getDataOverview : function(agency){
+    
+    d3.json('/data/overview/'+agency.datasource+'/class',function(err,data){
+        ServerActionCreators.getDataOverview(data,agency.id,'class')
+    })
+
+    d3.json('/data/overview/'+agency.datasource+'/wim',function(err,data){
+        ServerActionCreators.getDataOverview(data,agency.id,'wim')
+    })
+  
   },
   
   //---------------------------------------------------
@@ -131,3 +157,5 @@ module.exports = {
 
 
 };
+console.log('this is my sailsWebApi',api);
+module.exports = api;

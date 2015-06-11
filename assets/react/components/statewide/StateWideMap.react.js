@@ -1,7 +1,7 @@
 'use strict';
 
 var React = require('react'),
-    Router = require('react-router'),
+    Navigation = require('react-router').Navigation,
     
     
     // -- Stores
@@ -35,9 +35,7 @@ var map = null,
 
 var StateWideMap = React.createClass({
     
-    contextTypes: {
-        router: React.PropTypes.func
-    },
+    mixins: [Navigation],
 
     getDefaultProps: function() {
         return {
@@ -252,7 +250,7 @@ var StateWideMap = React.createClass({
                     
                     dblclick: function(e){
                         console.log('dbl click',feature.properties.station_id);
-                        scope.context.router.transitionTo('singleStation', {stationId: feature.properties.station_id,fips:feature.properties.state_fips});
+                        scope.transitionTo('singleStation', {stationId: feature.properties.station_id,fips:feature.properties.state_fips});
                     },
 
                     mouseover: function(e){

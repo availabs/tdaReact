@@ -32,6 +32,7 @@ module.exports.routes = {
   //------------------------------
 
   // -- Set Datasource  
+  '/data/overview/:database/:dataType' : 'TmGClassController.datasetOverview',
 
   // -- Class  Data
   '/tmgClass/byDay' : 'TmGClassController.byDay',
@@ -39,6 +40,9 @@ module.exports.routes = {
   '/tmgClass/byHour' : 'TmGClassController.byHour',
   
   // -- Hpms Data
-  '/hpms/:state' : 'HpmsController.getStateData'
+  '/hpms/:state' : 'HpmsController.getStateData',
+
+  // -- Upload Data
+  '/upload/:dataBase' : 'UploadController.upload'
 
 };

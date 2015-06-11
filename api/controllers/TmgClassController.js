@@ -19,7 +19,30 @@ var bigQuery = googleapis.bigquery('v2');
 module.exports = {
 	
 
+	datasetOverview:function(req,res){
+		var database = req.param('database'),
+			dataType = req.param('dataType');
 
+			var dataClass = dataType === 'class' ? 'Class' :'';
+
+			var sql = 	'SELECT state_fips,station_id,year '+
+						'from [tmasWIM12.'+database+dataClass+'] '+ 
+						'group by state_fips,station_id,year '+
+						'order by state_fips,station_id,year;';
+						
+			BQuery(sql,function(data){
+
+					var fullData = data.rows.map(function(row,index){
+						var outrow = {}
+						data.schema.fields.forEach(function(field,i){
+							outrow[field.name] = row.f[i].v;
+						});
+						return outrow;
+					});
+					res.json(fullData);
+			});
+
+	},
 	
 	byHour:function(req,res){
 		var database = req.param('database'),

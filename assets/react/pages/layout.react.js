@@ -7,25 +7,52 @@ var React = require('react'),
     Header = require('../components/layout/Header.react'),
 
     // -- Stores
-    AppStore = require('../stores/AppStore');
+    AppStore = require('../stores/AppStore'),
+    AgencyStore = require('../stores/AgencyStore'),
+    UserStore = require('../stores/UserStore'),
+    JobStore = require('../stores/JobStore');
+
+function getState(){
+  
+  return {
+
+      menu:AppStore.getMenu(),
+      agencies : AgencyStore.getAll(),
+      currentAgency : AgencyStore.getSelectedAgency(),
+      agencyOverview : AgencyStore.getAgencyOverview(),
+      sessionUser : UserStore.getSessionUser(),
+      activeJobs : JobStore.getAll()
+  
+  };
+
+} 
 
 var App = React.createClass({
  
   getInitialState: function(){   
-    return {menu:AppStore.getMenu()};
+    return getState();
   },
   
   componentDidMount: function() {
+      
       AppStore.addChangeListener(this._onChange);
+      AgencyStore.addChangeListener(this._onChange);
+      UserStore.addChangeListener(this._onChange);
+      JobStore.addChangeListener(this._onChange)
+  
   },
 
   componentWillUnmount: function() {
+  
       AppStore.removeChangeListener(this._onChange);
+      AgencyStore.removeChangeListener(this._onChange);
+      UserStore.removeChangeListener(this._onChange);
+      JobStore.removeChangeListener(this._onChange);
+  
   },
   
   _onChange: function(){
-    console.log('on change layout');
-    this.setState({menu:AppStore.getMenu()})
+    this.setState(getState())
   },
 
   render: function() {
@@ -35,7 +62,13 @@ var App = React.createClass({
             <Sidebar menuItems={this.state.menu} />
             <div className="wrap">
                 <Header />
-                 <RouteHandler/>
+                  <RouteHandler
+                    agencies={this.state.agencies}
+                    currentAgency = {this.state.currentAgency}
+                    agencyOverview = {this.state.agencyOverview}
+                    sessionUser={this.state.sessionUser}
+                    activeJobs = {this.state.activeJobs}
+                  />
             </div>
         </div>
     );

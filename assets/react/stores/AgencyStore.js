@@ -1,21 +1,21 @@
 'use strict';
-/**
- * This file is provided by Facebook for testing and evaluation purposes
- * only. Facebook reserves all rights not expressly granted.
- *
- */
 
 var AppDispatcher = require('../dispatcher/AppDispatcher'),
     Constants = require('../constants/AppConstants'),
     EventEmitter = require('events').EventEmitter,
     assign = require('object-assign'),
 
+
     ActionTypes = Constants.ActionTypes,
     CHANGE_EVENT = 'change';
 
+var SailsWebApi = require('../utils/api/SailsWebApi');
+    console.log('begining AgencyStore',SailsWebApi);
+
 var _selectedAgency = 1,
     _agencies = {},
-    _default = {datasource:'allWim'};
+    _default = {datasource:'allWim',name:'TMAS'},
+    _overviewData = {};
 
 function _addAgencies(rawData) {
   //console.log('stores/AgencyStore/_addUsers',rawData);
@@ -62,6 +62,20 @@ var AgencyStore = assign({}, EventEmitter.prototype, {
     return _agencies[_selectedAgency] ?  _agencies[_selectedAgency] : _default;
   },
 
+  getAgencyOverview:function(){
+    if(_agencies[_selectedAgency] && _agencies[_selectedAgency].datasource){
+      if(_overviewData[_selectedAgency] && _overviewData[_selectedAgency] !== 'loading'){
+        return _overviewData[_selectedAgency]
+      }
+      if(!_overviewData[_selectedAgency]){
+        console.log('swa',SailsWebApi);
+        SailsWebApi.getDataOverview(_agencies[_selectedAgency]);
+        _overviewData[_selectedAgency] = 'loading';
+      }
+    }
+    return {}
+  }
+
 
 
 });
@@ -85,6 +99,15 @@ AgencyStore.dispatchToken = AppDispatcher.register(function(payload) {
       _deleteUser(action.Id);
       AgencyStore.emitChange();
     break;
+
+    case ActionTypes.GET_DATA_OVERVIEW:
+
+      if(_overviewData[action.id] === 'loading'){
+        _overviewData[action.id] = {}
+      }
+      
+      _overviewData[action.id][action.dataType] = action.data;
+      AgencyStore.emitChange();
 
     default:
       // do nothing

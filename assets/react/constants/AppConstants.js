@@ -38,10 +38,13 @@ module.exports = {
     SET_SESSION_USER:null,
 
     //-------Data--------------------------------------------
+    GET_DATA_OVERVIEW:null,
     TMG_CLASS_BYDAY: null,
     TMG_CLASS_BYMONTH: null,
     TMG_CLASS_BYHOUR:null,
-    RECEIEVE_STATE_HPMS:null
+    RECEIEVE_STATE_HPMS:null,
+
+    RECEIVE_JOBS:null,
 
   }),
 
