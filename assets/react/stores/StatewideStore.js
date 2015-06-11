@@ -141,6 +141,7 @@ var StatewideStore = assign({}, EventEmitter.prototype, {
 
   getClassByHour:function(){
     //if data is loaded send it
+    //console.log('StatewideStore getClassByHour',_selectedState,_selectedStation)
     if(_classbyHour[_selectedStation] && _classbyHour[_selectedStation] !== 'loading' ){
       ClassByHourFilter.init(_classbyHour[_selectedStation],_selectedStation);
       return ClassByHourFilter;
@@ -148,9 +149,11 @@ var StatewideStore = assign({}, EventEmitter.prototype, {
     
     //if data hasn't start started loading, load it 
     if(_classbyHour[_selectedStation] !== 'loading'){
-      console.log('load',_selectedStation,_selectedState)
+      console.log('load',_selectedStation,_selectedState),
+
       SailsWebApi.getClassByHour(_selectedStation,_selectedState,AgencyStore.getSelectedAgency());
       _classbyHour[_selectedStation] = 'loading';
+      ClassByHourFilter.init([],_selectedStation);
     }
 
     //if requested data isn't loaded send most recent data

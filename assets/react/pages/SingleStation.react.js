@@ -103,14 +103,15 @@ var SingleStation = React.createClass({
                         
                     </div>
                 </div>
-                <div className="row">
-                    <div className="col-lg-12">
-                            
-                        <YearlyHighestDays stationData={this.state.stationdData} filters={this.state.filters} stationInfo={this.state.selectedStationMeta.properties} />
-                    </div>
-                </div>
+                
             </div>
         )
+        // <div className="row">
+        //     <div className="col-lg-12">
+                    
+        //         <YearlyHighestDays stationData={this.state.stationdData} filters={this.state.filters} stationInfo={this.state.selectedStationMeta.properties} />
+        //     </div>
+        // </div>
     },
     renderLoading:function(){
         return (
