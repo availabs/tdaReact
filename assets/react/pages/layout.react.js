@@ -20,6 +20,7 @@ function getState(){
       agencies : AgencyStore.getAll(),
       currentAgency : AgencyStore.getSelectedAgency(),
       agencyOverview : AgencyStore.getAgencyOverview(),
+      agencyOverviewDay : AgencyStore.getAgencyOverviewDay(),
       sessionUser : UserStore.getSessionUser(),
       activeJobs : JobStore.getAll()
   
@@ -66,6 +67,7 @@ var App = React.createClass({
                     agencies={this.state.agencies}
                     currentAgency = {this.state.currentAgency}
                     agencyOverview = {this.state.agencyOverview}
+                    agencyOverviewDay = {this.state.agencyOverviewDay}
                     sessionUser={this.state.sessionUser}
                     activeJobs = {this.state.activeJobs}
                   />

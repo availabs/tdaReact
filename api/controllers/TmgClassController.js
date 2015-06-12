@@ -44,6 +44,33 @@ module.exports = {
 
 	},
 	
+	datasetOverviewDay:function(req,res){
+		var database = req.param('database'),
+			dataType = req.param('dataType');
+
+			var dataClass = dataType === 'class' ? 'Class' :'';
+
+			var sql = 	'SELECT year,month,day,count(distinct CONCAT(state_fips,station_id)) '+
+						'from [tmasWIM12.'+database+dataClass+'] '+ 
+						'group by year,month,day '+
+						'order by year,month,day;';
+						
+			BQuery(sql,function(data){
+
+					var fullData = data.rows.map(function(row,index){
+						var outrow = {}
+						data.schema.fields.forEach(function(field,i){
+							outrow[field.name] = row.f[i].v;
+						});
+						return outrow;
+					});
+					res.json(fullData);
+			});
+
+	},
+
+	
+	
 	byHour:function(req,res){
 		var database = req.param('database'),
  			station = req.param('stationId'),

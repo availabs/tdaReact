@@ -33,6 +33,7 @@ module.exports.routes = {
 
   // -- Set Datasource  
   '/data/overview/:database/:dataType' : 'TmGClassController.datasetOverview',
+  '/data/overview/day/:database/:dataType' : 'TmGClassController.datasetOverviewDay',
 
   // -- Class  Data
   '/tmgClass/byDay' : 'TmGClassController.byDay',

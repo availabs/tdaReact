@@ -7,6 +7,7 @@ var React = require('react'),
     
     // -- components 
     Uploader = require('../../components/dataManagement/Uploader.react'),
+    CalendarGraph = require('../../components/dataManagement/calendarGraph.react'),
     
     // -- stores
    
@@ -32,30 +33,85 @@ var Overview = React.createClass({
     },
 
     renderOverviewDiv:function(type){
-        var Years = {}
+        var scope = this,
+            Years = {};
+        
+        function getYear(year){
+            
+            if(year.length  == 2){
+                    year = parseInt('20'+year)
+                }
+            if(year.length == 1){
+                year = parseInt('200'+year)
+            }
+            return year;
+        }
+
+        function getTime(time){
+          
+             if(time.length == 1){
+                time = '0'+time
+            }
+            return time;
+        }
+
         if(this.props.agencyOverview[type]){
            
             this.props.agencyOverview[type].forEach(function(d,i){
-                if(!Years[d.year]){ Years[d.year] = 0};
-                Years[d.year]++;
+                if(d.year != 'null'){
+                    if(!Years[d.year]){ Years[d.year] = 0};
+                    Years[d.year]++;
+                }
             })
 
         }
         
+        var yearsArray = {};
+        
+        if(this.props.agencyOverviewDay[type]){
+            //console.log('Day data',this.props.agencyOverviewDay[type])
+             Object.keys(Years).forEach(function(year){
+                if(year != 'null'){
+                    var yearData = {};
+                    var yearDays = scope.props.agencyOverviewDay[type].filter(function(d){
+                        return d.year === year;
+                    });
+
+                    yearDays.forEach(function(day){
+                        yearData[getYear(day.year)+'-'+getTime(day.month)+'-'+getTime(day.day)] = parseInt(day.f0_);
+                    });
+
+                    yearsArray[year] = yearData;
+
+                }
+            })
+        }
+       
+        
+        console.log('yearsArray',yearsArray);
+
         var rows = Object.keys(Years).map(function(key){
             if(key != 'null'){
+                var graphId = 'cg'+type+key;
+                var year = getYear(key);
+                //console.log('write row',yearsArray[key])
                 return (
-                    <tr><td>{key} </td><td> {Years[key]}</td></tr>
+                    <tr>
+                        <td> 
+                            <CalendarGraph divId={graphId} year={year} data={ yearsArray[key] }/>
+                            {'Total Active Stations: '+Years[key]}
+                        </td>
+                    </tr>
                 )
             }
         })
+        
         return (
-             <div className='col-md-4'>
+             <div className='col-md-6'>
                 <h4>{type.toUpperCase()} Stations</h4>
                 <table className='table'>
                     <thead>
                         <tr>
-                            <th>Year</th>
                             <th>Active Stations</th>
                         </tr>
                     </thead>
@@ -70,7 +126,7 @@ var Overview = React.createClass({
 
     render: function() {
         
-        console.log('datasource overview',this.props.agencyOverview);
+        //console.log('datasource overview',this.props.agencyOverview);
 
         return (
             <div className="content container">

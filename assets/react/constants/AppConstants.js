@@ -39,6 +39,7 @@ module.exports = {
 
     //-------Data--------------------------------------------
     GET_DATA_OVERVIEW:null,
+    GET_DATA_OVERVIEW_DAY:null,
     TMG_CLASS_BYDAY: null,
     TMG_CLASS_BYMONTH: null,
     TMG_CLASS_BYHOUR:null,

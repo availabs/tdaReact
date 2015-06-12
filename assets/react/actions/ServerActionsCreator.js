@@ -88,6 +88,15 @@ module.exports = {
       id:id
     })
   },
+
+  getDataOverviewDay:function(data,id,dataType){
+    AppDispatcher.handleServerAction({
+      type: ActionTypes.GET_DATA_OVERVIEW_DAY,
+      data:data,
+      dataType:dataType,
+      id:id
+    })
+  },
   
   //------------------------------------
   // CRUD Handlers

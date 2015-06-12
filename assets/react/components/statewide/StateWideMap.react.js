@@ -66,8 +66,9 @@ var StateWideMap = React.createClass({
         var mapDiv = document.getElementById('map');
         mapDiv.setAttribute("style","height:"+this.props.height+"px");
         
-
-        var mapquestOSM = L.tileLayer("http://{s}.tiles.mapbox.com/v3/am3081.h0po4e8k/{z}/{x}/{y}.png");
+        var key = 'erickrans.4f9126ad',//am3081.kml65fk1,
+            mapquestOSM = L.tileLayer("http://{s}.tiles.mapbox.com/v3/"+key+"/{z}/{x}/{y}.png");
+        
         L.Icon.Default.imagePath= '/bower_components/leaflet/dist/images';
         map = L.map("map", {
           center: [39.8282, -98.5795],

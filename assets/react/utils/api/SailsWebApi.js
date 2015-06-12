@@ -93,6 +93,18 @@ var api = {
     })
   
   },
+
+  getDataOverviewDay : function(agency){
+    
+    d3.json('/data/overview/day/'+agency.datasource+'/class',function(err,data){
+      ServerActionCreators.getDataOverviewDay(data,agency.id,'class')
+    })
+
+    d3.json('/data/overview/day/'+agency.datasource+'/wim',function(err,data){
+        ServerActionCreators.getDataOverviewDay(data,agency.id,'wim')
+    })
+  
+  },
   
   //---------------------------------------------------
   // HPMS Data Routes

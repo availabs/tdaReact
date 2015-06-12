@@ -14,7 +14,8 @@ var SailsWebApi = require('../utils/api/SailsWebApi');
 var _selectedAgency = 1,
     _agencies = {},
     _default = {datasource:'allWim',name:'TMAS'},
-    _overviewData = {};
+    _overviewData = {},
+    _overviewDayData = {};
 
 function _addAgencies(rawData) {
   //console.log('stores/AgencyStore/_addUsers',rawData);
@@ -67,9 +68,21 @@ var AgencyStore = assign({}, EventEmitter.prototype, {
         return _overviewData[_selectedAgency]
       }
       if(!_overviewData[_selectedAgency]){
-        console.log('swa',SailsWebApi);
         SailsWebApi.getDataOverview(_agencies[_selectedAgency]);
         _overviewData[_selectedAgency] = 'loading';
+      }
+    }
+    return {}
+  },
+
+  getAgencyOverviewDay:function(){
+    if(_agencies[_selectedAgency] && _agencies[_selectedAgency].datasource){
+      if(_overviewDayData[_selectedAgency] && _overviewDayData[_selectedAgency] !== 'loading'){
+        return _overviewDayData[_selectedAgency]
+      }
+      if(!_overviewDayData[_selectedAgency]){
+        SailsWebApi.getDataOverviewDay(_agencies[_selectedAgency]);
+        _overviewDayData[_selectedAgency] = 'loading';
       }
     }
     return {}
@@ -107,8 +120,22 @@ AgencyStore.dispatchToken = AppDispatcher.register(function(payload) {
       
       _overviewData[action.id][action.dataType] = action.data;
       AgencyStore.emitChange();
+    break;
+
+     case ActionTypes.GET_DATA_OVERVIEW_DAY:
+
+      if(_overviewDayData[action.id] === 'loading'){
+        _overviewDayData[action.id] = {}
+      }
+      
+      _overviewDayData[action.id][action.dataType] = action.data;
+      AgencyStore.emitChange();
+    break;
 
     default:
+
+   
+   
       // do nothing
   }
 
