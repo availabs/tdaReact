@@ -3,10 +3,10 @@ var React = require('react'),
     Link = require('react-router').Link,
     
     //--Utils
-    stnCardMeta = require('../utils/data/stnCardMeta');
+    stnCardMeta = require('../utils/data/stnCardMeta'),
     
     //--Actions
-    ClientActionsCreator = require('../actions/ClientActionsCreator')
+    ClientActionsCreator = require('../actions/ClientActionsCreator'),
 
     //--Stores
     StateWideStore = require('../stores/StatewideStore'),

@@ -23,7 +23,7 @@ var ToolTip = React.createClass({
 	},
 
 	render: function() {
-		displayStyle  = {
+		var displayStyle  = {
 
 			position:'fixed',
 			left:this.props.config.x,
@@ -37,23 +37,23 @@ var ToolTip = React.createClass({
 			borderRadius:'4px',
 			zIndex:1000
 		
-		}
+		},
 		headerStyle = {
 			fontWeight:700,
 			width:'100%',
 			color:'#000'
-		}
+		},
 		closeStyle = {
 			marginTop:'-30px',
 			color:'#000',
 			fontSize:'1.5em',
 			cursor:'pointer'
-		}
+		},
 
 		bodyStyle = {
 			width:'100%',
 			color:'#000'
-		}
+		};
 
 		//<i style={closeStyle} className="fa fa-close pull-right" onClick={this._Close}></i>
 		return (

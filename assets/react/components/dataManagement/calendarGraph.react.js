@@ -7,7 +7,7 @@ var React = require('react'),
     
 
     //-- Utils
-    colorRange = colorbrewer.RdBu[8],
+    colorRange = colorbrewer.YlGn[8],
     DataScale = d3.scale.quantile().domain([0,70000]).range(colorRange);
 
 var GraphContainer = React.createClass({
@@ -27,27 +27,29 @@ var GraphContainer = React.createClass({
 
     componentWillReceiveProps:function(nextProps){
         if(!this.props.data && nextProps.data){
-            //console.log('receive',Object.keys(nextProps.data).length);
-        
-            this._updateData();
+            console.log('receive1',this.props.divId,Object.keys(nextProps.data).length);
+            this._updateData(nextProps.data);
         }
         else if(nextProps.data && Object.keys(nextProps.data).length !== Object.keys(this.props.data).length){
-           //console.log('receive',Object.keys(nextProps.data).length,Object.keys(this.props.data).length);
-            this._updateData();
+            console.log('receive2',this.props.divId,Object.keys(nextProps.data).length,Object.keys(this.props.data).length);
+            this._updateData(nextProps.data);
         
         }
     },
 
-    _updateData:function(){
+    _updateData:function(newData){
         var scope = this;
-        
-        //console.log('calgraphData' ,this.props.divId,this.props.data);
+        var showData = this.props.data
+        if(newData){
+            showData = newData;
+        }
+        console.log('_updateData1' ,this.props.divId,   showData);
 
-        if(this.props.data && Object.keys(this.props.data).length > 0 ){
-            //console.log('calgraphData Run' ,this.props.divId,this.props.data);
+        if(showData && Object.keys(showData).length > 0 ){
+            console.log('_updateData2' ,this.props.divId,showData.length);
 
-            var values = Object.keys(this.props.data).map(function(key){
-                return scope.props.data[key];
+            var values = Object.keys(showData).map(function(key){
+                return showData[key];
             })
             var min = d3.min(values),
                 max = d3.max(values);
@@ -68,16 +70,16 @@ var GraphContainer = React.createClass({
             days
                 .filter(function(d) { 
                     //console.log('filtering',d,d in scope.props.data)
-                    return d in scope.props.data; 
+                    return d in showData; 
                 })
                 .attr("fill", function(d,i) { 
                     // if(i < 10){
                     //     console.log(d,scope.props.data[d],DataScale(scope.props.data[d]),DataScale(max/2),max,max/2)
                     // }
-                    return DataScale(scope.props.data[d]); 
+                    return DataScale(showData[d]); 
                 })
                 .select("title")
-                    .text(function(d) { return d + ": " + scope.props.data[d]; });
+                    .text(function(d) { return d + ": " + showData[d]; });
        
         }
     },

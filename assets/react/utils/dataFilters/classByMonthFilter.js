@@ -1,5 +1,5 @@
 // --stores
-var StationStore = require('../../stores/StationStore')
+var StationStore = require('../../stores/StationStore'),
 
 // -- utils
  	crossfilter = require('crossfilter');
@@ -80,17 +80,44 @@ module.exports  = {
 
 			
 		if(dataset !== currentDataSet){
-			//console.log('class By Month Init',dataset,currentDataSet,data.length);
+			console.log('class By Month Init',dataset,currentDataSet,data.length);
 			var stationData = {};
 			StationStore.getStateStations(dataset).forEach(function(d){
 				stationData[d.properties.station_id] = d.properties;
 			});
 			//console.log('before data',data.length,data);
+			data.forEach(function(d){
+				d.station_id = d.station_id.trim();
+				if(d.station_id.length < 6){
+
+					switch(d.station_id.length){
+						case 5:
+							d.station_id = '0'+d.station_id;
+						break;
+						case 4:
+							d.station_id = '00'+d.station_id;
+						break;
+						case 3:
+							d.station_id = '000'+d.station_id;
+						break;
+						case 2:
+							d.station_id = '0000'+d.station_id;
+						break;
+					}
+					//console.log('reset 2',d.station_id)
+
+				}
+			});
+
 			var total_data = data.map(function(d){
+				
+				//console.log('a',d.station_id)
+				d.single_day =  d.station_id +'-'+ d.year+'-'+d.month;
 				if(stationData[d.station_id]){
 					d.func_class_code = stationData[d.station_id].func_class_code || 0;
 					d.posted_sign_route_num = parseInt(stationData[d.station_id].posted_sign_route_num) || 0;
 				}
+
 				var normalForm = [];
 				for(var i = 1; i <= 13; i++){
 					var row = {}
@@ -106,8 +133,11 @@ module.exports  = {
 				return normalForm;
 			});
 			var total_data = [].concat.apply([],total_data);
-			//console.log('after data',total_data.length,total_data);
+			console.log('after data',
+				total_data.length,
+				total_data);
 			
+
 			//console.time('CBM crossFIlterData')
 			currentDataSet = dataset;
 
@@ -118,7 +148,10 @@ module.exports  = {
 
 			dimensions['ADT'] = classData.dimension(function(d){ return d.single_day});
 
-			dimensions['stationId'] = classData.dimension(function(d){ return d.station_id });
+			dimensions['stationId'] = classData.dimension(function(d){ 
+				return d.station_id 
+			});
+
 			groups['stationId'] = dimensions['stationId'].group().reduceCount();
 
 			

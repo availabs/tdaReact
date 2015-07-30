@@ -1,3 +1,5 @@
+'use strict';
+
 //---------------------------------------
 // App Controller View 
 // One Per Server Side Route
@@ -21,7 +23,7 @@ var React = require('react'),
     DataSourceOverview = require('./pages/dataManagement/DataSourceOverview.react'),
     DataSourceUpload = require('./pages/dataManagement/DataSourceUpload.react'),
     SingleStation = require('./pages/SingleStation.react'),
-    UserAdmin = require('./pages/UserAdmin.react')
+    UserAdmin = require('./pages/UserAdmin.react'),
 
 // --- Server API
     sailsWebApi = require('./utils/api/SailsWebApi.js');

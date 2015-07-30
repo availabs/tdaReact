@@ -684,17 +684,17 @@ var io="undefined"==typeof module?{}:module.exports;(function(){(function(a,b){v
         // so just require the request module and send the HTTP request that
         // way.
         else {
-          var mikealsReq = require('request');
-          mikealsReq.get(io.sails.url + xOriginCookieRoute, function(err, httpResponse, body) {
-            if (err) {
-              consolog(
-                'Failed to connect socket (failed to get cookie)',
-                'Error:', err
-              );
-              return;
-            }
-            goAheadAndActuallyConnect();
-          });
+          // var mikealsReq = require('request');
+          // mikealsReq.get(io.sails.url + xOriginCookieRoute, function(err, httpResponse, body) {
+          //   if (err) {
+          //     consolog(
+          //       'Failed to connect socket (failed to get cookie)',
+          //       'Error:', err
+          //     );
+          //     return;
+          //   }
+          //   goAheadAndActuallyConnect();
+          // });
         }
       } else goAheadAndActuallyConnect();
 

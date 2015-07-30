@@ -324,8 +324,8 @@ var newDataUploadChecker = function(newData,typeD,lines,fs,files,terminal,curren
 					    	console.log('bash command',"bq --project_id=avail-wim load --max_bad_records=10 tmasWIM12."+database+" "+files[0].fd+"_"+currentJob.id+" "+schema+" \n")
 				            terminal.stdin.write("bq --project_id=avail-wim load --max_bad_records=10 tmasWIM12."+database+" "+files[0].fd+"_"+currentJob.id+" "+schema+" \n");
 							//Below removes junkfiles and lets the user know what data got uploaded
-							terminal.stdin.write('rm ' + files[0].fd+"_"+currentJob.id +'\n');
-							terminal.stdin.write('rm ' + files[0].fd +'\n');
+							// terminal.stdin.write('rm ' + files[0].fd+"_"+currentJob.id +'\n');
+							// terminal.stdin.write('rm ' + files[0].fd +'\n');
 							terminal.stdin.end();
 					
 					}); //End wstream on finish
@@ -472,7 +472,7 @@ module.exports = {
         	console.log('###',data.toString());
         	if(typeof data === 'object'){
        			if(data.toString().indexOf("Failure details") > -1){
-       				UploadJob.update({id:currentJob.id},{isFinished:true,status:"Error - Not a valid TMG WIM or Class file."}).exec(function(err,job){
+       				UploadJob.update({id:currentJob.id},{isFinished:true,status:"Error - "+data.toString()}).exec(function(err,job){
 			    		if(err){ console.log(err)}
 			    		sails.sockets.blast('job_updated',job);
 			    	})
@@ -481,7 +481,7 @@ module.exports = {
        			else{
 		       		var status = data.toString().split(" Current status: ")
 		       		if(status[0].indexOf("Provided Schema does not match Table") > -1){
-		       			UploadJob.update({id:currentJob.id},{isFinished:true,status:"Error - Not a valid TMG WIM or Class file."}).exec(function(err,job){
+		       			UploadJob.update({id:currentJob.id},{isFinished:true,status:"Error - "+data.toString()}).exec(function(err,job){
 				    		if(err){ console.log(err) }
 				    		sails.sockets.blast('job_updated',job);
 				    	})

@@ -88,7 +88,7 @@ var Overview = React.createClass({
         }
        
         
-        console.log('yearsArray',yearsArray);
+        console.log('yearsArray',type,yearsArray);
 
         var rows = Object.keys(Years).map(function(key){
             if(key != 'null'){

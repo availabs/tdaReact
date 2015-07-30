@@ -25,7 +25,6 @@ var StateIndex = React.createClass({
         return {
             selectedState : StateWideStore.getSelectedState(),
             classByMonth : StateWideStore.getClassByMonth(),
-            classByDay : StateWideStore.getClassByDay(),
             hpmsData : HpmsStore.getStateData()
         };
     },
@@ -48,7 +47,6 @@ var StateIndex = React.createClass({
         this.setState({
             selectedState : StateWideStore.getSelectedState(),
             classByMonth : StateWideStore.getClassByMonth(),
-            classByDay : StateWideStore.getClassByDay(),
             hpmsData : HpmsStore.getStateData()
         });
     },

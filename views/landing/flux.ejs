@@ -2,4 +2,9 @@
 	User = <%- JSON.stringify(session.User) %>;
 	Datasource = <%- JSON.stringify(session.Datasource) %>;
 </script>
-<script src="/react/indexView.js"></script>
+<% if (devEnv) { %>
+    <script src="http://localhost:11233/bundle.js"></script>
+<% } else { %> 
+    <script src="bundle.js"></script>
+<% } %>
+

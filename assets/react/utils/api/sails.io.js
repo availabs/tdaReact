@@ -683,19 +683,7 @@ var socket = function() {
         // If there's no `window` object, we must be running in Node.js
         // so just require the request module and send the HTTP request that
         // way.
-        else {
-          var mikealsReq = require('request');
-          mikealsReq.get(io.sails.url + xOriginCookieRoute, function(err, httpResponse, body) {
-            if (err) {
-              consolog(
-                'Failed to connect socket (failed to get cookie)',
-                'Error:', err
-              );
-              return;
-            }
-            goAheadAndActuallyConnect();
-          });
-        }
+        
       } else goAheadAndActuallyConnect();
 
       // Start connecting after the current cycle of the event loop

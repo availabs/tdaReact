@@ -53,6 +53,7 @@ var GraphContainer = React.createClass({
                                         "color":AdtScale(ADT.value.classAvg.reduce( function(a,b){ return a+b}))
                                     }
                                 })
+            //console.log('_processData',stationADT)
             return stationADT
         }
         return []

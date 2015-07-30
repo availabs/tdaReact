@@ -147,7 +147,6 @@ module.exports = {
 						data.schema.fields.forEach(function(field,i){
 							outrow[field.name] = row.f[i].v;
 						});
-						outrow['single_day'] = outrow.station_id +'-'+ outrow.year+'-'+outrow.month
 						return outrow;
 					});
 					console.time('send Data');

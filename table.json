@@ -1,0 +1,168 @@
+{
+  "creationTime": "1402517837964", 
+  "etag": "\"Gn3Hpo5WaKnpFuT457VBDNMgZBw/MTQwMjUxNzgzNzk2NA\"", 
+  "id": "avail-wim:tmasWIM12.allWim", 
+  "kind": "bigquery#table", 
+  "lastModifiedTime": "1402517837964", 
+  "numBytes": "37216186008", 
+  "numRows": "249944110", 
+  "schema": {
+    "fields": [
+      {
+        "name": "record_type", 
+        "type": "STRING"
+      }, 
+      {
+        "name": "state_fips", 
+        "type": "STRING"
+      }, 
+      {
+        "name": "station_id", 
+        "type": "STRING"
+      }, 
+      {
+        "name": "dir", 
+        "type": "INTEGER"
+      }, 
+      {
+        "name": "lane", 
+        "type": "INTEGER"
+      }, 
+      {
+        "name": "year", 
+        "type": "INTEGER"
+      }, 
+      {
+        "name": "month", 
+        "type": "INTEGER"
+      }, 
+      {
+        "name": "day", 
+        "type": "INTEGER"
+      }, 
+      {
+        "name": "hour", 
+        "type": "INTEGER"
+      }, 
+      {
+        "name": "class", 
+        "type": "INTEGER"
+      }, 
+      {
+        "name": "open", 
+        "type": "STRING"
+      }, 
+      {
+        "name": "total_weight", 
+        "type": "INTEGER"
+      }, 
+      {
+        "name": "axle1", 
+        "type": "INTEGER"
+      }, 
+      {
+        "name": "axle1sp", 
+        "type": "INTEGER"
+      }, 
+      {
+        "name": "axle2", 
+        "type": "INTEGER"
+      }, 
+      {
+        "name": "axle2sp", 
+        "type": "INTEGER"
+      }, 
+      {
+        "name": "axle3", 
+        "type": "INTEGER"
+      }, 
+      {
+        "name": "axle3sp", 
+        "type": "INTEGER"
+      }, 
+      {
+        "name": "axle4", 
+        "type": "INTEGER"
+      }, 
+      {
+        "name": "axle4sp", 
+        "type": "INTEGER"
+      }, 
+      {
+        "name": "axle5", 
+        "type": "INTEGER"
+      }, 
+      {
+        "name": "axle5sp", 
+        "type": "INTEGER"
+      }, 
+      {
+        "name": "axle6", 
+        "type": "INTEGER"
+      }, 
+      {
+        "name": "axle6sp", 
+        "type": "INTEGER"
+      }, 
+      {
+        "name": "axle7", 
+        "type": "INTEGER"
+      }, 
+      {
+        "name": "axle7sp", 
+        "type": "INTEGER"
+      }, 
+      {
+        "name": "axle8", 
+        "type": "INTEGER"
+      }, 
+      {
+        "name": "axle8sp", 
+        "type": "INTEGER"
+      }, 
+      {
+        "name": "axle9", 
+        "type": "INTEGER"
+      }, 
+      {
+        "name": "axle9sp", 
+        "type": "INTEGER"
+      }, 
+      {
+        "name": "axle10", 
+        "type": "INTEGER"
+      }, 
+      {
+        "name": "axle10sp", 
+        "type": "INTEGER"
+      }, 
+      {
+        "name": "axle11", 
+        "type": "INTEGER"
+      }, 
+      {
+        "name": "axle11sp", 
+        "type": "INTEGER"
+      }, 
+      {
+        "name": "axle12", 
+        "type": "INTEGER"
+      }, 
+      {
+        "name": "axle12sp", 
+        "type": "INTEGER"
+      }, 
+      {
+        "name": "axle13", 
+        "type": "INTEGER"
+      }
+    ]
+  }, 
+  "selfLink": "https://www.googleapis.com/bigquery/v2/projects/avail-wim/datasets/tmasWIM12/tables/allWim", 
+  "tableReference": {
+    "datasetId": "tmasWIM12", 
+    "projectId": "avail-wim", 
+    "tableId": "allWim"
+  }, 
+  "type": "TABLE"
+}

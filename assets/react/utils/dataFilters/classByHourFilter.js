@@ -1,5 +1,5 @@
 // --stores
-var StationStore = require('../../stores/StationStore')
+var StationStore = require('../../stores/StationStore'),
 
 // -- utils
  	crossfilter = require('crossfilter');
