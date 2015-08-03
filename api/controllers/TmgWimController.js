@@ -28,145 +28,62 @@ function getClassStations(database){
 module.exports = {
 	
 
-	datasetOverview:function(req,res){
-		var database = req.param('database'),
-			dataType = req.param('dataType');
-
-			var dataClass = dataType === 'class' ? 'Class' :'';
-
-			var sql = 	'SELECT state_fips,station_id,year '+
-						'from [tmasWIM12.'+database+dataClass+'] '+ 
-						'group by state_fips,station_id,year '+
-						'order by state_fips,station_id,year;';
-						
-			BQuery(sql,function(data){
-
-					var fullData = data.rows.map(function(row,index){
-						var outrow = {}
-						data.schema.fields.forEach(function(field,i){
-							outrow[field.name] = row.f[i].v;
-						});
-						return outrow;
-					});
-					res.json(fullData);
-			});
-
-	},
-	
-	datasetOverviewDay:function(req,res){
-		var database = req.param('database'),
-			dataType = req.param('dataType');
-
-			var dataClass = dataType === 'class' ? 'Class' :'';
-
-			var sql = 	'SELECT year,month,day,count(distinct CONCAT(state_fips,station_id)) '+
-						'from [tmasWIM12.'+database+dataClass+'] '+ 
-						'group by year,month,day '+
-						'order by year,month,day;';
-						
-			BQuery(sql,function(data){
-
-					var fullData = data.rows.map(function(row,index){
-						var outrow = {}
-						data.schema.fields.forEach(function(field,i){
-							outrow[field.name] = row.f[i].v;
-						});
-						return outrow;
-					});
-					res.json(fullData);
-			});
-
-	},
-
-	
-	
-	byHour:function(req,res){
-		var database = req.param('database'),
- 			station = req.param('stationId'),
- 			fips = req.param('fips')
- 			output = {};
-
- 		fileCache.checkCache({datasource:database,type:'stationClassByHour',typeId:fips+station},function(data){
- 			//console.log('find cache',data);
- 			if(data){
- 				console.log('cache sucess');
- 				console.time('send cache');
- 				res.send(data)
- 				console.timeEnd('send cache');
- 			}else{
-			    var sql = 'SELECT '+ 
-				  'station_id,dir,year,month,day,hour, '+
-				  'sum(total_vol),sum(class1),sum(class2),'+
-				  'sum(class3),sum(class4),sum(class5),sum(class6),'+
-				  'sum(class7),sum(class8),sum(class9),sum(class10),sum(class11),sum(class12),sum(class13) '+
-				  "FROM [tmasWIM12."+database+"Class] where state_fips = '"+fips+"' and station_id = '"+station+"' "+
-				  'group by station_id,dir,year,month,day,hour '+
-				  'order by station_id,dir,year,month,day,hour ';
-				
-				//console.log('by hour',sql)
-				BQuery(sql,function(data){
-
-					var fullData = data.rows.map(function(row,index){
-						var outrow = {}
-						
-						data.schema.fields.forEach(function(field,i){
-							outrow[field.name] = row.f[i].v;
-						});
-						return outrow;
-					});
-					console.time('send Data');
-					res.json(fullData);
-					console.timeEnd('send Data');
-					console.log('caching');
-					fileCache.addData({datasource:database,type:'stationClassByHour',typeId:fips+station},fullData);
-				});
-
-			}
- 	
-		});
-	},
-
-	byMonth:function(req,res){
-		var database = req.param('database'),
+	Tonage: function(req,res) {
+ 		//console.log('getTonageInfoQuery')
+ 		if(typeof req.param('fips') == 'undefined'){
+ 			res.send('{status:"error",message:"state FIPS required"}',500);
+ 			return;
+ 		}
+ 		// if(typeof req.param('stationId') == 'undefined'){
+ 		// 	res.send('{status:"error",message:"state FIPS required"}',500);
+ 		// 	return;
+ 		// }
+ 		var stationId = req.param('stationId'),
  			fips = req.param('fips'),
- 			output = {};
-
- 		fileCache.checkCache({datasource:database,type:'classByMonth',typeId:fips},function(data){
- 			//console.log('find cache',data);
+ 			database = req.param('database');
+ 		var empty_truck_tonage = 43558,
+ 			truck_class = 9
+ 		fileCache.checkCache({datasource:database,type:'stateTonnage',typeId:fips},function(data){
  			if(data){
  				console.log('cache sucess');
  				console.time('send cache');
  				res.send(data)
  				console.timeEnd('send cache');
  			}else{
-			    var sql = 'SELECT '+ 
-				  'station_id,dir,year,month,count(distinct day) as numDays,'+
-				  'sum(total_vol),sum(class1),sum(class2),'+
-				  'sum(class3),sum(class4),sum(class5),sum(class6),'+
-				  'sum(class7),sum(class8),sum(class9),sum(class10),sum(class11),sum(class12),sum(class13) '+
-				  "FROM [tmasWIM12."+database+"Class] where state_fips = '"+fips+"' "+
-				  'group by station_id,dir,year,month '+
-				  'order by station_id,dir,year,month'
-				
-				BQuery(sql,function(data){
+		 		var sql = 'SELECT '+
+		 			//' SUM(case when total_weight*220.462 <= '+empty_truck_tonage+' then total_weight else 0 end) as empty_vius,'+
+		 			'SUM(case when ((total_weight*220.462)-19539) >= 0 and class = 4 then total_weight else 0 end) as c4 ,'+
+		 			'SUM(case when ((total_weight*220.462)-31464) >= 0 and class = 5 then total_weight else 0 end) c5,'+
+		 			'SUM(case when ((total_weight*220.462)-39739) >= 0 and class = 6 then total_weight else 0 end) c6,'+
+		 			'SUM(case when ((total_weight*220.462)-37000) >= 0 and class = 7 then total_weight else 0 end) c7,'+
+		 			'SUM(case when ((total_weight*220.462)-40000) >= 0 and class = 8 then total_weight else 0 end) c8,'+
+		 			'SUM(case when ((total_weight*220.462)-51935) >= 0 and class = 9 then total_weight else 0 end) c9,'+
+		 			'SUM(case when ((total_weight*220.462)-31000) >= 0 and class = 10 then total_weight else 0 end) c10,'+
+		 			'SUM(case when ((total_weight*220.462)-40000) >= 0 and class = 11 then total_weight else 0 end) c11,'+
+		 			'SUM(case when ((total_weight*220.462)-40000) >= 0 and class = 12 then total_weight else 0 end) c12,'+
+		 			'SUM(case when ((total_weight*220.462)-40000) >= 0 and class = 13 then total_weight else 0 end) c13,'+
+		 			'station_id, '+
+		 			' year,month,day, '+
+		 			' FROM [tmasWIM12.'+database+'] where state_fips = "'+fips+'"'+
+		 			' group by station_id,year,month,day'
 
+		 		console.time('getTonageInfoQuery')
+		 		console.log("gettonnageinfo ",sql)
+				BQuery(sql,function(data){
+					console.timeEnd('getTonageInfoQuery')
 					var fullData = data.rows.map(function(row,index){
 						var outrow = {}
 						
 						data.schema.fields.forEach(function(field,i){
 							outrow[field.name] = row.f[i].v;
 						});
+						outrow['single_day'] = outrow.station_id +'-'+ outrow.year+'-'+outrow.month+'-'+outrow.day
 						return outrow;
 					});
-					console.time('send Data');
-					res.json(fullData);
-					console.timeEnd('send Data');
-					console.log('caching');
-					fileCache.addData({datasource:database,type:'classByMonth',typeId:fips},fullData);
-				});
-
+					fileCache.addData({datasource:database,type:'stateTonnage',typeId:fips},fullData);
+					res.json(fullData)
+				})
 			}
- 	
 		})
 	},
 
@@ -357,3 +274,4 @@ function ensureExists(path, mask, cb) {
         } else cb(null); // successfully created folder
     });
 }
+

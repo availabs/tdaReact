@@ -8,12 +8,13 @@
 var googleapis = require('googleapis');
 var fs = require('fs');    
 var jwt = new googleapis.auth.JWT(
-		'424930963222-s59k4k5usekp20guokt0e605i06psh0d@developer.gserviceaccount.com', 
-		'availwim.pem', 
-		'3d161a58ac3237c1a1f24fbdf6323385213f6afc', 
-		['https://www.googleapis.com/auth/bigquery']
-	);
-jwt.authorize();	
+	'424930963222-s59k4k5usekp20guokt0e605i06psh0d@developer.gserviceaccount.com', 
+	'availwim.pem', 
+	'3d161a58ac3237c1a1f24fbdf6323385213f6afc', 
+	['https://www.googleapis.com/auth/bigquery']
+);
+//jwt.authorize();	
+
 var bigQuery = googleapis.bigquery('v2');
 
 function getClassStations(database){
@@ -25,12 +26,14 @@ function getClassStations(database){
 
 }
 
+getClassStations('allWim');
+
 module.exports = {
 	
 
-	datasetOverview:function(req,res){
-		var database = req.param('database'),
-			dataType = req.param('dataType');
+	datasetOverview:function(database,dataType){
+		// var database = req.param('database'),
+		// 	dataType = req.param('dataType');
 
 			var dataClass = dataType === 'class' ? 'Class' :'';
 
@@ -48,14 +51,14 @@ module.exports = {
 						});
 						return outrow;
 					});
-					res.json(fullData);
+					//res.json(fullData);
 			});
 
 	},
 	
-	datasetOverviewDay:function(req,res){
-		var database = req.param('database'),
-			dataType = req.param('dataType');
+	datasetOverviewDay:function(database,dataType){
+		// var database = req.param('database'),
+		// 	dataType = req.param('dataType');
 
 			var dataClass = dataType === 'class' ? 'Class' :'';
 
@@ -73,25 +76,25 @@ module.exports = {
 						});
 						return outrow;
 					});
-					res.json(fullData);
+					//res.json(fullData);
 			});
 
 	},
 
 	
 	
-	byHour:function(req,res){
-		var database = req.param('database'),
- 			station = req.param('stationId'),
- 			fips = req.param('fips')
- 			output = {};
+	byHour:function(database,station,fips){
+		// var database = req.param('database'),
+ 	// 		station = req.param('stationId'),
+ 	// 		fips = req.param('fips'),
+ 		var	output = {};
 
  		fileCache.checkCache({datasource:database,type:'stationClassByHour',typeId:fips+station},function(data){
  			//console.log('find cache',data);
  			if(data){
  				console.log('cache sucess');
  				console.time('send cache');
- 				res.send(data)
+ 				//res.send(data)
  				console.timeEnd('send cache');
  			}else{
 			    var sql = 'SELECT '+ 
@@ -126,10 +129,10 @@ module.exports = {
 		});
 	},
 
-	byMonth:function(req,res){
-		var database = req.param('database'),
- 			fips = req.param('fips'),
- 			output = {};
+	byMonth:function(database,fips){
+		// var database = req.param('database'),
+ 	// 		fips = req.param('fips'),
+ 		var output = {};
 
  		fileCache.checkCache({datasource:database,type:'classByMonth',typeId:fips},function(data){
  			//console.log('find cache',data);
@@ -170,17 +173,18 @@ module.exports = {
 		})
 	},
 
-	byDay:function(req,res){
- 		var database = req.param('database'),
- 			fips = req.param('fips'),
- 			output = {};
+	byDay:function(database,fips){
+ 		// var database = req.param('database'),
+ 		// 	fips = req.param('fips'),
+ 		var output = {};
  		
  		fileCache.checkCache({datasource:database,type:'classByDay',typeId:fips},function(data){
  			//console.log('find cache',data);
  			if(data){
  				console.log('cache sucess');
  				console.time('send cache');
- 				res.send(data)
+ 				//res.send(data)
+ 				return;
  				console.timeEnd('send cache');
  			}else{
 			    var sql = 'SELECT station_id,dir,year,month,day,'
@@ -204,7 +208,7 @@ module.exports = {
 						return outrow;
 					});
 					console.time('send Data');
-					res.json(fullData);
+					//res.json(fullData);
 					console.timeEnd('send Data');
 					console.log('caching');
 					fileCache.addData({datasource:database,type:'classByDay',typeId:fips},fullData);
@@ -220,8 +224,9 @@ module.exports = {
 function BQuery(sql,cb){
 
 	var output = {};
-	console.time('TmgClassController - byDay - query');
-    
+	console.time('BQuery - query');
+    jwt.authorize();
+    console.log('auth',jwt);
 	var request = bigQuery.jobs.query({
     	kind: "bigquery#queryRequest",
     	projectId: 'avail-wim',
@@ -230,8 +235,11 @@ function BQuery(sql,cb){
     	auth: jwt
     },
     function(err, response) {
-  		if (err) console.log('Error:',err);
-  		console.timeEnd('TmgClassController - byDay - query');
+  		if (err) {
+  			console.log('Error:',err)
+  			return cb([]);
+  		};
+  		console.timeEnd('BQuery - query');
     	if(response.rows){
 	    	console.log(response.rows.length,response.totalRows)
 	    	
@@ -246,7 +254,7 @@ function BQuery(sql,cb){
 	
 				console.log('finished');
 	
-				cb(output);
+				return cb(output);
 			}
 
 			//getMoreRows(response.jobReference.jobId,output.length)
@@ -278,19 +286,15 @@ function BQuery(sql,cb){
 						getMoreRows(jobid,output.rows.length)
 					
 					}else{
-			
-						
-			
-						
-      					
-						cb(output);
+
+						return cb(output);
 					}
 
 				});
 			}
 
       	}else{
-      		cb({rows:[],schema:[]})
+      		return cb({rows:[],schema:[]})
       	}
   		
     });

@@ -31,6 +31,11 @@ var GraphContainer = React.createClass({
         }
     },
 
+    getInitialState:function(){
+        return {
+            toggleChart:false
+        }
+    },
 
     _processData:function(){
         var scope = this;
@@ -131,6 +136,27 @@ var GraphContainer = React.createClass({
        }
        
     },
+    
+    toggleChartClick:function(){
+        console.log('toggleChart')
+        this.setState({toggleChart:!this.state.toggleChart})
+    },
+
+    renderDownload : function(){
+        return (
+            <div className="btn-group pull-right">
+                
+                <button className="btn btn-info btn-sm dropdown-toggle" data-toggle="dropdown" data-original-title="" title="" aria-expanded="false">
+                    <span className="fa fa-download"></span>
+                </button>
+                <ul className="dropdown-menu">
+                    <li><a href="#">PNG</a></li>
+                    <li><a href="#">CSV</a></li>
+                </ul>
+            </div>
+        )
+    },
+
     render: function() {
         var scope = this;
         var svgStyle = {
@@ -149,30 +175,47 @@ var GraphContainer = React.createClass({
         
 
         //console.log('_processData',this._processData())
-        return (
-            <div>
-            	<section className="widget large" style={{ background:'none'}}>
-                    <header>
-                        <h4 style={headerStyle}>
-                            {title}
-                        </h4>
-                        
-                    </header>
-                    <div className="body">
-                        <div id="adtchart">
-                            <svg style={svgStyle}></svg>
-                        </div>
-                        {this._updateGraph()}
-                        
+        var graph = (
+           
+                <div className="body">
+                    <div id="adtchart">
+                        <svg style={svgStyle}></svg>
                     </div>
-                </section>
-                <div>
-                    <DataTable data={this._processData()} columns={ [
-                        {key:'label', name:'Station ID'},
-                        {key:'value', name:'AADT'}
-                    ]} />
+                    {this._updateGraph()}
+                    
                 </div>
+           
+        ),
+        chart = (
+             <div>
+                <DataTable 
+                data={this._processData()} 
+                pageLength={7}
+                columns={ [
+                    {key:'label', name:'Station ID'},
+                    {key:'value', name:'AADT'}
+                ]} />
             </div>
+        );
+        return (
+            
+            <section className="widget large" style={{ background:'none'}}>
+                <header>
+                    <h4 style={headerStyle}>
+                        {title}
+
+                        {this.renderDownload()}
+                        <a onClick={this.toggleChartClick} className='btn btn-sm btn-success pull-right' style={{marginRight:'5px'}}>
+                            {scope.state.toggleChart ? <span className='fa fa-bar-chart'/> : <span className='fa fa-list'/>}
+                        </a>
+              
+                    </h4>
+                    
+                </header>
+             
+              {scope.state.toggleChart ? chart : graph}
+            </section>
+            
         );
     }
 });

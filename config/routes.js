@@ -36,9 +36,13 @@ module.exports.routes = {
   '/data/overview/day/:database/:dataType' : 'TmGClassController.datasetOverviewDay',
 
   // -- Class  Data
-  '/tmgClass/byDay' : 'TmGClassController.byDay',
-  '/tmgClass/byMonth' : 'TmGClassController.byMonth',
-  '/tmgClass/byHour' : 'TmGClassController.byHour',
+  '/tmgClass/byDay' : 'TmgClassController.byDay',
+  '/tmgClass/byMonth' : 'TmgClassController.byMonth',
+  '/tmgClass/byHour' : 'TmgClassController.byHour',
+
+  // -- WIM data
+  '/tmgWim/tonnage/:fips/:stationId' : 'TmgWimController.Tonage',
+  '/tmgWim/tonnage/:fips' : 'TmgWimController.Tonage',
   
   // -- Hpms Data
   '/hpms/:state' : 'HpmsController.getStateData',

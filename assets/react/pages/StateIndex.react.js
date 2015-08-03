@@ -50,6 +50,10 @@ var StateIndex = React.createClass({
             hpmsData : HpmsStore.getStateData()
         });
     },
+
+    _setActiveComponent : function(e){
+        this.setState({activeComponent:e.target.getAttribute('value')})
+    },
     
     //----------------------------------------------------------------------------------------------------------------
     // Render Components
@@ -74,16 +78,44 @@ var StateIndex = React.createClass({
                 
 
                     <div className="col-md-6">
-                    
-                        <AdtGraph  classByMonth={this.state.classByMonth} selectedState={this.state.selectedState} />
+                        <section className="widget widget-tabs">
+                            <header>
+                                <ul className="nav nav-tabs" onClick={this._setActiveComponent}>
+                                    <li value="classCounts" className='active'>
+                                        <a href="#classCounts" data-toggle="tab" value="classCounts" aria-expanded="true">Class</a>
+                                    </li>
+                                    <li value="wim">
+                                        <a href="#wim" data-toggle="tab" value="wim">WIM</a>
+                                    </li>
+                                    <li>
+                                        <a href="#hpms" data-toggle="tab" value="hpms">HPMS</a>
+                                    </li>
+                                   
+                                </ul>
+                            </header>
+                            <div className="body tab-content">
+                                <div id="classCounts" className="tab-pane clearfix active">
+                                    <AdtGraph  classByMonth={this.state.classByMonth} selectedState={this.state.selectedState} />
 
-                        <MadtGraph  classByMonth={this.state.classByMonth} selectedState={this.state.selectedState} index='0' />
+                                    <MadtGraph  classByMonth={this.state.classByMonth} selectedState={this.state.selectedState} index='0' />
 
-                        <MadtGraph classByMonth={this.state.classByMonth} selectedState={this.state.selectedState} graphType='season' index='1' />
+                                    <MadtGraph classByMonth={this.state.classByMonth} selectedState={this.state.selectedState} graphType='season' index='1' />
+
+                                </div>
+                                <div id="wim" className="tab-pane clearfix">
+                                 WIM
+                                </div>
+                                <div id="hpms" className="tab-pane clearfix">
+                                    <HpmsTypeGraph  hpmsData={this.state.hpmsData} selectedState={this.state.selectedState} groupKey='route_vdt' />
+
+                                    <HpmsTypeGraph  hpmsData={this.state.hpmsData} selectedState={this.state.selectedState} groupKey='route_length' />
+                                </div>
+                               
+
+                            </div>
+                        </section>
+                                                
                         
-                        <HpmsTypeGraph  hpmsData={this.state.hpmsData} selectedState={this.state.selectedState} groupKey='route_vdt' />
-
-                        <HpmsTypeGraph  hpmsData={this.state.hpmsData} selectedState={this.state.selectedState} groupKey='route_length' />
 
                         
 
