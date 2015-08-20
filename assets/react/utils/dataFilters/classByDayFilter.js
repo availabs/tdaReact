@@ -34,11 +34,11 @@ function reduceRemoveAvg() {
 
 function reduceInitAvg() {
   return {
-  			count:0, sum:0, avg:0,
-  			monthSum: [0,0,0,0,0,0,0,0,0,0,0,0],
-  			monthCount: [0,0,0,0,0,0,0,0,0,0,0,0],
-  			monthAvg:  [0,0,0,0,0,0,0,0,0,0,0,0]
-  		};
+		count:0, sum:0, avg:0,
+		monthSum: [0,0,0,0,0,0,0,0,0,0,0,0],
+		monthCount: [0,0,0,0,0,0,0,0,0,0,0,0],
+		monthAvg:  [0,0,0,0,0,0,0,0,0,0,0,0]
+	};
 }
 
 function orderValue(p) {
@@ -97,27 +97,31 @@ module.exports  = {
 			// );
 		}
 	},
+	
 	getDimension:function(dim){
 		return dimensions[dim];
 	},
+	
 	getDimensions:function(){
 		return dimensions;
 	},
+	
 	getGroup:function(group){
 		return groups[group];
 	},
+	
 	getGroups:function(){
 		return groups;
 	},
+	
 	getCrossFilter:function(){
 		return classData;
 	},
 	filter: function(dim,val){
 
-			
-			dimensions[dim].filter(function(d){
-			  return val.indexOf(d) > -1;
-			});
+		dimensions[dim].filter(function(d){
+		  return val.indexOf(d) > -1;
+		});
 		
 	},
 	initialized : function(){

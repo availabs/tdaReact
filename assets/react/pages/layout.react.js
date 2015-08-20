@@ -10,7 +10,10 @@ var React = require('react'),
     AppStore = require('../stores/AppStore'),
     AgencyStore = require('../stores/AgencyStore'),
     UserStore = require('../stores/UserStore'),
-    JobStore = require('../stores/JobStore');
+    JobStore = require('../stores/JobStore')
+    StationStore = require('../stores/StationStore'),
+    StateWideStore = require('../stores/StatewideStore'),
+    HpmsStore = require('../stores/HpmsStore');
 
 function getState(){
   
@@ -22,7 +25,12 @@ function getState(){
       agencyOverview : AgencyStore.getAgencyOverview(),
       agencyOverviewDay : AgencyStore.getAgencyOverviewDay(),
       sessionUser : UserStore.getSessionUser(),
-      activeJobs : JobStore.getAll()
+      activeJobs : JobStore.getAll(),
+      selectedState : StateWideStore.getSelectedState(),
+      selectedStation : StateWideStore.getSelectedStation(),
+      classByMonth : StateWideStore.getClassByMonth(),
+      hpmsData : HpmsStore.getStateData(),
+      activeFilters : StateWideStore.activeFilters()
   
   };
 
@@ -39,7 +47,10 @@ var App = React.createClass({
       AppStore.addChangeListener(this._onChange);
       AgencyStore.addChangeListener(this._onChange);
       UserStore.addChangeListener(this._onChange);
-      JobStore.addChangeListener(this._onChange)
+      JobStore.addChangeListener(this._onChange);
+      StationStore.addChangeListener(this._onChange);
+      StateWideStore.addChangeListener(this._onChange);
+      HpmsStore.addChangeListener(this._onChange);
   
   },
 
@@ -49,6 +60,9 @@ var App = React.createClass({
       AgencyStore.removeChangeListener(this._onChange);
       UserStore.removeChangeListener(this._onChange);
       JobStore.removeChangeListener(this._onChange);
+      StationStore.removeChangeListener(this._onChange);
+      StateWideStore.removeChangeListener(this._onChange);
+      HpmsStore.removeChangeListener(this._onChange);
   
   },
   
@@ -70,7 +84,11 @@ var App = React.createClass({
                     agencyOverviewDay = {this.state.agencyOverviewDay}
                     sessionUser={this.state.sessionUser}
                     activeJobs = {this.state.activeJobs}
-                  />
+                    selectedState = {this.state.selectedState}
+                    selectedStation = {this.state.selectedStation}
+                    classByMonth = {this.state.classByMonth}
+                    hpmsData = {this.state.hpmsData}
+                    activeFilters = {this.state.activeFilters}/>
             </div>
         </div>
     );

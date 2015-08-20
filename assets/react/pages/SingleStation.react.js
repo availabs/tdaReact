@@ -48,6 +48,7 @@ var SingleStation = React.createClass({
         }        
     
     },
+    
      componentDidMount: function() {
 
         StateWideStore.addChangeListener(this._onChange);

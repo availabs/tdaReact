@@ -39,11 +39,13 @@ module.exports.routes = {
   '/tmgClass/byDay' : 'TmgClassController.byDay',
   '/tmgClass/byMonth' : 'TmgClassController.byMonth',
   '/tmgClass/byHour' : 'TmgClassController.byHour',
+  '/tmgClass/byHour/station/:fips/:stationId': 'TmgClassController.CountByTime',
+
 
   // -- WIM data
-  '/tmgWim/tonnage/:fips/:stationId' : 'TmgWimController.Tonage',
   '/tmgWim/tonnage/:fips' : 'TmgWimController.Tonage',
-  
+  '/tmgWim/tonnage/month/:fips/' :'TmgWimController.TonageMonthGraph',
+
   // -- Hpms Data
   '/hpms/:state' : 'HpmsController.getStateData',
 

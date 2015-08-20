@@ -80,7 +80,7 @@ module.exports  = {
 
 			
 		if(dataset !== currentDataSet){
-			console.log('class By Month Init',dataset,currentDataSet,data.length);
+			//console.log('class By Month Init',dataset,currentDataSet,data.length);
 			var stationData = {};
 			StationStore.getStateStations(dataset).forEach(function(d){
 				stationData[d.properties.station_id] = d.properties;
@@ -133,9 +133,9 @@ module.exports  = {
 				return normalForm;
 			});
 			var total_data = [].concat.apply([],total_data);
-			console.log('after data',
-				total_data.length,
-				total_data);
+			// console.log('after data',
+			// 	total_data.length,
+			// 	total_data);
 			
 
 			//console.time('CBM crossFIlterData')
@@ -194,10 +194,9 @@ module.exports  = {
 	},
 	filter: function(dim,val){
 
-			
-			dimensions[dim].filter(function(d){
-			  return val.indexOf(d) > -1;
-			});
+		dimensions[dim].filter(function(d){
+		  return val.indexOf(d) > -1;
+		});
 		
 	},
 	initialized : function(){

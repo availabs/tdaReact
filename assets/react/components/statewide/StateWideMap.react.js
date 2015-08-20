@@ -247,11 +247,13 @@ var StateWideMap = React.createClass({
                 layer.on({
                     click: function(e){
                         //console.log('station_click',e.target.feature.properties);
+                       ClientActionsCreator.setSelectedStation(feature.properties.station_id,feature.properties.state_fips)
                     },
                     
                     dblclick: function(e){
                         console.log('dbl click',feature.properties.station_id);
-                        scope.transitionTo('singleStation', {stationId: feature.properties.station_id,fips:feature.properties.state_fips});
+                       //scope.transitionTo('singleStation', {stationId: feature.properties.station_id,fips:feature.properties.state_fips});
+                        
                     },
 
                     mouseover: function(e){

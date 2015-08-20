@@ -24,7 +24,7 @@ var _selectedState = null,
     _classbyMonth = {},
     _selectedStation = null,
     _selectedState = null,
-    _classbyHour = {},
+    _classbyHour = new ClassByHourFilter(),
     _filters={
       year:null,
       month:null,
@@ -60,8 +60,8 @@ function _setStation(stationId,fips){
 function _filterYear(year){
   //ClassByDayFilter.getDimension('year').filter(year);
   ClassByMonthFilter.getDimension('year').filter(year);
-  if(ClassByHourFilter.initialized()){
-    ClassByHourFilter.getDimension('year').filter(year);
+  if(_classbyHour.initialized()){
+    _classbyHour.getDimension('year').filter(year);
   }
   _filters.year = year;
 }
@@ -69,8 +69,8 @@ function _filterYear(year){
 function _filterMonth(data){
   //ClassByDayFilter.getDimension('year').filter(year);
   ClassByMonthFilter.getDimension('month').filter(data);
-  if(ClassByHourFilter.initialized()){
-    ClassByHourFilter.getDimension('month').filter(data);
+  if(_classbyHour.initialized()){
+    _classbyHour.getDimension('month').filter(data);
   }
   _filters.month = data;
 }
@@ -92,7 +92,7 @@ function _filterClassGroup(data){
     _filters.classGroups.splice(_filters.classGroups.indexOf(data),1)
   }
 
-  ClassByHourFilter.getDimension('classGroup').filterFunction(function(d){
+  _classbyHour.getDimension('classGroup').filterFunction(function(d){
     return _filters.classGroups.indexOf(d.classGroup) > -1
   });
   
@@ -139,27 +139,27 @@ var StatewideStore = assign({}, EventEmitter.prototype, {
     return _selectedStation;
   },
 
-  getClassByHour:function(){
-    //if data is loaded send it
-    //console.log('StatewideStore getClassByHour',_selectedState,_selectedStation)
-    if(_classbyHour[_selectedStation] && _classbyHour[_selectedStation] !== 'loading' ){
-      ClassByHourFilter.init(_classbyHour[_selectedStation],_selectedStation);
-      return ClassByHourFilter;
-    }
+  // getClassByHour:function(){
+  //   //if data is loaded send it
+  //   //console.log('StatewideStore getClassByHour',_selectedState,_selectedStation)
+  //   if(_classbyHour[_selectedStation] && _classbyHour[_selectedStation] !== 'loading' ){
+  //     _classbyHour.init(_classbyHour[_selectedStation],_selectedStation);
+  //     return ClassByHourFilter;
+  //   }
     
-    //if data hasn't start started loading, load it 
-    if(_classbyHour[_selectedStation] !== 'loading'){
-      //console.log('load',_selectedStation,_selectedState),
+  //   //if data hasn't start started loading, load it 
+  //   if(_classbyHour[_selectedStation] !== 'loading'){
+  //     //console.log('load',_selectedStation,_selectedState),
 
-      SailsWebApi.getClassByHour(_selectedStation,_selectedState,AgencyStore.getSelectedAgency());
-      _classbyHour[_selectedStation] = 'loading';
-      ClassByHourFilter.init('reset',_selectedStation);
-    }
+  //     SailsWebApi.getClassByHour(_selectedStation,_selectedState,AgencyStore.getSelectedAgency());
+  //     _classbyHour[_selectedStation] = 'loading';
+  //     ClassByHourFilter.init('reset',_selectedStation);
+  //   }
 
-    //if requested data isn't loaded send most recent data
-    // may want to rethink this
-    return ClassByHourFilter;
-  },
+  //   //if requested data isn't loaded send most recent data
+  //   // may want to rethink this
+  //   return ClassByHourFilter;
+  // },
 
   getClassByDay:function(){
     //if data is loaded send it

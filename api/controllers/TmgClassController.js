@@ -15,6 +15,8 @@ var jwt = new googleapis.auth.JWT(
 	);
 jwt.authorize();	
 var bigQuery = googleapis.bigquery('v2');
+var StationByHourFilter = require('../../assets/react/utils/dataFilters/classByHourFilter'),
+	stationFilters = {};
 
 function getClassStations(database){
 
@@ -79,53 +81,144 @@ module.exports = {
 	},
 
 	
-	
+	//----------------------------------------------------------------
+	// Single Station Routes
+	//-----------------------------------------------------------------
 	byHour:function(req,res){
 		var database = req.param('database'),
  			station = req.param('stationId'),
  			fips = req.param('fips')
  			output = {};
 
- 		fileCache.checkCache({datasource:database,type:'stationClassByHour',typeId:fips+station},function(data){
- 			//console.log('find cache',data);
- 			if(data){
- 				console.log('cache sucess');
- 				console.time('send cache');
- 				res.send(data)
- 				console.timeEnd('send cache');
- 			}else{
-			    var sql = 'SELECT '+ 
-				  'station_id,dir,year,month,day,hour, '+
-				  'sum(total_vol),sum(class1),sum(class2),'+
-				  'sum(class3),sum(class4),sum(class5),sum(class6),'+
-				  'sum(class7),sum(class8),sum(class9),sum(class10),sum(class11),sum(class12),sum(class13) '+
-				  "FROM [tmasWIM12."+database+"Class] where state_fips = '"+fips+"' and station_id = '"+station+"' "+
-				  'group by station_id,dir,year,month,day,hour '+
-				  'order by station_id,dir,year,month,day,hour ';
-				
-				//console.log('by hour',sql)
-				BQuery(sql,function(data){
-
-					var fullData = data.rows.map(function(row,index){
-						var outrow = {}
-						
-						data.schema.fields.forEach(function(field,i){
-							outrow[field.name] = row.f[i].v;
-						});
-						return outrow;
-					});
-					console.time('send Data');
-					res.json(fullData);
-					console.timeEnd('send Data');
-					console.log('caching');
-					fileCache.addData({datasource:database,type:'stationClassByHour',typeId:fips+station},fullData);
-				});
-
-			}
- 	
-		});
+ 		getStationByHour(database,fips,station,function(data){
+ 			res.json(data);
+ 		})
+ 		
 	},
 
+	CountByTime:function(req,res){
+		var database = req.param('database'),
+ 			station = req.param('stationId'),
+ 			fips = req.param('fips'),
+ 			filters = req.param('filters') || {},
+ 			output = [],
+ 			classGrouping = 'classGroup';
+
+ 		getStationFilter(database,fips,station,function(cFilter){
+ 			
+ 			console.log('test',cFilter.initialized())
+ 			cFilter.getDimension('year').filter(null);
+ 			cFilter.getDimension('month').filter(null);
+
+ 			if(filters.year){
+ 				cFilter.getDimension('year').filter(filters.year)
+ 			}
+ 			if(filters.month){
+ 				cFilter.getDimension('month').filter(filters.month)
+ 			}
+
+ 			var dailyTraffic = cFilter.getGroup(classGrouping).top(Infinity).map(function(vclass,i){
+                cFilter.getDimension(classGrouping).filter(vclass.key);
+                return cFilter.getGroup('dir').top(Infinity).map(function(dir,i){
+                    cFilter.getDimension('dir').filter(dir.key);
+                    var mult = 1;
+                    if(i > 0){
+                        mult = -1;
+                    }
+                    return {
+                        key:vclass.key,
+                        values: cFilter.getGroup('average_daily_traffic').top(Infinity).map(function(time){
+                            return {
+                                key:time.key,
+                                value:time.value*mult
+                            }
+                        })
+                    }
+                })
+            }).map(function(dirSet,i){
+                if(dirSet[1]){
+                    dirSet[1].values.forEach(function(d){
+                        dirSet[0].values.push(d);
+                    })
+                }
+                dirSet[0].values.sort(function(a,b){
+                    return b.key - a.key;
+                });
+                
+                return dirSet[0];
+            }).sort(function(a,b){
+                return a.key.split(' ')[0] - b.key.split(' ')[0];
+            });
+           
+            if(!filters.month){
+                      
+                dailyTraffic = dailyTraffic.map(function(d){
+                    var sums = {}
+                    d.values.forEach(function(v){
+                        var split = v.key.split('_'),
+                            year=split[0],
+                            month = split[1],
+                            day = split[2],
+                            dir = v.value < 0 ? 'one' : 'two',
+                            sumKey = year+"_"+dir,
+                            valKey = year;
+
+                        if(filters.year){
+                            sumKey = year+'_'+month+"_"+dir,
+                            valKey = month;
+                        }  
+                      
+                        if( !sums[sumKey] ){
+                            sums[sumKey] ={key:valKey,sum:0,count:0}
+                        }
+
+                        if(v.value > 0 || v.value < 0){
+                            sums[sumKey].sum+= v.value || 0;
+                            sums[sumKey].count++;
+                        }
+                        
+
+                    })
+                    d.values = Object.keys(sums).map(function(key){
+                        sums[key].value = Math.round(sums[key].sum/sums[key].count) || 0;
+                        
+                        return sums[key];
+                    }).sort(function(a,b){
+                        return +a.key - +b.key
+                    })
+               
+                    return d;
+                })
+            }else{
+                dailyTraffic = dailyTraffic.map(function(d){
+                    d.values = d.values.filter(function(v){
+                        var split = v.key.split('_');
+                        v.key = split[2]
+                        return  split[1] == filters.month
+                    }).sort(function(a,b){
+                        return +a.key - +b.key
+                    })
+                    return d;
+                })
+            }
+            output =  dailyTraffic
+    //         .map(function(d){
+	   //          if( filters.classGroups && filters.classGroups.indexOf(d.key) > -1){
+	   //              d.values = d.values.map(function(v){
+	   //                  v.value = 0;
+	   //                  return v;
+	   //              })    
+	   //          };
+ 			// })
+ 			res.json(output)
+		})
+	},
+
+
+
+	//----------------------------------------------------------------
+	// Statewide Routes
+	//-----------------------------------------------------------------
 	byMonth:function(req,res){
 		var database = req.param('database'),
  			fips = req.param('fips'),
@@ -217,6 +310,65 @@ module.exports = {
 
 };
 
+function getStationByHour(database,fips,station,cb){
+
+	fileCache.checkCache({datasource:database,type:'stationClassByHour',typeId:fips+station},function(data){
+ 			console.log('find cache',data.length);
+			if(data){
+				console.log('cache sucess');
+				console.time('send cache');
+				cb(data);
+				
+				console.timeEnd('send cache');
+			}else{
+		    var sql = 'SELECT '+ 
+			  'station_id,dir,year,month,day,hour, '+
+			  'sum(total_vol),sum(class1),sum(class2),'+
+			  'sum(class3),sum(class4),sum(class5),sum(class6),'+
+			  'sum(class7),sum(class8),sum(class9),sum(class10),sum(class11),sum(class12),sum(class13) '+
+			  "FROM [tmasWIM12."+database+"Class] where state_fips = '"+fips+"' and station_id = '"+station+"' "+
+			  'group by station_id,dir,year,month,day,hour '+
+			  'order by station_id,dir,year,month,day,hour ';
+			
+			console.log('by hour',sql)
+			BQuery(sql,function(data){
+
+				var fullData = data.rows.map(function(row,index){
+					var outrow = {}
+					
+					data.schema.fields.forEach(function(field,i){
+						outrow[field.name] = row.f[i].v;
+					});
+					return outrow;
+				});
+				cb(fullData);
+				fileCache.addData({datasource:database,type:'stationClassByHour',typeId:fips+station},fullData);
+			});
+
+		}
+	
+	});
+}
+
+function getStationFilter(database,fips,station,cb){
+	var cFilter = null
+	if( stationFilters[database] && stationFilters[database][fips+''+station] ){
+		cFilter =  stationFilters[database][fips+''+station];
+		cb(cFilter)
+	}else{
+		if(!stationFilters[database]){ stationFilters[database] = {} }
+		stationFilters[database][fips+''+station] = new StationByHourFilter();
+		
+		getStationByHour(database,fips,station,function(data){
+			console.log('test123',data.length)
+			stationFilters[database][fips+''+station].init(data)
+			cFilter = stationFilters[database][fips+''+station];
+			cb(cFilter)
+		})
+	}
+}
+
+
 function BQuery(sql,cb){
 
 	var output = {};
@@ -278,11 +430,6 @@ function BQuery(sql,cb){
 						getMoreRows(jobid,output.rows.length)
 					
 					}else{
-			
-						
-			
-						
-      					
 						cb(output);
 					}
 

@@ -7,6 +7,8 @@ var React = require('react'),
     AdtGraph = require('../components/statewide/graphs/Adt.graph.react'),
     MadtGraph = require('../components/statewide/graphs/Madt.graph.react'),
     HpmsTypeGraph = require('../components/statewide/graphs/HpmsType.graph.react'),
+    TonnageGraph = require('../components/statewide/graphs/Tonnage.graph.react'),
+    StationCountByTimeGraph = require('../components/singleStation/CountByTime.graph.react'),
     
     
     StateWideMap =require('../components/statewide/StateWideMap.react'),
@@ -23,34 +25,9 @@ var StateIndex = React.createClass({
     
     getInitialState: function() {
         return {
-            selectedState : StateWideStore.getSelectedState(),
-            classByMonth : StateWideStore.getClassByMonth(),
-            hpmsData : HpmsStore.getStateData()
         };
     },
     
-    componentDidMount: function() {
-
-        StationStore.addChangeListener(this._onChange);
-        StateWideStore.addChangeListener(this._onChange);
-        HpmsStore.addChangeListener(this._onChange);
-    },
-    
-    componentWillUnmount: function() {
-        StationStore.removeChangeListener(this._onChange);
-        StateWideStore.removeChangeListener(this._onChange);
-        HpmsStore.removeChangeListener(this._onChange);
-    },
-    
-    _onChange:function(){
-
-        this.setState({
-            selectedState : StateWideStore.getSelectedState(),
-            classByMonth : StateWideStore.getClassByMonth(),
-            hpmsData : HpmsStore.getStateData()
-        });
-    },
-
     _setActiveComponent : function(e){
         this.setState({activeComponent:e.target.getAttribute('value')})
     },
@@ -63,7 +40,14 @@ var StateIndex = React.createClass({
         // var mapStyle ={
            
         // };
-        
+        var activeStation = '';
+        if(this.props.selectedStation){
+            activeStation = (
+                <li>
+                    <a href="#selection" data-toggle="tab" value="selection">Station {this.props.selectedStation}</a>
+                </li>
+            )
+        }
         return (
             <div className="content container">
                 <div className="row">
@@ -90,26 +74,46 @@ var StateIndex = React.createClass({
                                     <li>
                                         <a href="#hpms" data-toggle="tab" value="hpms">HPMS</a>
                                     </li>
-                                   
+                                    {activeStation}
                                 </ul>
                             </header>
                             <div className="body tab-content">
                                 <div id="classCounts" className="tab-pane clearfix active">
-                                    <AdtGraph  classByMonth={this.state.classByMonth} selectedState={this.state.selectedState} />
+                                    <AdtGraph  
+                                        classByMonth={this.props.classByMonth} 
+                                        selectedState={this.props.selectedState} />
 
-                                    <MadtGraph  classByMonth={this.state.classByMonth} selectedState={this.state.selectedState} index='0' />
+                                    <MadtGraph  
+                                        classByMonth={this.props.classByMonth} 
+                                        selectedState={this.props.selectedState} 
+                                        index='0' />
 
-                                    <MadtGraph classByMonth={this.state.classByMonth} selectedState={this.state.selectedState} graphType='season' index='1' />
+                                    <MadtGraph 
+                                        classByMonth={this.props.classByMonth} 
+                                        selectedState={this.props.selectedState} 
+                                        graphType='season' 
+                                        index='1' />
 
                                 </div>
                                 <div id="wim" className="tab-pane clearfix">
                                  WIM
+                                    <TonnageGraph 
+                                        selectedState={this.props.selectedState} />
                                 </div>
                                 <div id="hpms" className="tab-pane clearfix">
-                                    <HpmsTypeGraph  hpmsData={this.state.hpmsData} selectedState={this.state.selectedState} groupKey='route_vdt' />
+                                    <HpmsTypeGraph  hpmsData={this.props.hpmsData} selectedState={this.props.selectedState} groupKey='route_vdt' />
 
-                                    <HpmsTypeGraph  hpmsData={this.state.hpmsData} selectedState={this.state.selectedState} groupKey='route_length' />
+                                    <HpmsTypeGraph  hpmsData={this.props.hpmsData} selectedState={this.props.selectedState} groupKey='route_length' />
                                 </div>
+                                <div id="selection" className="tab-pane clearfix">
+                                    {this.props.selectedStation}
+                                    <StationCountByTimeGraph 
+                                        fips={this.props.selectedState} 
+                                        selectedStation={this.props.selectedStation} 
+                                        filters={this.props.activeFilters}
+                                    />
+                                </div>
+
                                
 
                             </div>

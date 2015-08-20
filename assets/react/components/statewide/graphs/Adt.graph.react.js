@@ -197,6 +197,9 @@ var GraphContainer = React.createClass({
                 ]} />
             </div>
         );
+        
+        //console.log('adtGraph',this._processData())
+
         return (
             
             <section className="widget large" style={{ background:'none'}}>
