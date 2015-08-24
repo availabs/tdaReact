@@ -44,7 +44,7 @@ module.exports  = function classByHourFilter(){
 				initialized = false
 			}			
 			else if(dataset !== currentDataSet){
-				//console.log('class By Month Init',dataset,currentDataSet,data.length);
+				console.time('Station crossFIlterData')
 				var stationData = {};
 				StationStore.getStateStations(dataset).forEach(function(d){
 					stationData[d.properties.station_id] = d.properties;
@@ -91,7 +91,8 @@ module.exports  = function classByHourFilter(){
 				//dimensions['ADT'] = classData.dimension(function(d){ return d.single_day});
 				dimensions['single_day'] = classData.dimension(function(d){
 					return d.year+'_'+d.month+'_'+d.day;
-				})
+				});
+				
 				groups['average_daily_traffic'] = dimensions['single_day'].group().reduceSum(function(d){
 					return d['f0_'];
 				});
@@ -144,7 +145,7 @@ module.exports  = function classByHourFilter(){
 				
 
 				initialized = true;
-				//console.timeEnd('CBM crossFIlterData')
+				console.timeEnd('Station crossFIlterData')
 			}
 
 		},

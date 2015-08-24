@@ -4,9 +4,6 @@ var React = require('react'),
    
     // -- Utils
     d3 = require('d3'),
-    colorbrewer = require('colorbrewer'),
-    colorRange = colorbrewer.Paired[12],
-    nv = require('../../utils/dependencies/nvd3.js'),
     $lime = "#8CBF26",
     $red = "#e5603b",
     $redDark = "#d04f4f",
@@ -20,19 +17,20 @@ var React = require('react'),
     $gray = "#666",
     $white = "#fff",
     $textColor = $gray,
-    COLOR_VALUES = [$green, $teal, $redDark,  $blue, $red, $orange  ];
+    COLOR_VALUES = [$green, $teal, $redDark,  $blue, $red, $orange,  ];
+    nv = require('../../utils/dependencies/nvd3.js');
 
 
 
 
-var RouteTotalGraph = React.createClass({
+var AvgHourGraph = React.createClass({
 	
-    getDefaultProps:function(){
+   getDefaultProps:function(){
       return {
           height:400
       }
     },
-     getInitialState:function(){
+    getInitialState:function(){
         return {
             toggleChart:false,
             currentData:[],
@@ -43,7 +41,11 @@ var RouteTotalGraph = React.createClass({
     componentWillReceiveProps:function(nextProps){
         //console.log(nextProps.filters.year,this.props.filters.year,nextProps.filters.year !== this.props.filters.year)
         this._loadData(nextProps.fips,nextProps.selectedStation);
-      
+        // if(nextProps.fips+''+nextProps.selectedStation !== this.props.fips+''+this.props.selectedStation){
+        //     this._loadData(nextProps.fips,nextProps.selectedStation);
+        // }else if(nextProps.filters.year !== this.props.filters.year){
+        //     this._loadData(nextProps.fips,nextProps.selectedStation);
+        // }
     },
 
     _loadData:function(fips,stationId){
@@ -51,13 +53,16 @@ var RouteTotalGraph = React.createClass({
         if(stationId){
             //var filters = getAsUriParameters(scope.props.filters)
             //console.log('filters',scope.props.filters)
-            console.log('/tmgClass/byHour/station/'+fips+'/'+stationId+'?database=allWim')
+            console.log('avg hour Load data','/tmgClass/avgHour/station/'+fips+'/'+stationId+'?database=allWim');
             scope.setState({loading:true})
-            d3.json('/tmgClass/byHour/station/'+fips+'/'+stationId+'?database=allWim')
+            d3.json('/tmgClass/avgHour/station/'+fips+'/'+stationId+'?database=allWim')
               .post(JSON.stringify({filters:scope.props.filters}),function(err,data){
-                console.log('CountbyTime',data)
+                
                 if(data.loading){
+                    //console.log('reloading')
                     setTimeout(function(){ scope._loadData(fips,stationId) }, 2000);
+                    
+                
                 }else{
                     
                     scope.setState({
@@ -69,58 +74,64 @@ var RouteTotalGraph = React.createClass({
         }
          
     },
-   
-    renderGraph:function(timeName){
+    renderGraph:function(){
         var scope = this;
+        
         nv.addGraph(function(){
             var chart = nv.models.multiBarChart()
                 .x(function(d) { return d.key })    //Specify the data accessors.
                 .y(function(d) { return d.value })
                 .color(COLOR_VALUES)
-                //.staggerLabels(true)    //Too many bars and not enough room? Try staggering labels.
+              //.staggerLabels(true)    //Too many bars and not enough room? Try staggering labels.
                 .tooltips(true)        //Don't show tooltips
-                //.showValues(false)       //...instead, show the bar value right on top of each bar.
+              //.showValues(false)       //...instead, show the bar value right on top of each bar.
                 .transitionDuration(350)
                 .stacked(true)
                 .showControls(false)
-                .showLegend(false);
+                .showLegend(false)  
+            
+            chart.xAxis
+                .axisLabel('Hour')
 
-             chart.xAxis
-                .axisLabel(timeName)
-
-            d3.select('#routeTotalGraph svg')
-                .datum(scope.state.currentData)
-                .call(chart);
-
-         
+            d3.select('#AvgHourGraph svg')
+                .datum(scope.state.currentData.map(function(d){
+                    if( scope.props.filters.classGroups.indexOf(d.key) > -1){
+                        d.values = d.values.map(function(v){
+                            v.value = 0;
+                            return v;
+                        })    
+                    }
+                    
+                    return d; 
+                }))
+                .call(chart);  
         
             nv.utils.windowResize(chart.update);
         })
         
     },
-    
     componentDidUpdate:function(){
         if(!this.state.loading){
-            //console.log('render graph',this.state.currentData)
+            //console.log('render graph',this.state.currentData, d3.select('#AvgHourGraph svg'))
             this.renderGraph();
         }
     },
-
     render:function(){
-      //console.log('render graph',this.processData(),this.props.stationData)
+      //console.log('render avg hour graph',this.processData(),this.props.stationData)
     	var scope = this;
     	var svgStyle = {
           height: '100%',
           width: '100%'
-        };
+        }
         var svg = <svg style={svgStyle}/>
         if(this.state.loading){
            
             svg = <div style={{height:'256px',margin:'0 auto'}}>Loading {this.props.selectedStation}</div> 
             
         }
-
-        var timeName = 'Year',
+        
+      	
+         var timeName = 'Year',
             timeFor = '',
             avg = 'Average'
         if(scope.props.filters.year){
@@ -129,42 +140,23 @@ var RouteTotalGraph = React.createClass({
         }
         if(scope.props.filters.month){
             timeName = 'Day'
-            var yearName = 'All Years'
-            if(scope.props.filters.year){ yearName = scope.props.filters.year;}
-            timeFor = ' for '+scope.props.filters.month +' '+yearName;
+            timeFor = ' for '+scope.props.filters.month +' '+scope.props.filters.year;
             avg = '';
         }
-        this.renderGraph(timeName);
-
-
     	return(
-    		<section className="widget large" style={{background:'none'}}>
+            <section className="widget large" style={{background:'none'}}>
                 <header>
-                    <h4><i className="fa fa-bar-chart-o"></i> {avg} Daily Traffic by {timeName} {timeFor}
+                    <h4><i className="fa fa-bar-chart-o"></i> Average Hourly Traffic {timeFor}
                         <small  className="hidden-xs"></small>
-                   
                     </h4>
                 </header>
-                <div id="routeTotalGraph" className="body chart">
-                    {svg}
+                <div id="AvgHourGraph" className="body chart">
+                   {svg}
                 </div>
-            </section>	
+            </section>
+    		
     	)
     }
-   
 });
 
-module.exports = RouteTotalGraph;
-
-function getAsUriParameters (data) {
-  return Object.keys(data).map(function (k) {
-    if ( data[k] instanceof Array ) {
-      var keyE = encodeURIComponent(k + '[]');
-      return data[k].map(function (subData) {
-        return keyE + '=' + encodeURIComponent(subData);
-      }).join('&');
-    } else {
-      return encodeURIComponent(k) + '=' + encodeURIComponent(data[k]);
-    }
-  }).join('&');
-};
+module.exports = AvgHourGraph;

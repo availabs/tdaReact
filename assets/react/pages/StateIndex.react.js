@@ -9,6 +9,8 @@ var React = require('react'),
     HpmsTypeGraph = require('../components/statewide/graphs/HpmsType.graph.react'),
     TonnageGraph = require('../components/statewide/graphs/Tonnage.graph.react'),
     StationCountByTimeGraph = require('../components/singleStation/CountByTime.graph.react'),
+    StationAvgHourGraph = require('../components/singleStation/AvgHour.graph.react'),
+    VehicleClassPie = require('../components/singleStation/VehicleClassPie.graph.react'),
     
     
     StateWideMap =require('../components/statewide/StateWideMap.react'),
@@ -107,11 +109,22 @@ var StateIndex = React.createClass({
                                 </div>
                                 <div id="selection" className="tab-pane clearfix">
                                     {this.props.selectedStation}
+
+                                    <VehicleClassPie
+                                        fips={this.props.selectedState} 
+                                        selectedStation={this.props.selectedStation} 
+                                        filters={this.props.activeFilters}/>
+
                                     <StationCountByTimeGraph 
                                         fips={this.props.selectedState} 
                                         selectedStation={this.props.selectedStation} 
-                                        filters={this.props.activeFilters}
-                                    />
+                                        filters={this.props.activeFilters}/>
+
+                                    <StationAvgHourGraph 
+                                        fips={this.props.selectedState} 
+                                        selectedStation={this.props.selectedStation} 
+                                        filters={this.props.activeFilters}/>
+                                    
                                 </div>
 
                                

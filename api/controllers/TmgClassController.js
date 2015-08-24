@@ -55,6 +55,7 @@ module.exports = {
 
 	},
 	
+	
 	datasetOverviewDay:function(req,res){
 		var database = req.param('database'),
 			dataType = req.param('dataType');
@@ -95,8 +96,66 @@ module.exports = {
  		})
  		
 	},
+	classPie:function(req,res){
 
-	CountByTime:function(req,res){
+		var database = req.param('database'),
+ 			station = req.param('stationId'),
+ 			fips = req.param('fips'),
+ 			filters = req.param('filters') || {},
+ 			output = [],
+ 			classGrouping = 'classGroup',
+ 			$lime = "#8CBF26",
+		    $red = "#e5603b",
+		    $redDark = "#d04f4f",
+		    $blue = "#6a8da7",
+		    $green = "#56bc76",
+		    $orange = "#eac85e",
+		    $pink = "#E671B8",
+		    $purple = "#A700AE",
+		    $brown = "#A05000",
+		    $teal = "#4ab0ce",
+		    $gray = "#666",
+		    $white = "#fff",
+		    $textColor = $gray,
+		    COLOR_VALUES = [$green, $teal, $redDark,  $blue, $red, $orange  ];
+
+
+ 		getStationFilter(database,fips,station,function(cFilter){
+ 			
+ 			if(cFilter.initialized()){
+ 				cFilter.getDimension('year').filter(null);
+	 			cFilter.getDimension('month').filter(null);
+	 		
+	 			if(filters.year){
+	 				cFilter.getDimension('year').filter(filters.year)
+	 			}
+	 			if(filters.month){
+	 				cFilter.getDimension('month').filter(filters.month)
+	 			}
+ 			
+		
+				var classGrouping = 'classSum';//'classGroup' 
+	 			var output = cFilter.getGroup(classGrouping).top(Infinity).map(function(vclass,i){
+               
+		                return {
+		                    key:vclass.key,
+		                    color:COLOR_VALUES[i%6],
+		                    value: vclass.value
+		                }
+		            
+		            })
+	 				// .sort(function(a,b){
+		    //             return a.key.split(' ')[0] - b.key.split(' ')[0];
+		    //         });
+		        res.json(output) 
+	        }else{
+	    		console.log('classPie - still loading',fips,station)
+	    		res.json({loading:true});
+			}
+	    });
+	    
+	},
+	AvgHour:function(req,res){
 		var database = req.param('database'),
  			station = req.param('stationId'),
  			fips = req.param('fips'),
@@ -106,111 +165,181 @@ module.exports = {
 
  		getStationFilter(database,fips,station,function(cFilter){
  			
- 			console.log('test',cFilter.initialized())
- 			cFilter.getDimension('year').filter(null);
- 			cFilter.getDimension('month').filter(null);
+ 			if(cFilter.initialized()){
 
- 			if(filters.year){
- 				cFilter.getDimension('year').filter(filters.year)
+	 			cFilter.getDimension('year').filter(null);
+	 			cFilter.getDimension('month').filter(null);
+	 		
+	 			if(filters.year){
+	 				cFilter.getDimension('year').filter(filters.year)
+	 			}
+	 			if(filters.month){
+	 				cFilter.getDimension('month').filter(filters.month)
+	 			}
+ 			
+		
+				var classGrouping = 'classGroup' 
+	        
+	            
+	            var dailyTraffic = cFilter.getGroup(classGrouping).top(Infinity).map(function(vclass,i){
+	                cFilter.getDimension(classGrouping).filter(vclass.key);
+	                return cFilter.getGroup('dir').top(Infinity).map(function(dir,i){
+	                    cFilter.getDimension('dir').filter(dir.key);
+	                    var mult = 1;
+	                    if(i > 0){
+	                        mult = -1;
+	                    }
+	                    return {
+	                        key:vclass.key,
+	                        values: cFilter.getGroup('average_hourly_traffic').top(Infinity).map(function(time){
+	                            return {
+	                                key:time.key,
+	                                value:time.value.avg*mult
+	                            }
+	                        })
+	                    }
+	                })
+	            }).map(function(dirSet,i){
+	                if(dirSet[1]){
+	                    dirSet[1].values.forEach(function(d){
+	                        dirSet[0].values.push(d);
+	                    })
+	                }
+	                //dirSet[0].color = colorRange[i];
+	                dirSet[0].values.sort(function(a,b){
+	                    return a.key - b.key;
+	                });
+	                
+	                return dirSet[0];
+	            }).sort(function(a,b){
+	                return a.key.split(' ')[0] - b.key.split(' ')[0];
+	            });
+	           
+	           	console.log('avgHour Sending Data',fips,station)
+	            res.json(dailyTraffic);
+	        }else{
+	    		console.log('avghour - still loading',fips,station)
+	    		res.json({loading:true});
+			}
+	    });
+	    
+	},
+
+	CountByTime:function(req,res){
+		var database = req.param('database'),
+ 			station = req.param('stationId'),
+ 			fips = req.param('fips'),
+ 			filters = req.param('filters') || {},
+ 			output = [],
+ 			classGrouping = 'classGroup';
+ 		//console.log('1 - get filter')
+ 		getStationFilter(database,fips,station,function(cFilter){
+ 			
+ 			if(cFilter.initialized()){
+	 			cFilter.getDimension('year').filter(null);
+	 			cFilter.getDimension('month').filter(null);
+	 		
+
+	 			if(filters.year){
+	 				cFilter.getDimension('year').filter(filters.year)
+	 			}
+	 			if(filters.month){
+	 				cFilter.getDimension('month').filter(filters.month)
+	 			}
+ 			
+ 			
+
+	 			var dailyTraffic = cFilter.getGroup(classGrouping).top(Infinity).map(function(vclass,i){
+	                cFilter.getDimension(classGrouping).filter(vclass.key);
+	                return cFilter.getGroup('dir').top(Infinity).map(function(dir,i){
+	                    cFilter.getDimension('dir').filter(dir.key);
+	                    var mult = 1;
+	                    if(i > 0){
+	                        mult = -1;
+	                    }
+	                    return {
+	                        key:vclass.key,
+	                        values: cFilter.getGroup('average_daily_traffic').top(Infinity).map(function(time){
+	                            return {
+	                                key:time.key,
+	                                value:time.value*mult
+	                            }
+	                        })
+	                    }
+	                })
+	            }).map(function(dirSet,i){
+	                if(dirSet[1]){
+	                    dirSet[1].values.forEach(function(d){
+	                        dirSet[0].values.push(d);
+	                    })
+	                }
+	                dirSet[0].values.sort(function(a,b){
+	                    return b.key - a.key;
+	                });
+	                
+	                return dirSet[0];
+	            }).sort(function(a,b){
+	                return a.key.split(' ')[0] - b.key.split(' ')[0];
+	            });
+	           
+	            if(!filters.month){
+	                      
+	                dailyTraffic = dailyTraffic.map(function(d){
+	                    var sums = {}
+	                    d.values.forEach(function(v){
+	                        var split = v.key.split('_'),
+	                            year=split[0],
+	                            month = split[1],
+	                            day = split[2],
+	                            dir = v.value < 0 ? 'one' : 'two',
+	                            sumKey = year+"_"+dir,
+	                            valKey = year;
+
+	                        if(filters.year){
+	                            sumKey = year+'_'+month+"_"+dir,
+	                            valKey = month;
+	                        }  
+	                      
+	                        if( !sums[sumKey] ){
+	                            sums[sumKey] ={key:valKey,sum:0,count:0}
+	                        }
+
+	                        if(v.value > 0 || v.value < 0){
+	                            sums[sumKey].sum+= v.value || 0;
+	                            sums[sumKey].count++;
+	                        }
+	                        
+
+	                    })
+	                    d.values = Object.keys(sums).map(function(key){
+	                        sums[key].value = Math.round(sums[key].sum/sums[key].count) || 0;
+	                        
+	                        return sums[key];
+	                    }).sort(function(a,b){
+	                        return +a.key - +b.key
+	                    })
+	               
+	                    return d;
+	                })
+	            }else{
+	                dailyTraffic = dailyTraffic.map(function(d){
+	                    d.values = d.values.filter(function(v){
+	                        var split = v.key.split('_');
+	                        v.key = split[2]
+	                        return  split[1] == filters.month
+	                    }).sort(function(a,b){
+	                        return +a.key - +b.key
+	                    })
+	                    return d;
+	                })
+	            }
+	            output =  dailyTraffic
+	            console.log('cbh - sending data',fips,station)
+	 			res.json(output)
+ 			}else{
+ 				console.log('cbh - still loading',fips,station)
+ 				res.json({loading:true})
  			}
- 			if(filters.month){
- 				cFilter.getDimension('month').filter(filters.month)
- 			}
-
- 			var dailyTraffic = cFilter.getGroup(classGrouping).top(Infinity).map(function(vclass,i){
-                cFilter.getDimension(classGrouping).filter(vclass.key);
-                return cFilter.getGroup('dir').top(Infinity).map(function(dir,i){
-                    cFilter.getDimension('dir').filter(dir.key);
-                    var mult = 1;
-                    if(i > 0){
-                        mult = -1;
-                    }
-                    return {
-                        key:vclass.key,
-                        values: cFilter.getGroup('average_daily_traffic').top(Infinity).map(function(time){
-                            return {
-                                key:time.key,
-                                value:time.value*mult
-                            }
-                        })
-                    }
-                })
-            }).map(function(dirSet,i){
-                if(dirSet[1]){
-                    dirSet[1].values.forEach(function(d){
-                        dirSet[0].values.push(d);
-                    })
-                }
-                dirSet[0].values.sort(function(a,b){
-                    return b.key - a.key;
-                });
-                
-                return dirSet[0];
-            }).sort(function(a,b){
-                return a.key.split(' ')[0] - b.key.split(' ')[0];
-            });
-           
-            if(!filters.month){
-                      
-                dailyTraffic = dailyTraffic.map(function(d){
-                    var sums = {}
-                    d.values.forEach(function(v){
-                        var split = v.key.split('_'),
-                            year=split[0],
-                            month = split[1],
-                            day = split[2],
-                            dir = v.value < 0 ? 'one' : 'two',
-                            sumKey = year+"_"+dir,
-                            valKey = year;
-
-                        if(filters.year){
-                            sumKey = year+'_'+month+"_"+dir,
-                            valKey = month;
-                        }  
-                      
-                        if( !sums[sumKey] ){
-                            sums[sumKey] ={key:valKey,sum:0,count:0}
-                        }
-
-                        if(v.value > 0 || v.value < 0){
-                            sums[sumKey].sum+= v.value || 0;
-                            sums[sumKey].count++;
-                        }
-                        
-
-                    })
-                    d.values = Object.keys(sums).map(function(key){
-                        sums[key].value = Math.round(sums[key].sum/sums[key].count) || 0;
-                        
-                        return sums[key];
-                    }).sort(function(a,b){
-                        return +a.key - +b.key
-                    })
-               
-                    return d;
-                })
-            }else{
-                dailyTraffic = dailyTraffic.map(function(d){
-                    d.values = d.values.filter(function(v){
-                        var split = v.key.split('_');
-                        v.key = split[2]
-                        return  split[1] == filters.month
-                    }).sort(function(a,b){
-                        return +a.key - +b.key
-                    })
-                    return d;
-                })
-            }
-            output =  dailyTraffic
-    //         .map(function(d){
-	   //          if( filters.classGroups && filters.classGroups.indexOf(d.key) > -1){
-	   //              d.values = d.values.map(function(v){
-	   //                  v.value = 0;
-	   //                  return v;
-	   //              })    
-	   //          };
- 			// })
- 			res.json(output)
 		})
 	},
 
@@ -351,19 +480,18 @@ function getStationByHour(database,fips,station,cb){
 }
 
 function getStationFilter(database,fips,station,cb){
-	var cFilter = null
 	if( stationFilters[database] && stationFilters[database][fips+''+station] ){
-		cFilter =  stationFilters[database][fips+''+station];
-		cb(cFilter)
+		console.log('cached filter',fips+''+station)
+		cb( stationFilters[database][fips+''+station]);
 	}else{
 		if(!stationFilters[database]){ stationFilters[database] = {} }
 		stationFilters[database][fips+''+station] = new StationByHourFilter();
 		
 		getStationByHour(database,fips,station,function(data){
-			console.log('test123',data.length)
+			console.log('New Filter',fips+''+station,data.length)
 			stationFilters[database][fips+''+station].init(data)
-			cFilter = stationFilters[database][fips+''+station];
-			cb(cFilter)
+			//cFilter = ;
+			cb(stationFilters[database][fips+''+station])
 		})
 	}
 }

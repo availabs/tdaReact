@@ -36,10 +36,16 @@ module.exports.routes = {
   '/data/overview/day/:database/:dataType' : 'TmGClassController.datasetOverviewDay',
 
   // -- Class  Data
+  //-- Full Data
   '/tmgClass/byDay' : 'TmgClassController.byDay',
   '/tmgClass/byMonth' : 'TmgClassController.byMonth',
   '/tmgClass/byHour' : 'TmgClassController.byHour',
+
+  //-- Processed Data
   '/tmgClass/byHour/station/:fips/:stationId': 'TmgClassController.CountByTime',
+  '/tmgClass/avgHour/station/:fips/:stationId': 'TmgClassController.AvgHour',
+  '/tmgClass/classPie/station/:fips/:stationId': 'TmgClassController.classPie',
+  
 
 
   // -- WIM data
