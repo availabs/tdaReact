@@ -11,7 +11,8 @@ var kill = require('tree-kill');
 module.exports = {
 
   attributes: {
-  	start:{
+  	
+    start:{
   		type:'datetime',
   		defaultsTo:new Date()
   	},

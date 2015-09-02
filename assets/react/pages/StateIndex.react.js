@@ -11,7 +11,7 @@ var React = require('react'),
     StationCountByTimeGraph = require('../components/singleStation/CountByTime.graph.react'),
     StationAvgHourGraph = require('../components/singleStation/AvgHour.graph.react'),
     VehicleClassPie = require('../components/singleStation/VehicleClassPie.graph.react'),
-    
+    LoadSpectraGraph =  require('../components/singleStation/LoadSpectra.graph.react'),
     
     StateWideMap =require('../components/statewide/StateWideMap.react'),
 
@@ -27,23 +27,38 @@ var StateIndex = React.createClass({
     
     getInitialState: function() {
         return {
+            activeComponent:'classCounts'
         };
     },
     
     _setActiveComponent : function(e){
         this.setState({activeComponent:e.target.getAttribute('value')})
     },
+
     
     //----------------------------------------------------------------------------------------------------------------
     // Render Components
     //----------------------------------------------------------------------------------------------------------------
-
     render: function() {
         // var mapStyle ={
            
         // };
-        var activeStation = '';
+        var activeStation = '',
+            type='class',
+            wimGraphs = <span />;
         if(this.props.selectedStation){
+
+            if(d3.select(".station_"+this.props.selectedStation).classed("type_WIM")){
+                type='wim';
+                wimGraphs = (
+                    <LoadSpectraGraph
+                        fips={this.props.selectedState} 
+                        selectedStation={this.props.selectedStation} 
+                        filters={this.props.activeFilters}/>
+                )
+
+            }
+
             activeStation = (
                 <li>
                     <a href="#selection" data-toggle="tab" value="selection">Station {this.props.selectedStation}</a>
@@ -57,7 +72,7 @@ var StateIndex = React.createClass({
                     <div className="col-md-6" >
                         <section className="widget whitesmoke no-padding mapaffix"  >
                             <div className="body no-margin">
-                                <StateWideMap />
+                                <StateWideMap activeView={this.state.activeComponent}/>
                             </div>
                         </section>
                     </div>
@@ -66,6 +81,7 @@ var StateIndex = React.createClass({
                     <div className="col-md-6">
                         <section className="widget widget-tabs">
                             <header>
+                                {this.state.activeComponent}
                                 <ul className="nav nav-tabs" onClick={this._setActiveComponent}>
                                     <li value="classCounts" className='active'>
                                         <a href="#classCounts" data-toggle="tab" value="classCounts" aria-expanded="true">Class</a>
@@ -108,8 +124,10 @@ var StateIndex = React.createClass({
                                     <HpmsTypeGraph  hpmsData={this.props.hpmsData} selectedState={this.props.selectedState} groupKey='route_length' />
                                 </div>
                                 <div id="selection" className="tab-pane clearfix">
-                                    {this.props.selectedStation}
+                                    {this.props.selectedStation} {type}
 
+                                    {wimGraphs}
+                                    
                                     <VehicleClassPie
                                         fips={this.props.selectedState} 
                                         selectedStation={this.props.selectedStation} 

@@ -54,7 +54,17 @@ var StateWideMap = React.createClass({
         };
     },
     
-    
+    componentWillReceiveProps:function(nextProps){
+        if(nextProps.activeView !== this.props.activeView){
+            console.log('new view')
+            if(nextProps.activeView === 'wim'){
+                d3.selectAll('.type_Class').style('display','none')
+            }else{
+                 d3.selectAll('.type_Class').style('display','block')
+            }
+        
+        }
+    },
     
     componentDidMount: function() {
 
@@ -222,9 +232,10 @@ var StateWideMap = React.createClass({
         if(map.hasLayer(stationLayer)){
             map.removeLayer(stationLayer)
         }
-        
+
         stationLayer = L.geoJson(stationsGeo, {
             pointToLayer: function (d, latlng) {
+                var type = d.properties.method_of_truck_weighing > 0 ? 'WIM' :'Class';
                 var options = {
                    
                     color: "#000",
@@ -232,7 +243,9 @@ var StateWideMap = React.createClass({
                     opacity: 1,
                     fillOpacity: 0.8,
                     stroke:false,
-                    className:'station station_'+d.properties.station_id+' '+'route_'+parseInt(d.properties.posted_sign_route_num)
+                    className:'station station_'+d.properties.station_id+' '+
+                    'route_'+parseInt(d.properties.posted_sign_route_num)+' '+
+                    'type_'+type
                 };
 
                 AdtScale.range([0,3,4,5,6,7,8,9])
@@ -246,8 +259,10 @@ var StateWideMap = React.createClass({
                 
                 layer.on({
                     click: function(e){
-                        //console.log('station_click',e.target.feature.properties);
-                       ClientActionsCreator.setSelectedStation(feature.properties.station_id,feature.properties.state_fips)
+                        console.log('station_click',e.target.feature.geometry);
+                       ClientActionsCreator.setSelectedStation(feature.properties.station_id,feature.properties.state_fips);
+                       map.setView(e.target.feature.geometry.coordinates.reverse(),16);
+                        d3.select('.ToolTip').style({display:'none'});
                     },
                     
                     dblclick: function(e){

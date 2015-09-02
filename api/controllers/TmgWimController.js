@@ -29,6 +29,74 @@ function getClassStations(database){
 
 module.exports = {
 	
+	getWimStationData:function(req,res){
+
+ 		//console.log('getWimStationData');
+ 		if(typeof req.param('stationId') == 'undefined'){
+ 			res.send('{status:"error",message:"station_id required"}',500);
+ 			return;
+ 		}
+ 		if(typeof req.param('fips') == 'undefined'){
+ 			res.send('{status:"error",message:"state code required"}',500);
+ 			return;	
+ 		}
+
+ 		var station_id = req.param('stationId'),
+ 			filters = req.param('filters'),
+ 			state = req.param('fips'),
+ 			database = req.param('database'),
+ 			depth = generateDepth();
+
+ 		var select = {
+ 			1: 'year',
+ 			2: 'month',
+ 			3: 'day',
+ 			4: 'hour'
+ 		};
+
+ 		var sql = generateSQL();
+ 		BQuery(sql,function(data){
+ 			var fullData = data.rows.map(function(row,index){
+				var outrow = {}
+				
+				data.schema.fields.forEach(function(field,i){
+					outrow[field.name] = row.f[i].v;
+				});
+				return outrow;
+			});
+ 			res.json(fullData);
+ 		})
+
+ 		function generateDepth(){
+ 			if(filters.year && filters.month){
+ 				return [filters.year,filters.month]
+ 			}else if(filters.year){
+ 				return [filters.year]
+ 			}
+ 			return [0]
+ 		}
+
+ 		function generateSQL() {
+
+ 			var sql	= "SELECT " + select[depth.length] + ", class, total_weight AS weight, count(*) AS amount "
+ 				+ "FROM [tmasWIM12."+database+"] "
+ 				+ "WHERE station_id = '"+station_id+"' "
+ 				+ "and state_fips ='"+state+"' "
+ 				+ addPredicates()
+ 				+ "GROUP BY " + select[depth.length] + ", class, weight "
+ 				+ "ORDER BY " + select[depth.length] + ";";
+ 			console.log(sql)
+ 			return sql;
+ 		}
+ 		function addPredicates() {
+ 			var preds = '';
+ 			for (var i = 1; i < depth.length; i++) {
+ 				preds += 'AND ' + select[i] + ' = ' + depth[i] + ' ';
+ 			}
+ 			return preds;
+ 		}
+	},
+
 	TonageMonthGraph:function(req,res){
 		var fips = req.param('fips'),
 			database = req.param('database'),

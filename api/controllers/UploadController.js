@@ -317,12 +317,13 @@ var newDataUploadChecker = function(newData,typeD,lines,fs,files,terminal,curren
 							for(var i = 0;i<newData.length;i++){
 				                blastBackData.push("StateFips Code: "+newData[i].state+" Station: "+newData[i].station+" Month: "+newData[i].month+" Year: "+newData[i].year);
 				            }
-				            UploadJob.update({id:currentJob.id},{isFinished:false,progress:50,status:"Uploading data, "+blastBackData.length+' station-months'}).exec(function(err,job){
+				            UploadJob.update({id:currentJob.id},{isFinished:false,progress:50,status:"Uploading data, "+blastBackData.length+' station-months,'+lines.length+'rows'}).exec(function(err,job){
 					    		if(err){ console.log(err) }
 					    		sails.sockets.blast('job_updated',job);
 					    	})
-					    	console.log('bash command',"bq --project_id=avail-wim load --max_bad_records=10 tmasWIM12."+database+" "+files[0].fd+"_"+currentJob.id+" "+schema+" \n")
-				            terminal.stdin.write("bq --project_id=avail-wim load --max_bad_records=10 tmasWIM12."+database+" "+files[0].fd+"_"+currentJob.id+" "+schema+" \n");
+							var maxBad = parseInt(lines.length/10)			    	
+					    	console.log('bash command',"bq --project_id=avail-wim load --max_bad_records="+maxBad+" tmasWIM12."+database+" "+files[0].fd+"_"+currentJob.id+" "+schema+" \n")
+				            terminal.stdin.write("bq --project_id=avail-wim load --max_bad_records="+maxBad+" tmasWIM12."+database+" "+files[0].fd+"_"+currentJob.id+" "+schema+" \n");
 							//Below removes junkfiles and lets the user know what data got uploaded
 							// terminal.stdin.write('rm ' + files[0].fd+"_"+currentJob.id +'\n');
 							// terminal.stdin.write('rm ' + files[0].fd +'\n');

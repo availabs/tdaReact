@@ -130,7 +130,10 @@ var Overview = React.createClass({
 
         return (
             <div className="content container">
-                <h2 className="page-title" style={{color:'#000'}}>{this.props.currentAgency.name}<small> Data Management</small></h2>
+                <h2 className="page-title" style={{color:'#000'}}>
+                    {this.props.currentAgency.name}
+                    <small> Data Management</small>
+                </h2>
                 <div className="row">
                     <div className="col-lg-8">
                         <section className="widget whitesmoke">

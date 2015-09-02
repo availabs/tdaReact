@@ -43,7 +43,7 @@ var VehicleClassPie = React.createClass({
     },
     
     componentWillReceiveProps:function(nextProps){
-        console.log(nextProps.filters.year,this.props.filters.year,nextProps.filters.year !== this.props.filters.year)
+        //console.log(nextProps.filters.year,this.props.filters.year,nextProps.filters.year !== this.props.filters.year)
         this._loadData(nextProps.fips,nextProps.selectedStation);
       
     },
@@ -53,11 +53,11 @@ var VehicleClassPie = React.createClass({
         if(stationId){
             //var filters = getAsUriParameters(scope.props.filters)
             //console.log('filters',scope.props.filters)
-            console.log('/tmgClass/classPie/station/'+fips+'/'+stationId+'?database=allWim')
+            //console.log('/tmgClass/classPie/station/'+fips+'/'+stationId+'?database=allWim')
             scope.setState({loading:true})
             d3.json('/tmgClass/classPie/station/'+fips+'/'+stationId+'?database=allWim')
               .post(JSON.stringify({filters:scope.props.filters}),function(err,data){
-                console.log('classpie',data)
+                //console.log('classpie',data)
                 if(data.loading){
                     setTimeout(function(){ scope._loadData(fips,stationId) }, 3000);
                 }else{
@@ -131,7 +131,7 @@ var VehicleClassPie = React.createClass({
     },
     componentDidUpdate:function(){
         if(!this.state.loading){
-            console.log('render graph',this.state.currentData)
+            //console.log('render graph',this.state.currentData)
             this.renderGraph();
         }
     },

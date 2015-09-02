@@ -27,11 +27,11 @@ var GraphContainer = React.createClass({
 
     componentWillReceiveProps:function(nextProps){
         if(!this.props.data && nextProps.data){
-            console.log('receive1',this.props.divId,Object.keys(nextProps.data).length);
+            //console.log('receive1',this.props.divId,Object.keys(nextProps.data).length);
             this._updateData(nextProps.data);
         }
         else if(nextProps.data && Object.keys(nextProps.data).length !== Object.keys(this.props.data).length){
-            console.log('receive2',this.props.divId,Object.keys(nextProps.data).length,Object.keys(this.props.data).length);
+            //console.log('receive2',this.props.divId,Object.keys(nextProps.data).length,Object.keys(this.props.data).length);
             this._updateData(nextProps.data);
         
         }
@@ -43,10 +43,10 @@ var GraphContainer = React.createClass({
         if(newData){
             showData = newData;
         }
-        console.log('_updateData1' ,this.props.divId,   showData);
+        //console.log('_updateData1' ,this.props.divId,   showData);
 
         if(showData && Object.keys(showData).length > 0 ){
-            console.log('_updateData2' ,this.props.divId,showData.length);
+            //console.log('_updateData2' ,this.props.divId,showData.length);
 
             var values = Object.keys(showData).map(function(key){
                 return showData[key];
