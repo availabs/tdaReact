@@ -323,7 +323,7 @@ var newDataUploadChecker = function(newData,typeD,lines,fs,files,terminal,curren
 					    	})
 							var maxBad = parseInt(lines.length/10)			    	
 					    	console.log('bash command',"bq --project_id=avail-wim load --max_bad_records="+maxBad+" tmasWIM12."+database+" "+files[0].fd+"_"+currentJob.id+" "+schema+" \n")
-				            terminal.stdin.write("bq --project_id=avail-wim load --max_bad_records="+maxBad+" tmasWIM12."+database+" "+files[0].fd+"_"+currentJob.id+" "+schema+" \n");
+				            terminal.stdin.write("~/google-cloud-sdk/bin/bq --project_id=avail-wim load --max_bad_records="+maxBad+" tmasWIM12."+database+" "+files[0].fd+"_"+currentJob.id+" "+schema+" \n");
 							//Below removes junkfiles and lets the user know what data got uploaded
 							// terminal.stdin.write('rm ' + files[0].fd+"_"+currentJob.id +'\n');
 							// terminal.stdin.write('rm ' + files[0].fd +'\n');
