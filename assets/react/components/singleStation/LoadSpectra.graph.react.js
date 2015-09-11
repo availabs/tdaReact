@@ -118,7 +118,7 @@ var SpectraGraph = React.createClass({
                 .showLegend(false)  
             
             chart.xAxis
-                .axisLabel('Hour')
+                .axisLabel('Tons')
                 .tickFormat(function(d){
                     return parseInt(d*220.462);
                 })
@@ -134,7 +134,7 @@ var SpectraGraph = React.createClass({
 
     componentDidUpdate:function(){
         if(!this.state.loading){
-            console.log('render spectra graph',this.state.currentData,this.processData())
+            //console.log('render spectra graph',this.state.currentData,this.processData())
             this.renderGraph();
         }
     },
