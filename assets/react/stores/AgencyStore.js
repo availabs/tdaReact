@@ -78,11 +78,11 @@ var AgencyStore = assign({}, EventEmitter.prototype, {
 
   getUploads:function(){
 
-    if(_uploads[_agencies[_selectedAgency]] && _uploads[_agencies[_selectedAgency]] !== 'loading'){
-      return _uploads[_agencies[_selectedAgency]];
+    if(_uploads[_agencies[_selectedAgency].datasource] && _uploads[_agencies[_selectedAgency].datasource] !== 'loading'){
+      return _uploads[_agencies[_selectedAgency].datasource];
     }else{
       SailsWebApi.read('uploadjob',{source:_agencies[_selectedAgency].datasource})
-       _uploads[_agencies[_selectedAgency]] = 'loading' 
+       _uploads[_agencies[_selectedAgency].datasource] = 'loading' 
     }
     return []
   },
@@ -114,8 +114,11 @@ AgencyStore.dispatchToken = AppDispatcher.register(function(payload) {
       AgencyStore.emitChange();
     break;
 
-    case ActionTypes.RECEIEVE_UPLOADJOBS:
-      console.log('RECEIEVE_UPLOADJOBS',action);
+    case ActionTypes.RECEIVE_UPLOADJOBS:
+      console.log('RECEIVE_UPLOADJOBS',action);
+      if(action.data[0]  && action.data[0].source){
+        _uploads[action.data[0].source] = action.data;
+      }
       //AgencyStore.emitChange();
     break;
 

@@ -84,7 +84,7 @@ var StateWideMap = React.createClass({
           center: [39.8282, -98.5795],
           zoom: 4,
           layers: [mapquestOSM],
-          zoomControl: false,
+          zoomControl: true,
           attributionControl:false
         });
         d3.json('/geo/states.json',function(data){

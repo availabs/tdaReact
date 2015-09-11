@@ -106,6 +106,7 @@ module.exports = {
     //handles Create,Read & Update
 
     var actiontype = 'RECEIVE_'+type.toUpperCase()+'S';
+    //console.log('receiveData',actiontype);
     AppDispatcher.handleServerAction({
       type: ActionTypes[actiontype],
       data: data

@@ -57,7 +57,7 @@ var GraphContainer = React.createClass({
         if(scope.props.type==='season'){
             season=true;
         }
-        console.log('ld',JSON.stringify({filters:filters}))
+        //console.log('ld',JSON.stringify({filters:filters}))
         d3.json('/tmgWim/tonnage/madt/'+fips+'/?database=allWim')
             .post(JSON.stringify({filters:filters,season:season}),function(err,data){
             

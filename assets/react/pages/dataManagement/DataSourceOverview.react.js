@@ -8,6 +8,7 @@ var React = require('react'),
     // -- components 
     Uploader = require('../../components/dataManagement/Uploader.react'),
     CalendarGraph = require('../../components/dataManagement/calendarGraph.react'),
+    DataTable = require('../../components/utils/DataTable.react'),
     
     // -- stores
    
@@ -88,7 +89,7 @@ var Overview = React.createClass({
         }
        
         
-        console.log('yearsArray',type,yearsArray);
+        //console.log('yearsArray',type,yearsArray);
 
         var rows = Object.keys(Years).map(function(key){
             if(key != 'null'){
@@ -161,6 +162,36 @@ var Overview = React.createClass({
                                     </header>
                                     <div className="body no-margin">
                                         <Uploader currentAgency = {this.props.currentAgency} activeJobs={this.props.activeJobs}/>
+                                    </div>
+                                </section>
+                            </div>
+                        </section> 
+                        <section className="widget whitesmoke">
+                            
+                            <div className="body">
+                                <section className="widget">
+                                    <header>
+                                        <h4>
+                                            Uploads
+                                        </h4>
+                                        
+                                    </header>
+                                    <div className="body no-margin">
+                                        <DataTable 
+                                            data={this.props.uploads.filter(function(d){ return !d.isFinished })} 
+                                            pageLength={10}
+                                            columns={ [
+                                                {key:'filename', name:'Filename'},
+                                                {key:'status', name:'Status'}
+                                            ]} />
+                                        <DataTable 
+                                            data={this.props.uploads.filter(function(d){ return d.isFinished })} 
+                                            pageLength={10}
+                                            columns={ [
+                                                {key:'filename', name:'Filename'},
+                                                {key:'status', name:'Status'}
+                                            ]} />
+
                                     </div>
                                 </section>
                             </div>

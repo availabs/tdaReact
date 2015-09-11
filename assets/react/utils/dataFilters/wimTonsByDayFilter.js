@@ -4,10 +4,6 @@ var StationStore = require('../../stores/StationStore'),
 // -- utils
  	crossfilter = require('crossfilter');
 
-
-
-
-
 module.exports  = function WimTonsbyDayFilter(){
 
 	var classData 	=   {},
@@ -25,6 +21,7 @@ module.exports  = function WimTonsbyDayFilter(){
 	    return p;
 	  };
 	}
+	
 	function reduceRemoveAvg(attr) {
 	  return function(p,v) {
 	    --p.count
