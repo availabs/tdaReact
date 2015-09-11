@@ -30,7 +30,8 @@ function getState(){
       selectedStation : StateWideStore.getSelectedStation(),
       classByMonth : StateWideStore.getClassByMonth(),
       hpmsData : HpmsStore.getStateData(),
-      activeFilters : StateWideStore.activeFilters()
+      activeFilters : StateWideStore.activeFilters(),
+      uploadJobs : AgencyStore.getUploads()
   
   };
 
@@ -86,7 +87,8 @@ var App = React.createClass({
                     selectedStation = {this.state.selectedStation}
                     classByMonth = {this.state.classByMonth}
                     hpmsData = {this.state.hpmsData}
-                    activeFilters = {this.state.activeFilters}/>
+                    activeFilters = {this.state.activeFilters}
+                    uploads = {this.state.uploadJobs} />
             </div>
         </div>
     );

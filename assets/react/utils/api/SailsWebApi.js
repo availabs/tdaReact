@@ -190,5 +190,18 @@ var api = {
 
 
 };
-console.log('this is my sailsWebApi',api);
+//console.log('this is my sailsWebApi',api);
 module.exports = api;
+
+function getAsUriParameters (data) {
+  return Object.keys(data).map(function (k) {
+    if ( data[k] instanceof Array ) {
+      var keyE = encodeURIComponent(k + '[]');
+      return data[k].map(function (subData) {
+        return keyE + '=' + encodeURIComponent(subData);
+      }).join('&');
+    } else {
+      return encodeURIComponent(k) + '=' + encodeURIComponent(data[k]);
+    }
+  }).join('&');
+};

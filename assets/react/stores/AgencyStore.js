@@ -12,11 +12,11 @@ var AppDispatcher = require('../dispatcher/AppDispatcher'),
 var SailsWebApi = require('../utils/api/SailsWebApi');
     
 var _selectedAgency = 1,
-    _agencies = {},
+    _agencies = {"1":{id:1,datasource:'allWim',name:'TMAS'}},
     _default = {datasource:'allWim',name:'TMAS'},
     _overviewData = {},
     _overviewDayData = {},
-    _uploads={};
+    _uploads= {};
 
 function _addAgencies(rawData) {
   //console.log('stores/AgencyStore/_addUsers',rawData);
@@ -78,11 +78,11 @@ var AgencyStore = assign({}, EventEmitter.prototype, {
 
   getUploads:function(){
 
-    if(_uploads(_agencies[_selectedAgency]) && _uploads(_agencies[_selectedAgency]) !== 'loading'){
-      return _uploads(_agencies[_selectedAgency]);
+    if(_uploads[_agencies[_selectedAgency]] && _uploads[_agencies[_selectedAgency]] !== 'loading'){
+      return _uploads[_agencies[_selectedAgency]];
     }else{
       SailsWebApi.read('uploadjob',{source:_agencies[_selectedAgency].datasource})
-       _uploads(_agencies[_selectedAgency]) = 'loading' 
+       _uploads[_agencies[_selectedAgency]] = 'loading' 
     }
     return []
   },
@@ -114,6 +114,11 @@ AgencyStore.dispatchToken = AppDispatcher.register(function(payload) {
       AgencyStore.emitChange();
     break;
 
+    case ActionTypes.RECEIEVE_UPLOADJOBS:
+      console.log('RECEIEVE_UPLOADJOBS',action);
+      //AgencyStore.emitChange();
+    break;
+
     case ActionTypes.RECEIVE_AGENCYS:
       _addAgencies(action.data);
       AgencyStore.emitChange();
@@ -125,7 +130,7 @@ AgencyStore.dispatchToken = AppDispatcher.register(function(payload) {
     break;
 
     case ActionTypes.GET_DATA_OVERVIEW:
-
+      //console.log('test GET_DATA_OVERVIEW',action)
       if(_overviewData[action.id] === 'loading'){
         _overviewData[action.id] = {}
       }
