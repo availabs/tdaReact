@@ -104,7 +104,7 @@ module.exports = {
 	TonageMonthGraph:function(req,res){
 		var fips = req.param('fips'),
 			database = req.param('database'),
-			filters = req.param('filters');
+			filters = req.param('filters') || {};
 
 		getFilter(database,fips,function(cFilter){
 			

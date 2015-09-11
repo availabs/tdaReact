@@ -15,7 +15,8 @@ var _selectedAgency = 1,
     _agencies = {},
     _default = {datasource:'allWim',name:'TMAS'},
     _overviewData = {},
-    _overviewDayData = {};
+    _overviewDayData = {},
+    _uploads={};
 
 function _addAgencies(rawData) {
   //console.log('stores/AgencyStore/_addUsers',rawData);
@@ -73,6 +74,17 @@ var AgencyStore = assign({}, EventEmitter.prototype, {
       }
     }
     return {}
+  },
+
+  getUploads:function(){
+
+    if(_uploads(_agencies[_selectedAgency]) && _uploads(_agencies[_selectedAgency]) !== 'loading'){
+      return _uploads(_agencies[_selectedAgency]);
+    }else{
+      SailsWebApi.read('uploadjob',{source:_agencies[_selectedAgency].datasource})
+       _uploads(_agencies[_selectedAgency]) = 'loading' 
+    }
+    return []
   },
 
   getAgencyOverviewDay:function(){

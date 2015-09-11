@@ -46,6 +46,7 @@ module.exports = {
     RECEIEVE_STATE_HPMS:null,
 
     RECEIVE_JOBS:null,
+    RECEIVE_UPLOADJOBS:null,
 
   }),
 

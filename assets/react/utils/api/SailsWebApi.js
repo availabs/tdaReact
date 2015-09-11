@@ -137,11 +137,32 @@ var api = {
     });
   },
   
-  read: function(type) {
-    d3.json('/'+type,function(err,data){     
-      //console.log('utils/sailsWebApi/getUsers',data);
+  read: function(type,filter) {
+    
+    var where = ''
+    if(filter){ 
+      where = '/?'+getAsUriParameters(filter); 
+    }
+    if(filter && filter.type === 'where'){
+      where = '/?where='+filter.where;
+    }
+    
+    d3.json('/'+type+where,function(err,data){     
+      if(! (data instanceof Array)){
+        data = [data];
+      }
+      console.log('READS',type,where,data.length);
+    
+      //onsole.log('got data','/'+type+where,loadChildren,data)
+
+     
+      if( type.indexOf('/') >= 0){
+        type = type.split('/')[0]
+      }
       ServerActionCreators.receiveData(type,data);
+
     });
+  
   },
 
 
