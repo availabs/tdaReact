@@ -6,14 +6,18 @@
  */
 
 var googleapis = require('googleapis');
-var fs = require('fs');    
-var jwt = new googleapis.auth.JWT(
+	fs = require('fs'),
+	d3 = require('d3'),
+    colorbrewer = require('colorbrewer'),
+    colorRange = colorbrewer.RdBu[5].reverse(),
+	jwt = new googleapis.auth.JWT(
 		'424930963222-s59k4k5usekp20guokt0e605i06psh0d@developer.gserviceaccount.com', 
 		'availwim.pem', 
 		'3d161a58ac3237c1a1f24fbdf6323385213f6afc', 
 		['https://www.googleapis.com/auth/bigquery']
 	);
-jwt.authorize();	
+	jwt.authorize();	
+
 var bigQuery = googleapis.bigquery('v2');
 var wimTonsByDayFilter = require('../../assets/react/utils/dataFilters/wimTonsByDayFilter'),
 	tonFilters = {};
@@ -64,7 +68,7 @@ module.exports = {
 				});
 				return outrow;
 			});
- 			res.json(fullData);
+			res.json(fullData);
  		})
 
  		function generateDepth(){
@@ -104,14 +108,117 @@ module.exports = {
 
 		getFilter(database,fips,function(cFilter){
 			
-			var output = cFilter.getGroup('ADT').top(Infinity);
-			output = output.map(function(d){
-				return {
-					label: d.key,
-					value: d.value.avg
-				}
-			});
-			res.json(output)
+			if(cFilter.initialized()){
+
+ 				cFilter.getDimension('year').filter(null);
+	 			cFilter.getDimension('month').filter(null);
+	 		
+	 			if(filters.year){
+	 				cFilter.getDimension('year').filter(filters.year)
+	 			}
+	 			if(filters.month){
+	 				cFilter.getDimension('month').filter(filters.month)
+		 		}
+				
+
+				var output = cFilter.getGroup('ADT').top(Infinity);
+				output = output.map(function(d){
+					return {
+						label: d.key,
+						value: d.value.avg
+					}
+				});
+				res.json(output)
+
+			}else {
+				
+				res.json({loading:true})
+			
+			}
+			
+		})
+
+	},
+
+	TonageMadtGraph:function(req,res){
+		var fips = req.param('fips'),
+			database = req.param('database'),
+			filters = req.param('filters'),
+			season = req.param('season'),
+			
+    		AdtScale = d3.scale.quantile().domain([0,70000]).range(colorRange);
+
+		getFilter(database,fips,function(cFilter){
+			
+			if(cFilter.initialized()){
+
+ 				cFilter.getDimension('year').filter(null);
+	 			cFilter.getDimension('month').filter(null);
+
+	 		
+	 			if(filters.year){
+	 				cFilter.getDimension('year').filter(filters.year)
+	 			}
+	 			var stations = {}
+				var stationADT = cFilter.getGroup('ADT')
+					.order(function(p){return p.avg})
+                	.top(Infinity)
+                	.filter(function(d){ 
+                        return d.value.avg  
+                    })
+                stationADT.forEach(function(d){
+                	stations[d.key] = d.value.avg
+                })
+				//console.log('total',stationADT);
+                AdtScale.domain(stationADT.map(function(ADT){
+	                return ADT.value.avg;
+	            }));
+
+				var output = cFilter.getGroup('ADT')
+					.order(function(p){return p.avg})
+                    .top(Infinity)
+                    .filter(function(d){ 
+                        return d.value.avg  
+                    })
+                    .map(function (ADT){
+
+                    	var values = cFilter.getGroup('month')
+	                		.top(Infinity)
+	                		.map(function(m){
+	                			cFilter.getDimension('month').filter(m.key);
+
+	                			var data = cFilter.getGroup('ADT')
+	                				.top(Infinity)
+	                				.filter(function(d){
+	                					return d.key === ADT.key
+	                				})
+	                			var o = Math.round(data[0].value.avg)
+	                			if(season){
+	                				var adt = stationADT.filter(function(v){
+	                					return v.key === ADT.key
+	                				})
+	                				//console.log(m.key,o,stations[ADT.key],o / stations[ADT.key])
+	                				o = o / stations[ADT.key];
+	                			}
+	                			//console.log('month',m,cFilter.getGroup('ADT').top(Infinity))
+	                			return {month:m.key, y: o || 0}
+	                		}).sort(function(a,b){
+	                			return a.month - b.month;
+	                		})
+                    	//console.log("color",AdtScale(ADT.value.avg || 0))
+                        return {
+                            "key":(ADT.key),
+                            "values":values,
+                            "color":AdtScale(ADT.value.avg || 0)
+                        }
+                    })
+				res.json(output)
+
+			}else {
+				
+				res.json({loading:true})
+			
+			}
 			
 		})
 

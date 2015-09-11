@@ -13,5 +13,5 @@ module.exports.models = {
   //
   // (defaults to localDiskDb)
   connection: 'lorPostgress',
-  migrate : 'alter'
+  migrate : 'safe'
 };

@@ -51,6 +51,7 @@ module.exports.routes = {
   // -- WIM data
   '/tmgWim/tonnage/:fips' : 'TmgWimController.Tonage',
   '/tmgWim/tonnage/month/:fips/' :'TmgWimController.TonageMonthGraph',
+  '/tmgWim/tonnage/madt/:fips/' :'TmgWimController.TonageMadtGraph',
   '/tmgWim/:fips/:stationId':'TmgWimController.getWimStationData',
 
   // -- Hpms Data

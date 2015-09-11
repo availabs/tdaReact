@@ -73,8 +73,6 @@ var App = React.createClass({
   render: function() {
     return (
         <div>
-            <Logo />
-            <Sidebar menuItems={this.state.menu} />
             <div className="wrap">
                 <Header />
                   <RouteHandler

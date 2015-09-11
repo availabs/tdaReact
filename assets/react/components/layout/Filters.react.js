@@ -61,6 +61,9 @@ var Filters = React.createClass({
         console.log(e.target.getAttribute('value'))
         this.setState({currentYear:e.target.getAttribute('value')})
         ClientActionsCreator.filterYear(e.target.getAttribute('value'));
+        if(e.target.getAttribute('value') === null){
+             ClientActionsCreator.filterMonth(null);
+        }   
     },
 
     _setMonthFilter:function(e){
@@ -121,17 +124,21 @@ var Filters = React.createClass({
     },
 
     _getMonths : function(){
-        var scope = this;
+        var scope = this,
+        months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 
         if(this.state.classByMonth.getGroup('month')){
 
             var output = this.state.classByMonth.getGroup('month')
             .top(Infinity)
+            .filter(function(d){
+                return +d.key < 13;
+            })
             .sort(function(a,b){
                 return +b.key-+a.key
             })
             .map(function(month,i){
-                return (<li rel="1" key={i} value={month.key}><a  tabIndex="-1" onClick={scope._setMonthFilter} value={month.key} className="">{month.key}</a></li>)
+                return (<li rel="1" key={i} value={month.key}><a  tabIndex="-1" onClick={scope._setMonthFilter} value={month.key} className="">{month.key +'-'+ months[month.key-1]}</a></li>)
             })
             return output;
         }
@@ -155,67 +162,80 @@ var Filters = React.createClass({
         }
         return;
     },
-
+    renderMonth:function(){
+        var currentMonth = this.state.currentMonth || 'All';
+        var months = this._getMonths();
+        var scope = this,
+            monthscale = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+        return (
+             <div className="col-xs-4" >
+                <label className="control-label centered" style={labelStyle} ><strong>Months</strong></label>
+                <div className="controls form-group">
+                    <div className="btn-group bootstrap-select col-md-12">
+                        <button className="btn dropdown-toggle clearfix btn-primary btn-sm btn-block" 
+                            data-toggle="dropdown" id="simple-big" tabIndex="-1" 
+                            aria-expanded="false">
+                            <span className="filter-option">{currentMonth } {currentMonth === 'All' ? '' : '-'+monthscale[currentMonth-1]}</span>&nbsp;<i className="fa fa-caret-down"></i>
+                        </button>
+                        <ul className="dropdown-menu" role="menu" >
+                            <li rel="0"><a tabIndex="-1" onClick={scope._setMonthFilter} value={null}>All</a></li>
+                            {months}
+                        </ul>
+                    </div>               
+                </div>
+            </div>
+        )
+    },
     render: function() {
         var scope = this;
         //console.log('FILTERS/ render',this.state.currentYear)
         var currentYear = scope._parseYear(this.state.currentYear);
-        var currentMonth = this.state.currentMonth || 'All';
         var currentClass = this.state.currentClass || 'All';
         var years = this._getYears()
-        var months = this._getMonths();
         var classes = this._getClasses();
-
+        var renderMonth = currentYear === 'All' ? <span /> : this.renderMonth();
 
   
         return (
-        	<section className="widget ui-sortable no-padding" style={{background:'none'}}>
+        	<section className="widget ui-sortable no-padding" style={{background:'none',margin:'0px'}}>
     			<fieldset>
                     <div className="control-group">
-                        <label className="control-label centered" style={labelStyle} ><strong>Year</strong></label>
-                        <div className="controls form-group">
-                            <div className="btn-group bootstrap-select col-md-12">
-                            	<button className="btn dropdown-toggle clearfix btn-primary btn-lg btn-block" 
-                                    data-toggle="dropdown" id="simple-big" tabIndex="-1" aria-expanded="false">
-                                    <span className="filter-option">{currentYear}</span>&nbsp;<i className="fa fa-caret-down"></i>
-                                </button>
-                            	<ul className="dropdown-menu" role="menu" >
-                            		<li rel="0"><a tabIndex="-1" onClick={scope._setYearFilter} value={null}>All</a></li>
-                                    {years}
-                            	</ul>
-                            </div>               
+                        <div className="row" >
+                            <div className="col-xs-4" >
+                                <label className="control-label centered" style={labelStyle} ><strong>Year</strong></label>
+                                <div className="controls form-group">
+                                    <div className="btn-group bootstrap-select col-md-12">
+                                    	<button className="btn dropdown-toggle clearfix btn-primary btn-sm btn-block" 
+                                            data-toggle="dropdown" id="simple-big" tabIndex="-1" aria-expanded="false">
+                                            <span className="filter-option">{currentYear}</span>&nbsp;<i className="fa fa-caret-down"></i>
+                                        </button>
+                                    	<ul className="dropdown-menu" role="menu" >
+                                    		<li rel="0"><a tabIndex="-1" onClick={scope._setYearFilter} value={null}>All</a></li>
+                                            {years}
+                                    	</ul>
+                                    </div>               
+                                </div>
+                            </div>
+                            {renderMonth}
+                            <div className="col-xs-4" >
+                                <label className="control-label centered" style={labelStyle} ><strong>ClassName</strong></label>
+                                <div className="controls form-group">
+                                    <div className="btn-group bootstrap-select col-md-12">
+                                    	<button className="btn dropdown-toggle clearfix btn-primary btn-sm btn-block" 
+                                            data-toggle="dropdown" id="simple-big" tabIndex="-1" 
+                                            aria-expanded="false">
+                                            <span className="filter-option">{currentClass}</span>&nbsp;<i className="fa fa-caret-down"></i>
+                                        </button>
+                                    	<ul className="dropdown-menu" role="menu" >
+                                            <li rel="0"><a tabIndex="-1" onClick={scope._setClassFilter} value={null}>All</a></li>
+                                    		{classes}
+                                    	</ul>
+                                    </div>               
+                                </div>
+                            </div>
                         </div>
-                        <label className="control-label centered" style={labelStyle} ><strong>Months</strong></label>
-                        <div className="controls form-group">
-                            <div className="btn-group bootstrap-select col-md-12">
-                            	<button className="btn dropdown-toggle clearfix btn-primary btn-lg btn-block" 
-                                    data-toggle="dropdown" id="simple-big" tabIndex="-1" 
-                                    aria-expanded="false">
-                                    <span className="filter-option">{currentMonth}</span>&nbsp;<i className="fa fa-caret-down"></i>
-                                </button>
-                            	<ul className="dropdown-menu" role="menu" >
-                            		<li rel="0"><a tabIndex="-1" onClick={scope._setMonthFilter} value={null}>All</a></li>
-                                    {months}
-                            	</ul>
-                            </div>               
-                        </div>
-                        <label className="control-label centered" style={labelStyle} ><strong>ClassName</strong></label>
-                        <div className="controls form-group">
-                            <div className="btn-group bootstrap-select col-md-12">
-                            	<button className="btn dropdown-toggle clearfix btn-primary btn-lg btn-block" 
-                                    data-toggle="dropdown" id="simple-big" tabIndex="-1" 
-                                    aria-expanded="false">
-                                    <span className="filter-option">{currentClass}</span>&nbsp;<i className="fa fa-caret-down"></i>
-                                </button>
-                            	<ul className="dropdown-menu" role="menu" >
-                                    <li rel="0"><a tabIndex="-1" onClick={scope._setClassFilter} value={null}>All</a></li>
-                            		{classes}
-                            	</ul>
-                            </div>               
-                        </div>
-                        <div>
 
-                        </div>
+                       
                     </div>
                     {this._activeStations()}
                 </fieldset>

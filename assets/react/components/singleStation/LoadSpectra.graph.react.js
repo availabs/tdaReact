@@ -41,12 +41,10 @@ var SpectraGraph = React.createClass({
     
     componentWillReceiveProps:function(nextProps){
         //console.log(nextProps.filters.year,this.props.filters.year,nextProps.filters.year !== this.props.filters.year)
-        this._loadData(nextProps.fips,nextProps.selectedStation);
-        // if(nextProps.fips+''+nextProps.selectedStation !== this.props.fips+''+this.props.selectedStation){
-        //     this._loadData(nextProps.fips,nextProps.selectedStation);
-        // }else if(nextProps.filters.year !== this.props.filters.year){
-        //     this._loadData(nextProps.fips,nextProps.selectedStation);
-        // }
+       
+        if(nextProps.fips+''+nextProps.selectedStation !== this.props.fips+''+this.props.selectedStation){
+            this._loadData(nextProps.fips,nextProps.selectedStation);
+        }
     },
 
     _loadData:function(fips,stationId){
@@ -79,7 +77,14 @@ var SpectraGraph = React.createClass({
     },
     
     processData:function(){
-        var pairs = this.state.currentData.reduce(function(prev,next){
+        var scope = this;
+        var curData = this.state.currentData;
+        if(scope.props.filters.class){
+            curData = curData.filter(function(d){
+                return d.class == scope.props.filters.class
+            })
+        }
+        var pairs = curData.reduce(function(prev,next){
             if(!prev[next.weight]){
 
                 prev[next.weight] = 0
@@ -92,6 +97,7 @@ var SpectraGraph = React.createClass({
         }).filter(function(ds){
             return ds.key < 500
         })
+
         return [{"key": "Spectra",values:dataArray}]  
     },
 
@@ -113,6 +119,9 @@ var SpectraGraph = React.createClass({
             
             chart.xAxis
                 .axisLabel('Hour')
+                .tickFormat(function(d){
+                    return parseInt(d*220.462);
+                })
 
             d3.select('#SpectraGraph svg')
                 .datum(scope.processData())

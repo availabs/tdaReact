@@ -93,10 +93,10 @@ module.exports  = function WimTonsbyDayFilter(){
 				groups['stationId'] = dimensions['stationId'].group().reduceCount();
 
 				
-				// dimensions['year'] = classData.dimension(function(d){ return +d.year });
-				// groups['yearSum'] = dimensions['year'].group().reduceSum(function(d){
-				// 	return d['f0_'];
-				// });
+				dimensions['year'] = classData.dimension(function(d){ return +d.year });
+				groups['yearSum'] = dimensions['year'].group().reduceSum(function(d){
+					return d['f0_'];
+				});
 
 				dimensions['month'] = classData.dimension(function(d){ return +d.month });
 				groups['month'] = dimensions['month'].group().reduceCount();

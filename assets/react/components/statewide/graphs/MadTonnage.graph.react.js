@@ -13,7 +13,8 @@ var React = require('react'),
 
     //-- Utils
     colorRange = colorbrewer.RdBu[5],
-    AdtScale = d3.scale.quantile().domain([0,70000]).range(colorRange);
+    AdtScale = d3.scale.quantile().domain([0,70000]).range(colorRange),
+    months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];;
 
 
 var removeLabels = function(){
@@ -24,7 +25,8 @@ var GraphContainer = React.createClass({
 
     getDefaultProps:function(){
         return {
-            height: 300
+            height: 300,
+            //index:0
         }
     },
     
@@ -50,27 +52,23 @@ var GraphContainer = React.createClass({
 
     _loadData:function(fips){
         var scope = this;
-        d3.json('/tmgWim/tonnage/month/'+fips+'/?database=allWim')
-            .post(JSON.stringify({filters:scope.props.filters}),function(err,data){
+        var filters = scope.props.filters;
+        var season = false;
+        if(scope.props.type==='season'){
+            season=true;
+        }
+        console.log('ld',JSON.stringify({filters:filters}))
+        d3.json('/tmgWim/tonnage/madt/'+fips+'/?database=allWim')
+            .post(JSON.stringify({filters:filters,season:season}),function(err,data){
             
             if(data.loading){
                     console.log('reloading')
-                    setTimeout(function(){ scope._loadData(fips,stationId) }, 2000);
+                    setTimeout(function(){ scope._loadData(fips) }, 2000);
                     
-                
             }else{
-                AdtScale.domain(data.map(function(ADT){
-                    return ADT.value;
-                }));
 
-                var output = data.map(function(d){
-                    d.color = AdtScale(d.value)
-                    return d
-                }).sort(function(a,b){
-                    return b.value - a.value
-                })
-
-                scope.setState({currentData:output})
+                scope.setState({currentData:data})
+            
             }
         })
          
@@ -79,36 +77,31 @@ var GraphContainer = React.createClass({
     _updateGraph: function(){
         var scope = this;
         
-            
         nv.addGraph(function() {
-            var chart = nv.models.discreteBarChart()
-              .x(function(d) { return d.label })    //Specify the data accessors.
-              .y(function(d) { return d.value })
-              .staggerLabels(false)    //Too many bars and not enough room? Try staggering labels.
-              .tooltips(true)        //Don't show tooltips
-              .showValues(false)       //...instead, show the bar value right on top of each bar.
+            var chart = nv.models.lineChart()
+              .x(function(d) { return d.month })    //Specify the data accessors.
+              .y(function(d) { return +d.y })
+              .showLegend(false)
+              .useInteractiveGuideline(false)       //Don't show tooltips
               .transitionDuration(350)
               .showXAxis(true);
 
             chart.xAxis     //Chart x-axis settings
-                .axisLabel('Stations')
-                
+                .axisLabel('Months')
+                .tickFormat(function(d){
+                    return months[d-1];
+                })
+           
+
 
             
-            d3.select('#tonnagechart svg')
-                .datum(
-                    [
-                        {
-                            key:'stations',
-                            values:scope.state.currentData
-                        }
-                    ]
-                )
+            d3.select('#madTonchart_'+scope.props.index+' svg')
+                .datum(scope.state.currentData)
                 .call(chart);
+            
             removeLabels();
             nv.utils.windowResize(chart.update);
             nv.utils.windowResize(removeLabels);
-            
             return chart;
         });
         
@@ -149,14 +142,14 @@ var GraphContainer = React.createClass({
             fontWeight:'700',
             //display: Object.keys(scope.props.classByMonth.getDimensions()).length > 0 ? 'block' : 'none'
         }, 
-        title = 'Annual Average Daily Tonnage';
+        title = this.props.type === 'season' ? 'Seasonality of Tonnage':'Monthly Average Daily Tonnage';
         
 
         //console.log('_processData',this._processData())
         var graph = (
            
                 <div className="body">
-                    <div id="tonnagechart">
+                    <div id={'madTonchart_'+scope.props.index}>
                         <svg style={svgStyle}></svg>
                     </div>
                     {this._updateGraph()}
@@ -193,8 +186,6 @@ var GraphContainer = React.createClass({
                     </h4>
                     
                 </header>
-             test
-                {this.props.selectedState}
                 {scope.state.toggleChart ? chart : graph}
             </section>
             

@@ -4,7 +4,8 @@ var React = require('react'),
     
     // -- Components
     AgencyMenu = require('./AgencyMenu.react'),
-    UserMenu = require('./UserMenu.react');;
+    UserMenu = require('./UserMenu.react'),
+    Logo = require('./Logo.react');
 
 
 
@@ -30,7 +31,7 @@ var Header = React.createClass({
             <header className="page-header">
                 <div className="navbar">
                     <ul className="nav navbar-nav navbar-right pull-right">
-                        
+                        <Logo />
                         <AgencyMenu />
                         <UserMenu />
                         

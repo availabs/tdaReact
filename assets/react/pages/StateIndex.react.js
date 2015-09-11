@@ -7,7 +7,10 @@ var React = require('react'),
     AdtGraph = require('../components/statewide/graphs/Adt.graph.react'),
     MadtGraph = require('../components/statewide/graphs/Madt.graph.react'),
     HpmsTypeGraph = require('../components/statewide/graphs/HpmsType.graph.react'),
+    
     TonnageGraph = require('../components/statewide/graphs/Tonnage.graph.react'),
+    MadTonnageGraph = require('../components/statewide/graphs/MadTonnage.graph.react'),
+    
     StationCountByTimeGraph = require('../components/singleStation/CountByTime.graph.react'),
     StationAvgHourGraph = require('../components/singleStation/AvgHour.graph.react'),
     VehicleClassPie = require('../components/singleStation/VehicleClassPie.graph.react'),
@@ -18,7 +21,8 @@ var React = require('react'),
     //--Stores
     StationStore = require('../stores/StationStore'),
     StateWideStore = require('../stores/StatewideStore'),
-    HpmsStore = require('../stores/HpmsStore');
+    HpmsStore = require('../stores/HpmsStore'),
+    Filters = require('../components/layout/Filters.react');
 
     //--Utils
 
@@ -33,6 +37,8 @@ var StateIndex = React.createClass({
     
     _setActiveComponent : function(e){
         this.setState({activeComponent:e.target.getAttribute('value')})
+
+
     },
 
     
@@ -69,7 +75,7 @@ var StateIndex = React.createClass({
             <div className="content container">
                 <div className="row">
                 
-                    <div className="col-md-6" >
+                    <div className="col-xs-6" >
                         <section className="widget whitesmoke no-padding mapaffix"  >
                             <div className="body no-margin">
                                 <StateWideMap activeView={this.state.activeComponent}/>
@@ -78,10 +84,10 @@ var StateIndex = React.createClass({
                     </div>
                 
 
-                    <div className="col-md-6">
+                    <div className="col-xs-6">
                         <section className="widget widget-tabs">
                             <header>
-                                {this.state.activeComponent}
+                                
                                 <ul className="nav nav-tabs" onClick={this._setActiveComponent}>
                                     <li value="classCounts" className='active'>
                                         <a href="#classCounts" data-toggle="tab" value="classCounts" aria-expanded="true">Class</a>
@@ -95,6 +101,9 @@ var StateIndex = React.createClass({
                                     {activeStation}
                                 </ul>
                             </header>
+                            <section style={{backgroundColor:'#fff',padding:'10px'}}>
+                                <Filters />
+                            </section>
                             <div className="body tab-content">
                                 <div id="classCounts" className="tab-pane clearfix active">
                                     <AdtGraph  
@@ -116,7 +125,19 @@ var StateIndex = React.createClass({
                                 <div id="wim" className="tab-pane clearfix">
                                  WIM
                                     <TonnageGraph 
-                                        selectedState={this.props.selectedState} />
+                                        selectedState={this.props.selectedState}
+                                        filters={this.props.activeFilters} />
+
+                                    <MadTonnageGraph 
+                                        selectedState={this.props.selectedState}
+                                        filters={this.props.activeFilters} />
+
+                                     <MadTonnageGraph 
+                                        selectedState={this.props.selectedState}
+                                        filters={this.props.activeFilters} 
+                                        index="2"
+                                        type="season" />
+
                                 </div>
                                 <div id="hpms" className="tab-pane clearfix">
                                     <HpmsTypeGraph  hpmsData={this.props.hpmsData} selectedState={this.props.selectedState} groupKey='route_vdt' />
