@@ -41,9 +41,9 @@ var SpectraGraph = React.createClass({
     
     componentWillReceiveProps:function(nextProps){
         //console.log(nextProps.filters.year,this.props.filters.year,nextProps.filters.year !== this.props.filters.year)
-       
+        this._loadData(nextProps.fips,nextProps.selectedStation);
         if(nextProps.fips+''+nextProps.selectedStation !== this.props.fips+''+this.props.selectedStation){
-            this._loadData(nextProps.fips,nextProps.selectedStation);
+           
         }
     },
 
@@ -60,12 +60,12 @@ var SpectraGraph = React.createClass({
                     console.log('loading load spectra err',err)
                 }
                 if(data.loading){
-                    //console.log('reloading')
+                    console.log(' LS reloading')
                     setTimeout(function(){ scope._loadData(fips,stationId) }, 2000);
                     
                 
                 }else{
-                    
+                    console.log('ls data',data)
                     scope.setState({
                         currentData:data,
                         loading:false
