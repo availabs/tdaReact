@@ -51,11 +51,11 @@ var RouteTotalGraph = React.createClass({
         if(stationId){
             //var filters = getAsUriParameters(scope.props.filters)
             //console.log('filters',scope.props.filters)
-            console.log('/tmgClass/byHour/station/'+fips+'/'+stationId+'?database=allWim')
+           // console.log('/tmgClass/byHour/station/'+fips+'/'+stationId+'?database=allWim')
             scope.setState({loading:true})
             d3.json('/tmgClass/byHour/station/'+fips+'/'+stationId+'?database=allWim')
               .post(JSON.stringify({filters:scope.props.filters}),function(err,data){
-                console.log('CountbyTime',data)
+                //console.log('CountbyTime',data)
                 if(data.loading){
                     setTimeout(function(){ scope._loadData(fips,stationId) }, 2000);
                 }else{

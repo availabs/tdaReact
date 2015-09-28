@@ -53,7 +53,7 @@ var AvgHourGraph = React.createClass({
         if(stationId){
             //var filters = getAsUriParameters(scope.props.filters)
             //console.log('filters',scope.props.filters)
-            console.log('avg hour Load data','/tmgClass/avgHour/station/'+fips+'/'+stationId+'?database=allWim');
+            //console.log('avg hour Load data','/tmgClass/avgHour/station/'+fips+'/'+stationId+'?database=allWim');
             scope.setState({loading:true})
             d3.json('/tmgClass/avgHour/station/'+fips+'/'+stationId+'?database=allWim')
               .post(JSON.stringify({filters:scope.props.filters}),function(err,data){
