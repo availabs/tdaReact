@@ -4,7 +4,7 @@ var React = require('react'),
     
     //--Components
     WidgetHeader = require('../components/WidgetHeader.react'),
-    AdtGraph = require('../components/statewide/graphs/Adt.graph.react'),
+    AdtGraph = require('../components/statewide/graphs/AdtRyan.graph.react'),
     MadtGraph = require('../components/statewide/graphs/Madt.graph.react'),
     HpmsTypeGraph = require('../components/statewide/graphs/HpmsType.graph.react'),
     

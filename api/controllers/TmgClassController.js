@@ -5,6 +5,17 @@
  * @help        :: See http://links.sailsjs.org/docs/controllers
  */
 
+
+//ClassByMonth filter included
+//getclassbymonth filter function
+
+//route that returns data from that filter for ADT graph 
+
+
+//WANT TONNAGE GRAPH
+//STARTING WITH ADTSERVERGRAPH
+
+
 var googleapis = require('googleapis');
 var fs = require('fs');    
 var jwt = new googleapis.auth.JWT(
