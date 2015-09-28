@@ -4,7 +4,7 @@ var React = require('react'),
     
     //--Components
     WidgetHeader = require('../components/WidgetHeader.react'),
-    AdtGraph = require('../components/statewide/graphs/AdtRyan.graph.react'),
+    AdtGraph = require('../components/statewide/graphs/Adt.graph.react'),
     MadtGraph = require('../components/statewide/graphs/Madt.graph.react'),
     HpmsTypeGraph = require('../components/statewide/graphs/HpmsType.graph.react'),
     
@@ -107,8 +107,8 @@ var StateIndex = React.createClass({
                             <div className="body tab-content">
                                 <div id="classCounts" className="tab-pane clearfix active">
                                     <AdtGraph  
-                                        classByMonth={this.props.classByMonth} 
-                                        selectedState={this.props.selectedState} />
+                                        selectedState={this.props.selectedState} 
+                                        filters={this.props.activeFilters} />
 
                                     <MadtGraph  
                                         classByMonth={this.props.classByMonth} 

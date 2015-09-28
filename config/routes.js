@@ -45,7 +45,7 @@ module.exports.routes = {
   '/tmgClass/byHour/station/:fips/:stationId': 'TmgClassController.CountByTime',
   '/tmgClass/avgHour/station/:fips/:stationId': 'TmgClassController.AvgHour',
   '/tmgClass/classPie/station/:fips/:stationId': 'TmgClassController.classPie',
-  
+  '/tmgClass/stateAADT/:fips' : 'TmgClassController.getStateAADT',
 
 
   // -- WIM data

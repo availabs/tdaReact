@@ -31,51 +31,10 @@ var GraphContainer = React.createClass({
         }
     },
 
- getInitialState:function(){
+    getInitialState:function(){
         return {
-            toggleChart:false,
-            currentData:[]
+            toggleChart:false
         }
-    },
-
-    componentDidMount:function(){
-        if(this.props.selectedState){
-            this._loadData(this.props.selectedState);
-        }
-    },
-
-    componentWillReceiveProps:function(nextProps){
-        //if(nextProps.selectedState !== this.props.selectedState){
-            this._loadData(nextProps.selectedState);
-        //}
-    },
-
-    _loadData:function(fips){
-        var scope = this;
-        d3.json('/tmgWim/tonnage/month/'+fips+'/?database=allWim')
-            .post(JSON.stringify({filters:scope.props.filters}),function(err,data){
-            
-            if(data.loading){
-                    console.log('reloading')
-                    setTimeout(function(){ scope._loadData(fips,stationId) }, 2000);
-                    
-                
-            }else{
-                AdtScale.domain(data.map(function(ADT){
-                    return ADT.value;
-                }));
-
-                var output = data.map(function(d){
-                    d.color = AdtScale(d.value)
-                    return d
-                }).sort(function(a,b){
-                    return b.value - a.value
-                })
-
-                scope.setState({currentData:output})
-            }
-        })
-         
     },
 
     _processData:function(){

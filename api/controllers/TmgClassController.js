@@ -27,7 +27,14 @@ var jwt = new googleapis.auth.JWT(
 jwt.authorize();	
 var bigQuery = googleapis.bigquery('v2');
 var StationByHourFilter = require('../../assets/react/utils/dataFilters/classByHourFilter'),
+	StateByClassFilter = require('../../assets/react/utils/dataFilters/classStateByMonthFilter'),
+	stateFilters = {},	
 	stationFilters = {};
+
+var	d3 = require('d3'),
+	colorbrewer = require('colorbrewer'),
+    colorRange = colorbrewer.RdBu[5],
+    AdtScale = d3.scale.quantile().domain([0,70000]).range(colorRange);
 
 function getClassStations(database){
 
@@ -107,6 +114,68 @@ module.exports = {
  		})
  		
 	},
+
+	getStateAADT:function(req,res){
+		var database = req.param('database'),
+ 			fips = req.param('fips'),
+ 			filters = req.param('filters') || {};
+	
+		getStateFilter(database,fips,function(cFilter){
+			if(cFilter.initialized()){
+
+
+				//apply filters
+				cFilter.getDimension('year').filter(null);
+	 			cFilter.getDimension('month').filter(null);
+	 		
+	 			if(filters.year){
+	 				cFilter.getDimension('year').filter(filters.year)
+	 			}
+	 			if(filters.month){
+	 				cFilter.getDimension('month').filter(filters.month)
+	 			}
+
+
+	 			var data = cFilter.getGroups()
+                                .ADT.order(function(p){return p.classAvg.reduce( function(a,b){ return a+b}) })
+                                .top(Infinity)
+                                .filter(function(p){ 
+                                    var value = p.value.classAvg.reduce( function(a,b){ return a+b});
+                                    return !isNaN(value) && value > 0;
+                                })
+                                .sort(function(a,b){
+                                    return b.value.classAvg.reduce( function(a,b){ return a+b})-a.value.classAvg.reduce( function(a,b){ return a+b});
+                                }).map(function (ADT){
+                                    return {
+                                        "label":ADT.key,
+                                        "value":ADT.value.classAvg.reduce( function(a,b){ return a+b})
+                                    }
+                                })
+
+	            AdtScale.domain(data.map(function(ADT){
+	                    return ADT.value;
+	            }));
+
+	            var output = data.map(function(d){
+	                d.color = AdtScale(d.value)
+	                return d
+	            }).sort(function(a,b){
+	                return b.value - a.value
+	            })
+
+
+				//get appropriate data
+				//res.json that data
+				res.json(output);
+			}else{
+	    		console.log('getStateAADT still loading',fips,station)
+	    		res.json({loading:true});
+			}
+
+
+		})
+	},
+
 	classPie:function(req,res){
 
 		var database = req.param('database'),
@@ -450,6 +519,47 @@ module.exports = {
 
 };
 
+function getStateByMonth(database,fips,cb){
+
+	var output = {};
+
+		fileCache.checkCache({datasource:database,type:'classByMonth',typeId:fips},function(data){
+			//console.log('find cache',data);
+			if(data){
+				console.log('cache sucess');
+				console.time('send cache');
+				cb(data)
+				console.timeEnd('send cache');
+			}else{
+		    var sql = 'SELECT '+ 
+			  'station_id,dir,year,month,count(distinct day) as numDays,'+
+			  'sum(total_vol),sum(class1),sum(class2),'+
+			  'sum(class3),sum(class4),sum(class5),sum(class6),'+
+			  'sum(class7),sum(class8),sum(class9),sum(class10),sum(class11),sum(class12),sum(class13) '+
+			  "FROM [tmasWIM12."+database+"Class] where state_fips = '"+fips+"' "+
+			  'group by station_id,dir,year,month '+
+			  'order by station_id,dir,year,month'
+			
+			BQuery(sql,function(data){
+
+				var fullData = data.rows.map(function(row,index){
+					var outrow = {}
+					
+					data.schema.fields.forEach(function(field,i){
+						outrow[field.name] = row.f[i].v;
+					});
+					return outrow;
+				});
+				cb(fullData);
+				fileCache.addData({datasource:database,type:'classByMonth',typeId:fips},fullData);
+			});
+
+		}
+	
+	})
+}
+
+
 function getStationByHour(database,fips,station,cb){
 
 	fileCache.checkCache({datasource:database,type:'stationClassByHour',typeId:fips+station},function(data){
@@ -488,6 +598,21 @@ function getStationByHour(database,fips,station,cb){
 		}
 	
 	});
+}
+
+function getStateFilter(database,fips,cb){
+	if( stateFilters[database]&& stateFilters[database][fips] ){
+		cb(stateFilters[database][fips])
+	}else{
+		if(!stateFilters[database]){ stateFilters[database] = {} }
+		stateFilters[database][fips] = new StateByClassFilter();
+		getStateByMonth(database,fips,function(data){
+			console.log('New state Filter',fips,data.length)
+			stateFilters[database][fips].init(data);
+			cb(stateFilters[database][fips])
+		})	
+	}
+
 }
 
 function getStationFilter(database,fips,station,cb){

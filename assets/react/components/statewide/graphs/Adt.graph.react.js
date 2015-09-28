@@ -27,65 +27,54 @@ var GraphContainer = React.createClass({
     getDefaultProps:function(){
         return {
             height: 300,
-            classByMonth:StateWideStore.getClassByMonth()
         }
     },
 
     getInitialState:function(){
         return {
-            toggleChart:false
+            toggleChart:false,
+            currentData:[]
+        }
+    },
+    componentDidMount:function(){
+        if(this.props.selectedState){
+            this._loadData(this.props.selectedState);
         }
     },
 
-    _processData:function(){
+    componentWillReceiveProps:function(nextProps){
+            this._loadData(nextProps.selectedState);
+    },
+    _loadData:function(fips){
         var scope = this;
-        if(Object.keys(scope.props.classByMonth.getDimensions()).length > 0){
 
-            var stationADT= scope.props.classByMonth.getGroups()
-                                .ADT
-                                .top(Infinity)
-                                .filter(function(p){ 
-                                    var value = p.value.classAvg.reduce( function(a,b){ return a+b});
-                                    return !isNaN(value) && value > 0;
-                                })
-                                .sort(function(a,b){
-                                    return b.value.classAvg.reduce( function(a,b){ return a+b})-a.value.classAvg.reduce( function(a,b){ return a+b});
-                                })
-                                .map(function (ADT){
-                                    return {
-                                        "label":ADT.key,
-                                        "value":ADT.value.classAvg.reduce( function(a,b){ return a+b}),
-                                        "color":AdtScale(ADT.value.classAvg.reduce( function(a,b){ return a+b}))
-                                    }
-                                })
-            //console.log('_processData',stationADT)
-            return stationADT
-        }
-        return []
+        d3.json('/tmgClass/stateAADT/'+fips+'?database=allWim')
+            .post(JSON.stringify({filters:scope.props.filters}),function(err,data){
+            
+            if(data.loading){
+                    console.log('reloading')
+                    setTimeout(function(){ scope._loadData(fips,stationId) }, 2000);
+                    
+                
+            }else{
+                AdtScale.domain(data.map(function(ADT){
+                    return ADT.value;
+                }));
+
+                var output = data.map(function(d){
+                    d.color = AdtScale(d.value)
+                    return d
+                }).sort(function(a,b){
+                    return b.value - a.value
+                })
+
+                scope.setState({currentData:output});
+            }
+        })
     },
-
     _updateGraph: function(){
         var scope = this;
-        
-
-        if(Object.keys(scope.props.classByMonth.getDimensions()).length > 0){
-
-
-            var stationADT = scope.props.classByMonth.getGroups()
-                .ADT.order(function(p){return p.classAvg.reduce( function(a,b){ return a+b}) })
-                .top(Infinity)
-                .filter(function(p){ 
-                    var value = p.value.classAvg.reduce( function(a,b){ return a+b});
-                    return !isNaN(value) && value > 0;
-                });
-
-        
-           
-
-            AdtScale.domain(stationADT.map(function(ADT){
-                return ADT.value.classAvg.reduce( function(a,b){ return a+b});
-            }));
-            
+          
             nv.addGraph(function() {
                 var chart = nv.models.discreteBarChart()
                   .x(function(d) { return d.label })    //Specify the data accessors.
@@ -103,26 +92,12 @@ var GraphContainer = React.createClass({
                 
                 d3.select('#adtchart svg')
                     .datum(
-                        [{
-                            key:"ADT",
-                            values:scope.props.classByMonth.getGroups()
-                                .ADT
-                                .top(Infinity)
-                                .filter(function(p){ 
-                                    var value = p.value.classAvg.reduce( function(a,b){ return a+b});
-                                    return !isNaN(value) && value > 0;
-                                })
-                                .sort(function(a,b){
-                                    return b.value.classAvg.reduce( function(a,b){ return a+b})-a.value.classAvg.reduce( function(a,b){ return a+b});
-                                })
-                                .map(function (ADT){
-                                    return {
-                                        "label":ADT.key,
-                                        "value":ADT.value.classAvg.reduce( function(a,b){ return a+b}),
-                                        "color":AdtScale(ADT.value.classAvg.reduce( function(a,b){ return a+b}))
-                                    }
-                                })
-                        }]
+                        [
+                            {
+                                key:'ADT',
+                                values:scope.state.currentData
+                            }
+                        ]
                     )
                     .call(chart);
                 removeLabels();
@@ -131,10 +106,6 @@ var GraphContainer = React.createClass({
                 
                 return chart;
             });
-        
-           
-       }
-       
     },
     
     toggleChartClick:function(){
@@ -169,7 +140,7 @@ var GraphContainer = React.createClass({
             padding:'5px',
             marginLeft:'-10px',
             fontWeight:'700',
-            display: Object.keys(scope.props.classByMonth.getDimensions()).length > 0 ? 'block' : 'none'
+            //display: Object.keys(scope.props.classByMonth.getDimensions()).length > 0 ? 'block' : 'none'
         }, 
         title = 'Annual Average Daily Traffic';
         
@@ -189,7 +160,7 @@ var GraphContainer = React.createClass({
         chart = (
              <div>
                 <DataTable 
-                data={this._processData()} 
+                data={scope.state.currentData} 
                 pageLength={7}
                 columns={ [
                     {key:'label', name:'Station ID'},
