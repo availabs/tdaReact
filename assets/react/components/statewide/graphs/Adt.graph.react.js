@@ -10,7 +10,7 @@ var React = require('react'),
     DataTable = require('../../utils/DataTable.react'),
 
     //-- Stores
-    StateWideStore = require('../../../stores/StatewideStore'),
+
 
     //-- Utils
     colorRange = colorbrewer.RdBu[5],
@@ -78,8 +78,6 @@ var GraphContainer = React.createClass({
                 chart.xAxis     //Chart x-axis settings
                     .axisLabel('Stations')
                     
-
-                
                 d3.select('#adtchart svg')
                     .datum(
                         [

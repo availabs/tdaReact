@@ -6,7 +6,6 @@ var React = require('react'),
     fips2state = require('../../../utils/data/fips2state'),
 
     //-- Stores
-    StateWideStore = require('../../../stores/StatewideStore'),
 
     //-- Utils
     colorRange = colorbrewer.RdBu[5],
@@ -17,14 +16,13 @@ var GraphContainer = React.createClass({
     
     getDefaultProps:function(){
         return {
-            classByMonth:StateWideStore.getClassByMonth(),
             graphType:'count',
+            height:300,
             index:0
         }
     },
     getInitialState:function(){
         return{
-            height:300,
             currentData:[]
         }
     },
@@ -88,7 +86,7 @@ var GraphContainer = React.createClass({
     render: function() {
         var scope = this;
         var svgStyle = {
-          height: '300px',
+          height: this.props.height+'px',
           width: '100%'
         };
         var widgetStyle = {
