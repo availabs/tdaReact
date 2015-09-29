@@ -57,18 +57,8 @@ var GraphContainer = React.createClass({
                     
                 
             }else{
-                AdtScale.domain(data.map(function(ADT){
-                    return ADT.value;
-                }));
 
-                var output = data.map(function(d){
-                    d.color = AdtScale(d.value)
-                    return d
-                }).sort(function(a,b){
-                    return b.value - a.value
-                })
-
-                scope.setState({currentData:output});
+                scope.setState({currentData:data});
             }
         })
     },

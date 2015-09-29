@@ -111,13 +111,13 @@ var StateIndex = React.createClass({
                                         filters={this.props.activeFilters} />
 
                                     <MadtGraph  
-                                        classByMonth={this.props.classByMonth} 
                                         selectedState={this.props.selectedState} 
+                                        filters={this.props.activeFilters}
                                         index='0' />
 
                                     <MadtGraph 
-                                        classByMonth={this.props.classByMonth} 
                                         selectedState={this.props.selectedState} 
+                                        filters={this.props.activeFilters}
                                         graphType='season' 
                                         index='1' />
 
