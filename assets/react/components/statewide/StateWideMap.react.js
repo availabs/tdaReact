@@ -77,16 +77,35 @@ var StateWideMap = React.createClass({
         mapDiv.setAttribute("style","height:"+this.props.height+"px");
         
         var key = 'erickrans.4f9126ad',//am3081.kml65fk1,
-            mapquestOSM = L.tileLayer("http://{s}.tiles.mapbox.com/v3/"+key+"/{z}/{x}/{y}.png");
-        
+            mapquestOSM = L.tileLayer("http://{s}.tiles.mapbox.com/v3/"+key+"/{z}/{x}/{y}.png",{name:"mapquestOSM"}),
+            tContours = L.tileLayer("https://{s}.tiles.mapbox.com/v3/aj.um7z9lus/{z}/{x}/{y}.png",{name:"tContours"}),
+            streetMap = L.tileLayer("https://{s}.tiles.mapbox.com/v3/am3081.nb3amb93/{z}/{x}/{y}.png",{name:"streetMap"}),
+            aImagery = L.tileLayer("http://{s}.tiles.mapbox.com/v3/am3081.h0pml9h7/{z}/{x}/{y}.png",{name:"aImagery"}), //+ http://{s}.tiles.mapbox.com/v3/am3081.h0pml9h7/{z}/{x}/{y}.png              
+            aImageTerr = L.tileLayer("https://{s}.tiles.mapbox.com/v3/matt.hd0b27jd/{z}/{x}/{y}.png",{name:"aImageTerr"});   
+
+        var baseMaps = {
+            "Dark Map" : mapquestOSM,
+            "Light Map": streetMap,
+            "Light Terrain (with streets)": tContours,
+            "Dark Terrain (only terrain)" : aImageTerr,
+            "Dark Terrain (with streets)" : aImagery,
+            
+        }
+
         L.Icon.Default.imagePath= '/bower_components/leaflet/dist/images';
+
         map = L.map("map", {
           center: [39.8282, -98.5795],
           zoom: 4,
           layers: [mapquestOSM],
+          baseLayers: [baseMaps],
           zoomControl: true,
           attributionControl:false
         });
+
+
+        L.control.layers(baseMaps).addTo(map);
+
         d3.json('/geo/states.json',function(data){
             //if data is topo, convert
             if (data.type == "Topology") {
@@ -259,9 +278,29 @@ var StateWideMap = React.createClass({
                 
                 layer.on({
                     click: function(e){
-                        console.log('station_click',e.target.feature.geometry);
+                       console.log('station_click',e.target.feature.geometry);
                        ClientActionsCreator.setSelectedStation(feature.properties.station_id,feature.properties.state_fips);
                        map.setView(e.target.feature.geometry.coordinates.reverse(),16);
+
+                       console.log("selecting base layers",map.options.baseLayers[0]);
+
+
+                       if(!map.hasLayer(map.options.baseLayers[0]["Dark Terrain (only terrain)"])){
+
+                        //Want to Switch to a specific base layer
+                        console.log("Switching to Satillite");  
+
+                        Object.keys(map.options.baseLayers[0]).forEach(function(layerName){
+
+                            map.removeLayer(map.options.baseLayers[0][layerName]);
+                        })
+                        map.addLayer(map.options.baseLayers[0]["Dark Terrain (only terrain)"]);
+                       }
+
+
+
+
+
                         d3.select('.ToolTip').style({display:'none'});
                     },
                     
