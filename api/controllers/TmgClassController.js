@@ -134,6 +134,9 @@ module.exports = {
 	 			if(filters.month){
 	 				cFilter.getDimension('month').filter(filters.month)
 	 			}
+	 			if(filters.dir){
+	 				cFilter.getDimension('dir').filter(filters.dir)	 				
+	 			};
 
 
 	 			var data = cFilter.getGroups()
