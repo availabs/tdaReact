@@ -80,7 +80,7 @@ module.exports  = function(){
 	return {
 		init:function(data,dataset){
 
-				
+			console.log(data,dataset);
 			if(dataset !== currentDataSet){
 				//console.log('class By Month Init',dataset,currentDataSet,data.length);
 				var stationData = {};
