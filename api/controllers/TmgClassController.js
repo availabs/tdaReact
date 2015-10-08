@@ -190,6 +190,7 @@ module.exports = {
 				//apply filters
 				cFilter.getDimension('year').filter(null);
 	 			cFilter.getDimension('month').filter(null);
+	 			cFilter.getDimension('dir').filter(null);
 	 		
 	 			if(filters.year){
 	 				cFilter.getDimension('year').filter(filters.year)
@@ -197,6 +198,9 @@ module.exports = {
 	 			if(filters.month){
 	 				cFilter.getDimension('month').filter(filters.month)
 	 			}
+	 			if(filters.dir){
+	 				cFilter.getDimension('dir').filter(filters.dir)	 				
+	 			};
 
 		        var stationADT = cFilter.getGroups()
 		            .ADT.order(function(p){return p.avg})
