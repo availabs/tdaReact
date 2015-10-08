@@ -127,6 +127,7 @@ module.exports = {
 				//apply filters
 				cFilter.getDimension('year').filter(null);
 	 			cFilter.getDimension('month').filter(null);
+	 			cFilter.getDimension('dir').filter(null);
 	 		
 	 			if(filters.year){
 	 				cFilter.getDimension('year').filter(filters.year)

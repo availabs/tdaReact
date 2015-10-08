@@ -166,6 +166,9 @@ module.exports  = function(){
 				dimensions['class'] = classData.dimension(function(d){ return +d.class });
 				groups['class'] = dimensions['class'].group().reduceCount();
 
+				dimensions['dir'] = classData.dimension(function(d){ return +d.dir });
+				groups['dir'] = dimensions['dir'].group().reduceCount();
+
 
 				groups['ADT'] = dimensions['ADT']
 					.group( function (d,i){ return d.substr(0,6) })

@@ -81,7 +81,7 @@ var Filters = React.createClass({
     _setDirFilter:function(e){
         console.log(e.target.getAttribute('value'))
         this.setState({currentDir:e.target.getAttribute('value')})
-        ClientActionsCreator.filterClass(e.target.getAttribute('value'));
+        ClientActionsCreator.filterDir(e.target.getAttribute('value'));
     },
     _parseYear:function(year){
         if(!year){
