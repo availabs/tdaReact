@@ -103,6 +103,9 @@ module.exports  = function WimTonsbyDayFilter(){
 					return d['f0_'];
 				});
 
+				dimensions['dir'] = classData.dimension(function(d){ return +d.dir });
+				groups['dir'] = dimensions['dir'].group().reduceCount();
+
 				// dimensions['day'] = classData.dimension(function(d){ return +d.day });
 				// groups['day'] = dimensions['day'].group().reduceCount();
 

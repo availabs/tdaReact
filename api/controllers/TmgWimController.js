@@ -110,15 +110,19 @@ module.exports = {
 			
 			if(cFilter.initialized()){
 
- 				cFilter.getDimension('year').filter(null);
+				cFilter.getDimension('year').filter(null);
 	 			cFilter.getDimension('month').filter(null);
+	 			cFilter.getDimension('dir').filter(null);
 	 		
 	 			if(filters.year){
 	 				cFilter.getDimension('year').filter(filters.year)
 	 			}
 	 			if(filters.month){
 	 				cFilter.getDimension('month').filter(filters.month)
-		 		}
+	 			}
+	 			if(filters.dir){
+	 				cFilter.getDimension('dir').filter(filters.dir)	 				
+	 			};
 				
 
 				var output = cFilter.getGroup('ADT').top(Infinity);
@@ -152,13 +156,16 @@ module.exports = {
 			
 			if(cFilter.initialized()){
 
- 				cFilter.getDimension('year').filter(null);
+				cFilter.getDimension('year').filter(null);
 	 			cFilter.getDimension('month').filter(null);
-
+	 			cFilter.getDimension('dir').filter(null);
 	 		
 	 			if(filters.year){
 	 				cFilter.getDimension('year').filter(filters.year)
 	 			}
+	 			if(filters.dir){
+	 				cFilter.getDimension('dir').filter(filters.dir)	 				
+	 			};
 	 			var stations = {}
 				var stationADT = cFilter.getGroup('ADT')
 					.order(function(p){return p.avg})
@@ -321,9 +328,9 @@ function TonageData(fips,database,cb){
 	 			'SUM(case when ((total_weight*220.462)-40000) >= 0 and class = 12 then total_weight else 0 end) c12,'+
 	 			'SUM(case when ((total_weight*220.462)-40000) >= 0 and class = 13 then total_weight else 0 end) c13,'+
 	 			'station_id, '+
-	 			' year,month,day, '+
+	 			' dir,year,month,day, '+
 	 			' FROM [tmasWIM12.'+database+'] where state_fips = "'+fips+'"'+
-	 			' group by station_id,year,month,day'
+	 			' group by station_id,dir,year,month,day'
 
 	 		console.time('getTonageInfoQuery')
 	 		console.log("gettonnageinfo ",sql)
