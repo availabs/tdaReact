@@ -6,15 +6,6 @@
  */
 
 
-//ClassByMonth filter included
-//getclassbymonth filter function
-
-//route that returns data from that filter for ADT graph 
-
-
-//WANT TONNAGE GRAPH
-//STARTING WITH ADTSERVERGRAPH
-
 
 var googleapis = require('googleapis');
 var fs = require('fs');    
@@ -98,6 +89,83 @@ module.exports = {
 			});
 
 	},
+
+	// getClassByMonthFilters:function(req,res){
+	// 	var database = req.param('database');
+	
+	// 	getStateFilter(database,function(cFilter){
+	// 		if(cFilter.initialized()){
+
+	// 			var classByMonth = {},
+ //        		months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+	// 			//years
+	// 			//months
+	// 			//dirs
+	// 			//classes
+
+	//             var orderedYears =  cFilter.getGroup('year').top(Infinity).map(function(year){
+	//                 return {key:year.key, name:parseYear(year.key)};
+	//             }).sort(function(a,b){
+	//                 return b.name-a.name;
+	//             })
+
+	//             var orderedMonths = cFilter.getGroup('month')
+	//             .top(Infinity)
+	//             .filter(function(d){
+	//                 return +d.key < 13;
+	//             })
+	//             .sort(function(a,b){
+	//                 return +b.key-+a.key
+	//             })
+
+	//             var orderedDirs =  cFilter.getGroup('dir').top(Infinity).map(function(dir){
+	//                 return {key:dir.key, name:dir.key};
+	//             }).sort(function(a,b){
+	//                 return b.name-a.name;
+	//             })
+
+	//             var orderedClasses = cFilter.getGroup('class')
+	//             .top(Infinity)
+	//             .sort(function(a,b){
+	//                 return +b.key-+a.key
+	//             })
+
+
+	//             classByMonth["orderedYears"] = orderedYears;
+	//             classByMonth["orderedMonths"] = orderedMonths;
+	//             classByMonth["orderedDirs"] = orderedDirs;
+	//             classByMonth["orderedClasses"] = orderedClasses;
+
+
+	//             res.json(classByMonth);
+	// 		}else{
+	//     		console.log('filters',station)
+	//     		res.json({loading:true});
+	// 		}
+	// 	})
+	// },
+
+ //    _parseYear:function(year){
+ //        if(!year){
+ //            return 'All'
+ //        }
+
+ //        var yearName = '';
+ //        year = year.toString();
+ //        if(year.length === 1){
+ //                yearName = '200'+year;
+ //        }else  if(year.length === 2){
+ //            yearName = '20'+year;
+ //        }else if(year.length === 4){
+ //            if(parseInt(year.substr(2,2)) > 50){
+ //                yearName = '19'+year.substr(2,2)
+ //            }else{
+ //                yearName = year;
+ //            }
+ //        }
+ //        return parseInt(yearName);
+ //    },
 
 	
 	//----------------------------------------------------------------

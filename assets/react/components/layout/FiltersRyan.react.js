@@ -15,46 +15,44 @@ var labelStyle = {
 }
 
 
+function updateClassByMonth(){
+    return {
+        classByMonth : _getClassByMonthFilters(),
+        filters: StateWideStore.activeFilters()
+    };
+}
 
-//Get rid of statewidestore for class by month
-//Maybe need a new route for all states, or something.
+function _getClassByMonthFilters(){
 
-function updateClassByMonth(fips){
-        var scope = this;
-        var classByMonth;
-
-        d3.json('/tmgClass/stateAADT/'+fips+'?database=allWim')
-            .post(JSON.stringify({filters:scope.props.filters}),function(err,data){
-            
-            if(data.loading){
-                    console.log('reloading')
-                    setTimeout(function(){ scope._loadData(fips,stationId) }, 2000);
-                    
+    d3.json('/tmgClass/classByMonthFilters?database=allWim')
+        .post(JSON.stringify({filters:StateWideStore.activeFilters()}),function(err,data){
+        
+        if(data.loading){
+                console.log('reloading')
+                setTimeout(function(){_getClassByMonthFilters() }, 2000);
                 
-            }else{
-                return {
-                    classByMonth : data,
-                    filters: StateWideStore.activeFilters()
-                };
+        }else{
 
-            }
-        })
-
+            return data;
+        }
+    })
 }
 
 var Filters = React.createClass({
 //style="overflow-y: auto; min-height: 60px; max-height: 123px;"
     getInitialState: function() {
         return {
-            classByMonth : null,
+            classByMonth : {},
             filters: StateWideStore.activeFilters(),
             currentYear: null,
             currentClass: null,
-            currentMonth:null
+            currentMonth:null,
+            currentDir:null
         }
     },
 
     componentDidMount: function() {
+        this.setState(updateClassByMonth());      
         StateWideStore.addChangeListener(this._onChange);
     },
 
@@ -96,7 +94,11 @@ var Filters = React.createClass({
         this.setState({currentClass:e.target.getAttribute('value')})
         ClientActionsCreator.filterClass(e.target.getAttribute('value'));
     },
-
+    _setDirFilter:function(e){
+        console.log(e.target.getAttribute('value'))
+        this.setState({currentDir:e.target.getAttribute('value')})
+        ClientActionsCreator.filterDir(e.target.getAttribute('value'));
+    },
     _parseYear:function(year){
         if(!year){
             return 'All'
@@ -121,20 +123,8 @@ var Filters = React.createClass({
     _getYears : function(){
         var scope = this;
 
-        if(this.state.classByMonth.getGroup('year')){
-
-            var orderedYears =  this.state.classByMonth.getGroup('year').top(Infinity).map(function(year){
-               
-                
-               
-                return {key:year.key, name:scope._parseYear(year.key)};
-
-            }).sort(function(a,b){
-                return b.name-a.name;
-            })
-
-
-            var output = orderedYears.map(function(year,i){
+        if(this.state.classByMonth['orderedYears']){
+            var output = this.state.classByMonth['orderedYears'].map(function(year,i){
                 return (<li rel="1" key={i}><a tabIndex="-1" onClick={scope._setYearFilter} value={year.key} className="">{year.name}</a></li>)
             })
             return output;
@@ -143,38 +133,36 @@ var Filters = React.createClass({
     },
 
     _getMonths : function(){
-        var scope = this,
-        months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+        var scope = this;
 
-        if(this.state.classByMonth.getGroup('month')){
 
-            var output = this.state.classByMonth.getGroup('month')
-            .top(Infinity)
-            .filter(function(d){
-                return +d.key < 13;
-            })
-            .sort(function(a,b){
-                return +b.key-+a.key
-            })
-            .map(function(month,i){
+        if(this.state.classByMonth['orderedMonths']){
+            var output = this.state.classByMonth['orderedYears'].map(function(month,i){
                 return (<li rel="1" key={i} value={month.key}><a  tabIndex="-1" onClick={scope._setMonthFilter} value={month.key} className="">{month.key +'-'+ months[month.key-1]}</a></li>)
             })
             return output;
         }
         return;
     },
+    _getDirs : function(){
+        var scope = this;
+        var output = (<li rel="1" key="0" value="north" ><a  tabIndex="-1" onClick={scope._setDirFilter} value="north" className="">North</a></li>)
+    
+
+        if(this.state.classByMonth['orderedDirs']){
+            var output = this.state.classByMonth['orderedDirs'].map(function(dir,i){
+                return (<li rel="1" key={i}><a tabIndex="-1" onClick={scope._setDirFilter} value={dir.key} className="">{dir.name}</a></li>)
+            })
+            return output;
+        }
+    },
 
     _getClasses : function(){
         var scope = this;
 
-        if(this.state.classByMonth.getGroup('class')){
+        if(this.state.classByMonth['orderedClasses']){
 
-            var output = this.state.classByMonth.getGroup('class')
-            .top(Infinity)
-            .sort(function(a,b){
-                return +b.key-+a.key
-            })
-            .map(function(vclass,i){
+            var output = this.state.classByMonth['orderedClasses'].map(function(vclass,i){
                 return (<li rel="1" key={i} value={vclass.key} ><a  tabIndex="-1" onClick={scope._setClassFilter} value={vclass.key} className="">Class {vclass.key}</a></li>)
             })
             return output;
@@ -210,8 +198,10 @@ var Filters = React.createClass({
         //console.log('FILTERS/ render',this.state.currentYear)
         var currentYear = scope._parseYear(this.state.currentYear);
         var currentClass = this.state.currentClass || 'All';
-        var years = this._getYears()
+        var currentDir = this.state.currentDir || 'All';
+        var years = this._getYears();
         var classes = this._getClasses();
+        var dirs = this._getDirs();
         var renderMonth = currentYear === 'All' ? <span /> : this.renderMonth();
 
   
@@ -249,6 +239,22 @@ var Filters = React.createClass({
                                             <li rel="0"><a tabIndex="-1" onClick={scope._setClassFilter} value={null}>All</a></li>
                                     		{classes}
                                     	</ul>
+                                    </div>               
+                                </div>
+                            </div>
+                            <div className="col-xs-4" >
+                                <label className="control-label centered" style={labelStyle} ><strong>Direction</strong></label>
+                                <div className="controls form-group">
+                                    <div className="btn-group bootstrap-select col-md-12">
+                                        <button className="btn dropdown-toggle clearfix btn-primary btn-sm btn-block" 
+                                            data-toggle="dropdown" id="simple-big" tabIndex="-1" 
+                                            aria-expanded="false">
+                                            <span className="filter-option">{currentDir}</span>&nbsp;<i className="fa fa-caret-down"></i>
+                                        </button>
+                                        <ul className="dropdown-menu" role="menu" >
+                                            <li rel="0"><a tabIndex="-1" onClick={scope._setDirFilter} value={null}>All</a></li>
+                                            {dirs}
+                                        </ul>
                                     </div>               
                                 </div>
                             </div>

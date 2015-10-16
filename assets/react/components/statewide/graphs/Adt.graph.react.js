@@ -47,7 +47,7 @@ var GraphContainer = React.createClass({
     },
     _loadData:function(fips){
         var scope = this;
-        console.log("Ryan",scope.props.filters);
+
         d3.json('/tmgClass/stateAADT/'+fips+'?database=allWim')
             .post(JSON.stringify({filters:scope.props.filters}),function(err,data){
             

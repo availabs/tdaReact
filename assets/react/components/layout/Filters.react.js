@@ -10,8 +10,8 @@ var React = require('react'),
 
 
 var labelStyle = {
-	width:"100%",
-	"textlign":"center"
+    width:"100%",
+    "textlign":"center"
 }
 
 
@@ -233,22 +233,22 @@ var Filters = React.createClass({
 
   
         return (
-        	<section className="widget ui-sortable no-padding" style={{background:'none',margin:'0px'}}>
-    			<fieldset>
+            <section className="widget ui-sortable no-padding" style={{background:'none',margin:'0px'}}>
+                <fieldset>
                     <div className="control-group">
                         <div className="row" >
                             <div className="col-xs-4" >
                                 <label className="control-label centered" style={labelStyle} ><strong>Year</strong></label>
                                 <div className="controls form-group">
                                     <div className="btn-group bootstrap-select col-md-12">
-                                    	<button className="btn dropdown-toggle clearfix btn-primary btn-sm btn-block" 
+                                        <button className="btn dropdown-toggle clearfix btn-primary btn-sm btn-block" 
                                             data-toggle="dropdown" id="simple-big" tabIndex="-1" aria-expanded="false">
                                             <span className="filter-option">{currentYear}</span>&nbsp;<i className="fa fa-caret-down"></i>
                                         </button>
-                                    	<ul className="dropdown-menu" role="menu" >
-                                    		<li rel="0"><a tabIndex="-1" onClick={scope._setYearFilter} value={null}>All</a></li>
+                                        <ul className="dropdown-menu" role="menu" >
+                                            <li rel="0"><a tabIndex="-1" onClick={scope._setYearFilter} value={null}>All</a></li>
                                             {years}
-                                    	</ul>
+                                        </ul>
                                     </div>               
                                 </div>
                             </div>
@@ -257,15 +257,15 @@ var Filters = React.createClass({
                                 <label className="control-label centered" style={labelStyle} ><strong>ClassName</strong></label>
                                 <div className="controls form-group">
                                     <div className="btn-group bootstrap-select col-md-12">
-                                    	<button className="btn dropdown-toggle clearfix btn-primary btn-sm btn-block" 
+                                        <button className="btn dropdown-toggle clearfix btn-primary btn-sm btn-block" 
                                             data-toggle="dropdown" id="simple-big" tabIndex="-1" 
                                             aria-expanded="false">
                                             <span className="filter-option">{currentClass}</span>&nbsp;<i className="fa fa-caret-down"></i>
                                         </button>
-                                    	<ul className="dropdown-menu" role="menu" >
+                                        <ul className="dropdown-menu" role="menu" >
                                             <li rel="0"><a tabIndex="-1" onClick={scope._setClassFilter} value={null}>All</a></li>
-                                    		{classes}
-                                    	</ul>
+                                            {classes}
+                                        </ul>
                                     </div>               
                                 </div>
                             </div>
@@ -291,7 +291,7 @@ var Filters = React.createClass({
                     </div>
                     {this._activeStations()}
                 </fieldset>
-    	 	</section>
+            </section>
         );
     },
     _activeStations:function(){
