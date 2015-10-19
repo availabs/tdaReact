@@ -90,82 +90,62 @@ module.exports = {
 
 	},
 
-	// getClassByMonthFilters:function(req,res){
-	// 	var database = req.param('database');
-	
-	// 	getStateFilter(database,function(cFilter){
-	// 		if(cFilter.initialized()){
+	getClassByMonthFilters:function(req,res){
+		var database = req.param('database'),
+			fips = req.param('fips');
 
-	// 			var classByMonth = {},
- //        		months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+		getStateFilter(database,fips,function(cFilter){
+			if(cFilter.initialized()){
 
-	// 			//years
-	// 			//months
-	// 			//dirs
-	// 			//classes
+				var classByMonth = {},
+        		months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-	//             var orderedYears =  cFilter.getGroup('year').top(Infinity).map(function(year){
-	//                 return {key:year.key, name:parseYear(year.key)};
-	//             }).sort(function(a,b){
-	//                 return b.name-a.name;
-	//             })
+				//years
+				//months
+				//dirs
+				//classes
 
-	//             var orderedMonths = cFilter.getGroup('month')
-	//             .top(Infinity)
-	//             .filter(function(d){
-	//                 return +d.key < 13;
-	//             })
-	//             .sort(function(a,b){
-	//                 return +b.key-+a.key
-	//             })
+	            var orderedYears =  cFilter.getGroup('year').top(Infinity).map(function(year){
+	                return {key:year.key, name:_parseYear(year.key)};
+	            }).sort(function(a,b){
+	                return b.name-a.name;
+	            })
 
-	//             var orderedDirs =  cFilter.getGroup('dir').top(Infinity).map(function(dir){
-	//                 return {key:dir.key, name:dir.key};
-	//             }).sort(function(a,b){
-	//                 return b.name-a.name;
-	//             })
+	            var orderedMonths = cFilter.getGroup('month')
+	            .top(Infinity)
+	            .filter(function(d){
+	                return +d.key < 13;
+	            })
+	            .sort(function(a,b){
+	                return +b.key-+a.key
+	            })
 
-	//             var orderedClasses = cFilter.getGroup('class')
-	//             .top(Infinity)
-	//             .sort(function(a,b){
-	//                 return +b.key-+a.key
-	//             })
+	            var orderedDirs =  cFilter.getGroup('dir').top(Infinity).map(function(dir){
+	                return {key:dir.key, name:dir.key};
+	            }).sort(function(a,b){
+	                return b.name-a.name;
+	            })
 
-
-	//             classByMonth["orderedYears"] = orderedYears;
-	//             classByMonth["orderedMonths"] = orderedMonths;
-	//             classByMonth["orderedDirs"] = orderedDirs;
-	//             classByMonth["orderedClasses"] = orderedClasses;
+	            var orderedClasses = cFilter.getGroup('class')
+	            .top(Infinity)
+	            .sort(function(a,b){
+	                return +b.key-+a.key
+	            })
 
 
-	//             res.json(classByMonth);
-	// 		}else{
-	//     		console.log('filters',station)
-	//     		res.json({loading:true});
-	// 		}
-	// 	})
-	// },
+	            classByMonth["orderedYears"] = orderedYears;
+	            classByMonth["orderedMonths"] = orderedMonths;
+	            classByMonth["orderedDirs"] = orderedDirs;
+	            classByMonth["orderedClasses"] = orderedClasses;
 
- //    _parseYear:function(year){
- //        if(!year){
- //            return 'All'
- //        }
+	            res.json(classByMonth);
+			}else{
+	    		console.log('filters',station)
+	    		res.json({loading:true});
+			}
+		})
+	},
 
- //        var yearName = '';
- //        year = year.toString();
- //        if(year.length === 1){
- //                yearName = '200'+year;
- //        }else  if(year.length === 2){
- //            yearName = '20'+year;
- //        }else if(year.length === 4){
- //            if(parseInt(year.substr(2,2)) > 50){
- //                yearName = '19'+year.substr(2,2)
- //            }else{
- //                yearName = year;
- //            }
- //        }
- //        return parseInt(yearName);
- //    },
 
 	
 	//----------------------------------------------------------------
@@ -858,6 +838,28 @@ function BQuery(sql,cb){
       	}
   		
     });
+}
+
+
+function _parseYear(year){
+    if(!year){
+        return 'All'
+    }
+
+    var yearName = '';
+    year = year.toString();
+    if(year.length === 1){
+            yearName = '200'+year;
+    }else  if(year.length === 2){
+        yearName = '20'+year;
+    }else if(year.length === 4){
+        if(parseInt(year.substr(2,2)) > 50){
+            yearName = '19'+year.substr(2,2)
+        }else{
+            yearName = year;
+        }
+    }
+    return parseInt(yearName);
 }
 
 
