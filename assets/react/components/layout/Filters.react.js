@@ -41,7 +41,6 @@ var Filters = React.createClass({
 
     _onChange:function(){
         this._getClassByMonthFilters(StateWideStore.getSelectedState());
-        console.log("RY2");
     },
 
    _getClassByMonthFilters: function(fips){
@@ -194,7 +193,6 @@ var Filters = React.createClass({
         var dirs = this._getDirs();
         var renderMonth = currentYear === 'All' ? <span /> : this.renderMonth();
 
-        console.log("RY",scope);
         return (
         	<section className="widget ui-sortable no-padding" style={{background:'none',margin:'0px'}}>
     			<fieldset>
