@@ -140,7 +140,7 @@ module.exports = {
 
 	            res.json(classByMonth);
 			}else{
-	    		console.log('filters',station)
+	    		console.log('filters')
 	    		res.json({loading:true});
 			}
 		})
@@ -300,7 +300,7 @@ module.exports = {
 
 			}
 			else{
-	    		console.log('getStateMADT still loading',fips,station)
+	    		console.log('getStateMADT still loading',fips)
 	    		res.json({loading:true});				
 			}
 		})			

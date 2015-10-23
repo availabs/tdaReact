@@ -115,6 +115,7 @@ AgencyStore.dispatchToken = AppDispatcher.register(function(payload) {
     break;
 
     case ActionTypes.RECEIVE_UPLOADJOBS:
+      action['data'].reverse();
       console.log('RECEIVE_UPLOADJOBS',action);
       if(action.data[0]  && action.data[0].source){
         _uploads[action.data[0].source] = action.data;
