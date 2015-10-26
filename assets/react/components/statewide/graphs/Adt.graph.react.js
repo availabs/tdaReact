@@ -50,7 +50,7 @@ var GraphContainer = React.createClass({
         if(fips){
             d3.json('/tmgClass/stateAADT/'+fips+'?database=allWim')
                 .post(JSON.stringify({filters:scope.props.filters}),function(err,data){
-                
+                console.log('adtGraph data',data)
                 if(data.loading){
                         console.log('reloading')
                         setTimeout(function(){ scope._loadData(fips) }, 2000);

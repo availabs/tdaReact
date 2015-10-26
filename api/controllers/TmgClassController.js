@@ -220,7 +220,7 @@ module.exports = {
 				//res.json that data
 				res.json(output);
 			}else{
-	    		console.log('getStateAADT still loading',fips,station)
+	    		console.log('getStateAADT still loading',fips)
 	    		res.json({loading:true});
 			}
 
