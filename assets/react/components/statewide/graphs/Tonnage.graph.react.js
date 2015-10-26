@@ -56,7 +56,7 @@ var GraphContainer = React.createClass({
                 
                 if(data.loading){
                         console.log('reloading')
-                        setTimeout(function(){ scope._loadData(fips,stationId) }, 2000);
+                        setTimeout(function(){ scope._loadData(fips) }, 2000);
                         
                     
                 }else{
