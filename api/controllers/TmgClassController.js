@@ -6,15 +6,6 @@
  */
 
 
-//ClassByMonth filter included
-//getclassbymonth filter function
-
-//route that returns data from that filter for ADT graph 
-
-
-//WANT TONNAGE GRAPH
-//STARTING WITH ADTSERVERGRAPH
-
 
 var googleapis = require('googleapis');
 var fs = require('fs');    
@@ -99,6 +90,63 @@ module.exports = {
 
 	},
 
+	getClassByMonthFilters:function(req,res){
+		var database = req.param('database'),
+			fips = req.param('fips');
+
+		getStateFilter(database,fips,function(cFilter){
+			if(cFilter.initialized()){
+
+				var classByMonth = {},
+        		months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+				//years
+				//months
+				//dirs
+				//classes
+
+	            var orderedYears =  cFilter.getGroup('year').top(Infinity).map(function(year){
+	                return {key:year.key, name:_parseYear(year.key)};
+	            }).sort(function(a,b){
+	                return b.name-a.name;
+	            })
+
+	            var orderedMonths = cFilter.getGroup('month')
+	            .top(Infinity)
+	            .filter(function(d){
+	                return +d.key < 13;
+	            })
+	            .sort(function(a,b){
+	                return +b.key-+a.key
+	            })
+
+	            var orderedDirs =  cFilter.getGroup('dir').top(Infinity).map(function(dir){
+	                return {key:dir.key, name:dir.key};
+	            }).sort(function(a,b){
+	                return b.name-a.name;
+	            })
+
+	            var orderedClasses = cFilter.getGroup('class')
+	            .top(Infinity)
+	            .sort(function(a,b){
+	                return +b.key-+a.key
+	            })
+
+
+	            classByMonth["orderedYears"] = orderedYears;
+	            classByMonth["orderedMonths"] = orderedMonths;
+	            classByMonth["orderedDirs"] = orderedDirs;
+	            classByMonth["orderedClasses"] = orderedClasses;
+
+	            res.json(classByMonth);
+			}else{
+	    		console.log('filters')
+	    		res.json({loading:true});
+			}
+		})
+	},
+
+
 	
 	//----------------------------------------------------------------
 	// Single Station Routes
@@ -127,6 +175,7 @@ module.exports = {
 				//apply filters
 				cFilter.getDimension('year').filter(null);
 	 			cFilter.getDimension('month').filter(null);
+	 			cFilter.getDimension('dir').filter(null);
 	 		
 	 			if(filters.year){
 	 				cFilter.getDimension('year').filter(filters.year)
@@ -134,6 +183,9 @@ module.exports = {
 	 			if(filters.month){
 	 				cFilter.getDimension('month').filter(filters.month)
 	 			}
+	 			if(filters.dir){
+	 				cFilter.getDimension('dir').filter(filters.dir)	 				
+	 			};
 
 
 	 			var data = cFilter.getGroups()
@@ -152,16 +204,16 @@ module.exports = {
                                     }
                                 })
 
-	            AdtScale.domain(data.map(function(ADT){
-	                    return ADT.value;
-	            }));
+                AdtScale.domain(data.map(function(ADT){
+                    return ADT.value;
+                }));
 
-	            var output = data.map(function(d){
-	                d.color = AdtScale(d.value)
-	                return d
-	            }).sort(function(a,b){
-	                return b.value - a.value
-	            })
+                var output = data.map(function(d){
+                    d.color = AdtScale(d.value)
+                    return d
+                }).sort(function(a,b){
+                    return b.value - a.value
+                })
 
 
 				//get appropriate data
@@ -174,6 +226,87 @@ module.exports = {
 
 
 		})
+	},
+	getStateMADT:function(req,res){
+		var database = req.param('database'),
+			graphType = req.param('graphType'),
+ 			fips = req.param('fips'),
+ 			filters = req.param('filters') || {};
+
+ 		getStateFilter(database,fips,function(cFilter){
+			if(cFilter.initialized()){
+				//apply filters
+				cFilter.getDimension('year').filter(null);
+	 			cFilter.getDimension('month').filter(null);
+	 			cFilter.getDimension('dir').filter(null);
+	 		
+	 			if(filters.year){
+	 				cFilter.getDimension('year').filter(filters.year)
+	 			}
+	 			if(filters.month){
+	 				cFilter.getDimension('month').filter(filters.month)
+	 			}
+	 			if(filters.dir){
+	 				cFilter.getDimension('dir').filter(filters.dir)	 				
+	 			};
+
+		        var stationADT = cFilter.getGroups()
+		            .ADT.order(function(p){return p.avg})
+		            .top(Infinity)
+
+		        var data = cFilter.getGroups()
+		                .ADT.order(function(p){return p.avg || 0})
+		                .top(Infinity)
+		                .filter(function(p){ 
+		                    return p.value.avg && !isNaN(p.value.avg);
+		                })
+		                .map(function(p,i){
+		                    if(p.value.monthAvg.length > 12){
+		                        p.value.monthAvg =  p.value.monthAvg.filter(function(d,i){
+		                            return i < 12 && !isNaN(d);
+		                        })
+		                    }
+		                    return p.value.monthAvg.reduce(function(a,b){ return a+b})
+		                });
+
+		        AdtScale.domain(stationADT.map(function(ADT){
+		            return ADT.value.avg;
+		        }));
+
+  				var testing = cFilter.getGroups()
+                            .ADT.order(function(p){return p.avg})
+                            .top(Infinity)
+                            .filter(function(d){ 
+                                return d.value.avg  
+                            })
+                            .map(function (ADT){
+                                return {
+                                    "key":(ADT.key),
+                                    "values":ADT.value.monthAvg.map(function(d,i){ 
+                                        var value = d.reduce(function(a,b){ return a+b}) || 0;
+                                        if(graphType === 'season'){
+                                            value = value / ADT.value.classAvg.reduce( function(a,b){ return a+b})
+                                        }
+                                        if(value === Infinity){
+                                            value = 0
+                                        }
+                                        return {month:i,y:+value}
+                                    }),
+                                    "color":AdtScale(ADT.value.avg || 0)
+                                }
+                            }) 
+
+                res.json(testing)
+
+			}
+			else{
+	    		console.log('getStateMADT still loading',fips)
+	    		res.json({loading:true});				
+			}
+		})			
+
+
+
 	},
 
 	classPie:function(req,res){
@@ -705,6 +838,28 @@ function BQuery(sql,cb){
       	}
   		
     });
+}
+
+
+function _parseYear(year){
+    if(!year){
+        return 'All'
+    }
+
+    var yearName = '';
+    year = year.toString();
+    if(year.length === 1){
+            yearName = '200'+year;
+    }else  if(year.length === 2){
+        yearName = '20'+year;
+    }else if(year.length === 4){
+        if(parseInt(year.substr(2,2)) > 50){
+            yearName = '19'+year.substr(2,2)
+        }else{
+            yearName = year;
+        }
+    }
+    return parseInt(yearName);
 }
 
 

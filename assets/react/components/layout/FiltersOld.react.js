@@ -10,18 +10,24 @@ var React = require('react'),
 
 
 var labelStyle = {
-	width:"100%",
-	"textlign":"center"
+    width:"100%",
+    "textlign":"center"
 }
 
 
+function updateClassByMonth(){
 
+    return {
+        classByMonth : StateWideStore.getClassByMonth(),
+        filters: StateWideStore.activeFilters()
+    };
+}
 
 var Filters = React.createClass({
 //style="overflow-y: auto; min-height: 60px; max-height: 123px;"
     getInitialState: function() {
         return {
-            classByMonth : {},
+            classByMonth : StateWideStore.getClassByMonth(),
             filters: StateWideStore.activeFilters(),
             currentYear: null,
             currentClass: null,
@@ -31,7 +37,6 @@ var Filters = React.createClass({
     },
 
     componentDidMount: function() {
-        this._getClassByMonthFilters(StateWideStore.getSelectedState());      
         StateWideStore.addChangeListener(this._onChange);
     },
 
@@ -40,28 +45,18 @@ var Filters = React.createClass({
     },
 
     _onChange:function(){
-        this._getClassByMonthFilters(StateWideStore.getSelectedState());
-    },
-
-   _getClassByMonthFilters: function(fips){
-        var scope = this;
-        if(fips != null){
-            d3.json('/tmgClass/classByMonthFilters?database=allWim')
-                .post(JSON.stringify({filters:StateWideStore.activeFilters(),fips:fips}),function(err,data){
-            
-                if(data.loading){
-                        console.log('reloading')
-                        setTimeout(function(){_getClassByMonthFilters(fips) }, 2000);
-                        
-                }else{
-                    console.log("In d3.json call",data);
-                    scope.setState({classByMonth:data});
-                }
-            })
+        this.setState(updateClassByMonth());
+        if(this.state.classByMonth.getGroup('stationId')){
+            // console.log(
+            //     'on change Filter2',
+            //     this.state.classByMonth.getGroup('stationId')
+            //         .top(Infinity)
+            //         .map(function(d){
+            //             return d.key
+            //         })
+            // )
         }
     },
-
-
 
     _setYearFilter:function(e){
         console.log(e.target.getAttribute('value'))
@@ -112,8 +107,20 @@ var Filters = React.createClass({
     _getYears : function(){
         var scope = this;
 
-        if(this.state.classByMonth['orderedYears']){
-            var output = this.state.classByMonth['orderedYears'].map(function(year,i){
+        if(this.state.classByMonth.getGroup('year')){
+
+            var orderedYears =  this.state.classByMonth.getGroup('year').top(Infinity).map(function(year){
+               
+                
+               
+                return {key:year.key, name:scope._parseYear(year.key)};
+
+            }).sort(function(a,b){
+                return b.name-a.name;
+            })
+
+
+            var output = orderedYears.map(function(year,i){
                 return (<li rel="1" key={i}><a tabIndex="-1" onClick={scope._setYearFilter} value={year.key} className="">{year.name}</a></li>)
             })
             return output;
@@ -123,10 +130,19 @@ var Filters = React.createClass({
 
     _getMonths : function(){
         var scope = this,
-            months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 
-        if(this.state.classByMonth['orderedMonths']){
-            var output = this.state.classByMonth['orderedMonths'].map(function(month,i){
+        if(this.state.classByMonth.getGroup('month')){
+
+            var output = this.state.classByMonth.getGroup('month')
+            .top(Infinity)
+            .filter(function(d){
+                return +d.key < 13;
+            })
+            .sort(function(a,b){
+                return +b.key-+a.key
+            })
+            .map(function(month,i){
                 return (<li rel="1" key={i} value={month.key}><a  tabIndex="-1" onClick={scope._setMonthFilter} value={month.key} className="">{month.key +'-'+ months[month.key-1]}</a></li>)
             })
             return output;
@@ -138,20 +154,42 @@ var Filters = React.createClass({
         var output = (<li rel="1" key="0" value="north" ><a  tabIndex="-1" onClick={scope._setDirFilter} value="north" className="">North</a></li>)
     
 
-        if(this.state.classByMonth['orderedDirs']){
-            var output = this.state.classByMonth['orderedDirs'].map(function(dir,i){
+        if(this.state.classByMonth.getGroup('year')){
+
+            var orderedDirs =  this.state.classByMonth.getGroup('dir').top(Infinity).map(function(dir){
+               
+                
+               
+                return {key:dir.key, name:dir.key};
+
+            }).sort(function(a,b){
+                return b.name-a.name;
+            })
+
+
+            output = orderedDirs.map(function(dir,i){
                 return (<li rel="1" key={i}><a tabIndex="-1" onClick={scope._setDirFilter} value={dir.key} className="">{dir.name}</a></li>)
             })
             return output;
         }
+
+
+
+
+        //return output;
     },
 
     _getClasses : function(){
         var scope = this;
 
-        if(this.state.classByMonth['orderedClasses']){
+        if(this.state.classByMonth.getGroup('class')){
 
-            var output = this.state.classByMonth['orderedClasses'].map(function(vclass,i){
+            var output = this.state.classByMonth.getGroup('class')
+            .top(Infinity)
+            .sort(function(a,b){
+                return +b.key-+a.key
+            })
+            .map(function(vclass,i){
                 return (<li rel="1" key={i} value={vclass.key} ><a  tabIndex="-1" onClick={scope._setClassFilter} value={vclass.key} className="">Class {vclass.key}</a></li>)
             })
             return output;
@@ -193,23 +231,24 @@ var Filters = React.createClass({
         var dirs = this._getDirs();
         var renderMonth = currentYear === 'All' ? <span /> : this.renderMonth();
 
+  
         return (
-        	<section className="widget ui-sortable no-padding" style={{background:'none',margin:'0px'}}>
-    			<fieldset>
+            <section className="widget ui-sortable no-padding" style={{background:'none',margin:'0px'}}>
+                <fieldset>
                     <div className="control-group">
                         <div className="row" >
                             <div className="col-xs-4" >
                                 <label className="control-label centered" style={labelStyle} ><strong>Year</strong></label>
                                 <div className="controls form-group">
                                     <div className="btn-group bootstrap-select col-md-12">
-                                    	<button className="btn dropdown-toggle clearfix btn-primary btn-sm btn-block" 
+                                        <button className="btn dropdown-toggle clearfix btn-primary btn-sm btn-block" 
                                             data-toggle="dropdown" id="simple-big" tabIndex="-1" aria-expanded="false">
                                             <span className="filter-option">{currentYear}</span>&nbsp;<i className="fa fa-caret-down"></i>
                                         </button>
-                                    	<ul className="dropdown-menu" role="menu" >
-                                    		<li rel="0"><a tabIndex="-1" onClick={scope._setYearFilter} value={null}>All</a></li>
+                                        <ul className="dropdown-menu" role="menu" >
+                                            <li rel="0"><a tabIndex="-1" onClick={scope._setYearFilter} value={null}>All</a></li>
                                             {years}
-                                    	</ul>
+                                        </ul>
                                     </div>               
                                 </div>
                             </div>
@@ -218,15 +257,15 @@ var Filters = React.createClass({
                                 <label className="control-label centered" style={labelStyle} ><strong>ClassName</strong></label>
                                 <div className="controls form-group">
                                     <div className="btn-group bootstrap-select col-md-12">
-                                    	<button className="btn dropdown-toggle clearfix btn-primary btn-sm btn-block" 
+                                        <button className="btn dropdown-toggle clearfix btn-primary btn-sm btn-block" 
                                             data-toggle="dropdown" id="simple-big" tabIndex="-1" 
                                             aria-expanded="false">
                                             <span className="filter-option">{currentClass}</span>&nbsp;<i className="fa fa-caret-down"></i>
                                         </button>
-                                    	<ul className="dropdown-menu" role="menu" >
+                                        <ul className="dropdown-menu" role="menu" >
                                             <li rel="0"><a tabIndex="-1" onClick={scope._setClassFilter} value={null}>All</a></li>
-                                    		{classes}
-                                    	</ul>
+                                            {classes}
+                                        </ul>
                                     </div>               
                                 </div>
                             </div>
@@ -252,7 +291,7 @@ var Filters = React.createClass({
                     </div>
                     {this._activeStations()}
                 </fieldset>
-    	 	</section>
+            </section>
         );
     },
     _activeStations:function(){

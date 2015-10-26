@@ -80,7 +80,6 @@ module.exports  = function(){
 	return {
 		init:function(data,dataset){
 
-				
 			if(dataset !== currentDataSet){
 				//console.log('class By Month Init',dataset,currentDataSet,data.length);
 				var stationData = {};
@@ -165,6 +164,9 @@ module.exports  = function(){
 
 				dimensions['class'] = classData.dimension(function(d){ return +d.class });
 				groups['class'] = dimensions['class'].group().reduceCount();
+
+				dimensions['dir'] = classData.dimension(function(d){ return +d.dir });
+				groups['dir'] = dimensions['dir'].group().reduceCount();
 
 
 				groups['ADT'] = dimensions['ADT']

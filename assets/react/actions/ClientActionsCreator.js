@@ -73,6 +73,14 @@ module.exports = {
   
   },
 
+  filterDir: function(dir){
+    AppDispatcher.handleViewAction({
+      type: ActionTypes.FILTER_DIR,
+      dir:dir
+    })
+  
+  },
+
 
   filterClassGroup: function(data){
     AppDispatcher.handleViewAction({
