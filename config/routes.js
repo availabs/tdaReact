@@ -31,7 +31,11 @@ module.exports.routes = {
   // Data Routes
   //------------------------------
 
+
+
   // -- Set Datasource  
+  '/database/set/:agencyId': 'UserController.changeDatabase',
+
   '/data/overview/:database/:dataType' : 'TmGClassController.datasetOverview',
   '/data/overview/day/:database/:dataType' : 'TmGClassController.datasetOverviewDay',
 
