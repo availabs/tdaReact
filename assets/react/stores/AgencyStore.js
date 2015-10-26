@@ -115,9 +115,17 @@ AgencyStore.dispatchToken = AppDispatcher.register(function(payload) {
     break;
 
     case ActionTypes.RECEIVE_UPLOADJOBS:
-      action['data'].reverse();
-      console.log('RECEIVE_UPLOADJOBS',action);
       if(action.data[0]  && action.data[0].source){
+        //action['data'].reverse();
+        action['data'].sort(function(a, b){
+            var keyA = a.id,
+                keyB = b.id;
+            // Compare the 2 ids
+            if(keyA > keyB) return -1;
+            if(keyA < keyB) return 1;
+            return 0;
+        });
+        console.log('RECEIVE_UPLOADJOBS',action);
         _uploads[action.data[0].source] = action.data;
       }
       //AgencyStore.emitChange();
