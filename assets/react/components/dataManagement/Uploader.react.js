@@ -43,7 +43,10 @@ var Upload = React.createClass({
                     });
             
             });
-            scope.setState(curState);
+            if(this.isMounted()){
+                scope.setState(curState);               
+            }
+
         }
     },
     
