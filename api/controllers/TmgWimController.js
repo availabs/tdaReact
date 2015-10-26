@@ -9,7 +9,7 @@ var googleapis = require('googleapis');
 	fs = require('fs'),
 	d3 = require('d3'),
     colorbrewer = require('colorbrewer'),
-    colorRange = colorbrewer.RdBu[5].reverse(),
+    colorRange = colorbrewer.RdYlBu[5].reverse(),
 	jwt = new googleapis.auth.JWT(
 		'424930963222-s59k4k5usekp20guokt0e605i06psh0d@developer.gserviceaccount.com', 
 		'availwim.pem', 

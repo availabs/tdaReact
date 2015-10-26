@@ -24,7 +24,7 @@ var StationByHourFilter = require('../../assets/react/utils/dataFilters/classByH
 
 var	d3 = require('d3'),
 	colorbrewer = require('colorbrewer'),
-    colorRange = colorbrewer.RdBu[5],
+    colorRange = colorbrewer.RdYlBu[5],
     AdtScale = d3.scale.quantile().domain([0,70000]).range(colorRange);
 
 function getClassStations(database){
