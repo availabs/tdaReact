@@ -105,38 +105,38 @@ module.exports = {
 				//dirs
 				//classes
 
-	            var orderedYears =  cFilter.getGroup('year').top(Infinity).map(function(year){
-	                return {key:year.key, name:_parseYear(year.key)};
-	            }).sort(function(a,b){
-	                return b.name-a.name;
-	            })
+	            // var orderedYears =  cFilter.getGroup('year').top(Infinity).map(function(year){
+	            //     return {key:year.key, name:_parseYear(year.key)};
+	            // }).sort(function(a,b){
+	            //     return b.name-a.name;
+	            // })
 
-	            var orderedMonths = cFilter.getGroup('month')
-	            .top(Infinity)
-	            .filter(function(d){
-	                return +d.key < 13;
-	            })
-	            .sort(function(a,b){
-	                return +b.key-+a.key
-	            })
+	            // var orderedMonths = cFilter.getGroup('month')
+	            // .top(Infinity)
+	            // .filter(function(d){
+	            //     return +d.key < 13;
+	            // })
+	            // .sort(function(a,b){
+	            //     return +b.key-+a.key
+	            // })
 
-	            var orderedDirs =  cFilter.getGroup('dir').top(Infinity).map(function(dir){
-	                return {key:dir.key, name:dir.key};
-	            }).sort(function(a,b){
-	                return b.name-a.name;
-	            })
+	            // var orderedDirs =  cFilter.getGroup('dir').top(Infinity).map(function(dir){
+	            //     return {key:dir.key, name:dir.key};
+	            // }).sort(function(a,b){
+	            //     return b.name-a.name;
+	            // })
 
-	            var orderedClasses = cFilter.getGroup('class')
-	            .top(Infinity)
-	            .sort(function(a,b){
-	                return +b.key-+a.key
-	            })
+	            // var orderedClasses = cFilter.getGroup('class')
+	            // .top(Infinity)
+	            // .sort(function(a,b){
+	            //     return +b.key-+a.key
+	            // })
 
 
-	            classByMonth["orderedYears"] = orderedYears;
-	            classByMonth["orderedMonths"] = orderedMonths;
-	            classByMonth["orderedDirs"] = orderedDirs;
-	            classByMonth["orderedClasses"] = orderedClasses;
+	            classByMonth["orderedYears"] = [];//orderedYears;
+	            classByMonth["orderedMonths"] = [];//orderedMonths;
+	            classByMonth["orderedDirs"] = [];//orderedDirs;
+	            classByMonth["orderedClasses"] = [];//orderedClasses;
 
 	            res.json(classByMonth);
 			}else{
