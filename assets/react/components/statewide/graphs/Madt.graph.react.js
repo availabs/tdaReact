@@ -8,7 +8,7 @@ var React = require('react'),
     //-- Stores
 
     //-- Utils
-    colorRange = colorbrewer.RdBu[5],
+    colorRange = colorbrewer.RdYlBu[5],
     AdtScale = d3.scale.quantile().domain([0,70000]).range(colorRange),
     months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
