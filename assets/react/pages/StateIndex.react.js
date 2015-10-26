@@ -74,7 +74,7 @@ var StateIndex = React.createClass({
         return (
             <div className="content container">
                 <div className="row">
-                
+                    
                     <div className="col-xs-6" >
                         <section className="widget whitesmoke no-padding mapaffix"  >
                             <div className="body no-margin">
@@ -102,20 +102,25 @@ var StateIndex = React.createClass({
                                 </ul>
                             </header>
                             <section style={{backgroundColor:'#fff',padding:'10px'}}>
-                                <Filters />
+                                <Filters
+                                     agency={this.props.currentAgency.datasource}
+                                    selectedState={this.props.selectedState} />
                             </section>
                             <div className="body tab-content">
                                 <div id="classCounts" className="tab-pane clearfix active">
-                                    <AdtGraph  
+                                    <AdtGraph
+                                        agency={this.props.currentAgency.datasource}
                                         selectedState={this.props.selectedState} 
                                         filters={this.props.activeFilters} />
 
-                                    <MadtGraph  
+                                    <MadtGraph
+                                        agency={this.props.currentAgency.datasource}  
                                         selectedState={this.props.selectedState} 
                                         filters={this.props.activeFilters}
                                         index='0' />
 
-                                    <MadtGraph 
+                                    <MadtGraph
+                                        agency={this.props.currentAgency.datasource}
                                         selectedState={this.props.selectedState} 
                                         filters={this.props.activeFilters}
                                         graphType='season' 
@@ -125,14 +130,17 @@ var StateIndex = React.createClass({
                                 <div id="wim" className="tab-pane clearfix">
                                  WIM
                                     <TonnageGraph 
+                                        agency={this.props.currentAgency.datasource}
                                         selectedState={this.props.selectedState}
                                         filters={this.props.activeFilters} />
 
                                     <MadTonnageGraph 
+                                        agency={this.props.currentAgency.datasource}
                                         selectedState={this.props.selectedState}
                                         filters={this.props.activeFilters} />
 
                                      <MadTonnageGraph 
+                                        agency={this.props.currentAgency.datasource}
                                         selectedState={this.props.selectedState}
                                         filters={this.props.activeFilters} 
                                         index="2"

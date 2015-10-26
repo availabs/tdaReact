@@ -25,10 +25,12 @@ var MenuSearch = React.createClass({
 
 
 var Header = React.createClass({
+
     render: function() {
         
         return (
             <header className="page-header">
+                
                 <div className="navbar">
                     <ul className="nav navbar-nav navbar-right pull-right">
                         <Logo />

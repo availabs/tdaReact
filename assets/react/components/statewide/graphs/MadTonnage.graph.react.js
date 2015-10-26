@@ -38,28 +38,29 @@ var GraphContainer = React.createClass({
         }
     },
 
-    componentDidMount:function(){
+     componentDidMount:function(){
         if(this.props.selectedState){
-            this._loadData(this.props.selectedState);
+            this._loadData(this.props.selectedState,this.props.agency);
         }
     },
 
     componentWillReceiveProps:function(nextProps){
-        //if(nextProps.selectedState !== this.props.selectedState){
-            this._loadData(nextProps.selectedState);
-        //}
+        if(nextProps.selectedState && nextProps.agency){
+            this._loadData(nextProps.selectedState,nextProps.agency);
+        }
     },
 
-    _loadData:function(fips){
+    _loadData:function(fips,agency){
+        
         var scope = this;
         var filters = scope.props.filters;
         var season = false;
         if(scope.props.type==='season'){
             season=true;
         }
-        if(fips){
+        if(fips && agency ){
             //console.log('ld',JSON.stringify({filters:filters}))
-            d3.json('/tmgWim/tonnage/madt/'+fips+'/?database=allWim')
+            d3.json('/tmgWim/tonnage/madt/'+fips+'/?database='+agency)
                 .post(JSON.stringify({filters:filters,season:season}),function(err,data){
                 
                 if(data.loading){

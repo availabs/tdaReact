@@ -3,10 +3,10 @@
 var React = require('react'),
     
     //--Actions
-    ClientActionsCreator = require('../../actions/ClientActionsCreator'),
+    ClientActionsCreator = require('../../actions/ClientActionsCreator');
 
     //--Stores 
-    StateWideStore = require('../../stores/StatewideStore');
+
 
 
 var labelStyle = {
@@ -31,27 +31,26 @@ var Filters = React.createClass({
     },
 
     componentDidMount: function() {
-        this._getClassByMonthFilters(StateWideStore.getSelectedState());      
-        StateWideStore.addChangeListener(this._onChange);
+        this._getClassByMonthFilters(this.props.selectedState,this.props.agency);      
+       
     },
 
-    componentWillUnmount: function() {
-        StateWideStore.removeChangeListener(this._onChange);
+
+    componentWillReceiveProps:function(nextProps){
+
+        this._getClassByMonthFilters(nextProps.selectedState,nextProps.agency);
+    
     },
 
-    _onChange:function(){
-        this._getClassByMonthFilters(StateWideStore.getSelectedState());
-    },
-
-   _getClassByMonthFilters: function(fips){
+   _getClassByMonthFilters: function(fips,agency){
         var scope = this;
-        if(fips != null){
-            d3.json('/tmgClass/classByMonthFilters?database=allWim')
+        if(fips && agency){
+            d3.json('/tmgClass/classByMonthFilters?database='+agency)
                 .post(JSON.stringify({filters:StateWideStore.activeFilters(),fips:fips}),function(err,data){
             
                 if(data.loading){
                         console.log('reloading')
-                        setTimeout(function(){_getClassByMonthFilters(fips) }, 2000);
+                        setTimeout(function(){ scope._getClassByMonthFilters(fips) }, 2000);
                         
                 }else{
                     console.log("In d3.json call",data);
@@ -111,9 +110,11 @@ var Filters = React.createClass({
 
     _getYears : function(){
         var scope = this;
-
         if(this.state.classByMonth['orderedYears']){
-            var output = this.state.classByMonth['orderedYears'].map(function(year,i){
+            var output = this.state.classByMonth['orderedYears'].filter(function(d){
+                return parseInt(d.name) < 2016;
+
+            }).map(function(year,i){
                 return (<li rel="1" key={i}><a tabIndex="-1" onClick={scope._setYearFilter} value={year.key} className="">{year.name}</a></li>)
             })
             return output;

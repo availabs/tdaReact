@@ -7,7 +7,7 @@ new WebpackDevServer(webpack(config), {
   hot: true,
   noInfo: true, /* Seems necessary to prevent Grunt errors. */
   historyApiFallback: true,
-  headers: { 'Access-Control-Allow-Origin': 'http://localhost:1333' },
+  headers: { 'Access-Control-Allow-Origin': 'http://localhost:1337' },
 }).listen(11233, 'localhost', function (err, result) {
   if (err) {
     console.log(err);

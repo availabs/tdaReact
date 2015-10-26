@@ -67,6 +67,7 @@ module.exports  = function WimTonsbyDayFilter(){
 					}
 					return normalForm;
 				});
+				console.log('how big is this data?',total_data.length)
 				var total_data = [].concat.apply([],total_data);
 				console.log('after data',total_data.length,total_data[0]);
 				

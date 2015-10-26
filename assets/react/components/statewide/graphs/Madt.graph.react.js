@@ -21,33 +21,39 @@ var GraphContainer = React.createClass({
             index:0
         }
     },
+
     getInitialState:function(){
         return{
             currentData:[]
         }
     },
+
     componentDidMount:function(){
         if(this.props.selectedState){
-            this._loadData(this.props.selectedState);
+            this._loadData(this.props.selectedState,this.props.agency);
         }
     },
 
     componentWillReceiveProps:function(nextProps){
-            this._loadData(nextProps.selectedState);
+        if(nextProps.selectedState && nextProps.agency){
+            this._loadData(nextProps.selectedState,nextProps.agency);
+        }
     },
-    _loadData: function(fips){
-        var scope = this; 
 
-        d3.json('/tmgClass/stateMADT/'+fips+'/'+scope.props.graphType+'?database=allWim')
-            .post(JSON.stringify({filters:scope.props.filters}),function(err,data){
-            
-            if(data.loading){
-                    console.log('reloading')
-                    setTimeout(function(){ scope._loadData(fips) }, 2000);
-            }else{
-                scope.setState({currentData:data});
-            }
-        })
+    _loadData: function(fips,agency){
+        var scope = this; 
+        if(fips && agency){
+            d3.json('/tmgClass/stateMADT/'+fips+'/'+scope.props.graphType+'?database='+agency)
+                .post(JSON.stringify({filters:scope.props.filters}),function(err,data){
+                
+                if(data.loading){
+                        console.log('reloading')
+                        setTimeout(function(){ scope._loadData(fips) }, 2000);
+                }else{
+                    scope.setState({currentData:data});
+                }
+            })
+        }
     },
     
     _updateGraph: function(){
@@ -110,7 +116,7 @@ var GraphContainer = React.createClass({
         	<section className="widget large" style={{ background:'none'}}>
                 <header>
                     <h4 style={headerStyle}>
-                        {title}
+                        {title} {this.props.agency}
                     </h4>
                     
                 </header>

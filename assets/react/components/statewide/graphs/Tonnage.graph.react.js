@@ -38,20 +38,20 @@ var GraphContainer = React.createClass({
 
     componentDidMount:function(){
         if(this.props.selectedState){
-            this._loadData(this.props.selectedState);
+            this._loadData(this.props.selectedState,this.props.agency);
         }
     },
 
     componentWillReceiveProps:function(nextProps){
-        //if(nextProps.selectedState !== this.props.selectedState){
-            this._loadData(nextProps.selectedState);
-        //}
+        if(nextProps.selectedState && nextProps.agency){
+            this._loadData(nextProps.selectedState,nextProps.agency);
+        }
     },
 
-    _loadData:function(fips){
+    _loadData:function(fips,agency){
         var scope = this;
-        if(fips){
-            d3.json('/tmgWim/tonnage/month/'+fips+'/?database=allWim')
+        if(fips && agency){
+            d3.json('/tmgWim/tonnage/month/'+fips+'/?database='+agency)
                 .post(JSON.stringify({filters:scope.props.filters}),function(err,data){
                 
                 if(data.loading){
@@ -185,7 +185,7 @@ var GraphContainer = React.createClass({
             <section className="widget large" style={{ background:'none'}}>
                 <header>
                     <h4 style={headerStyle}>
-                        {title}
+                        {title} {this.props.agency}
 
                         {this.renderDownload()}
                         <a onClick={this.toggleChartClick} className='btn btn-sm btn-success pull-right' style={{marginRight:'5px'}}>
