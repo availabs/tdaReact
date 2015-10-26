@@ -12,7 +12,7 @@ var AppDispatcher = require('../dispatcher/AppDispatcher'),
 var SailsWebApi = require('../utils/api/SailsWebApi');
     
 var _selectedAgency = 1,
-    _agencies = {"1":{id:1,datasource:'allWim',name:'TMAS'}},
+    _agencies = require('../utils/data/agencies'),
     _default = {datasource:'allWim',name:'TMAS'},
     _overviewData = {},
     _overviewDayData = {},
@@ -25,6 +25,7 @@ function _addAgencies(rawData) {
       _agencies[agency.id] = agency;
     
   });
+  //console.log('agencies',JSON.stringify(_agencies))
 };
 
 function _deleteAgency(id){
@@ -98,7 +99,8 @@ var AgencyStore = assign({}, EventEmitter.prototype, {
       }
     }
     return {}
-  }
+  },
+
 
 
 
@@ -110,11 +112,13 @@ AgencyStore.dispatchToken = AppDispatcher.register(function(payload) {
   switch(action.type) {
 
     case ActionTypes.SET_SELECTED_AGENCY:
+      SailsWebApi.setDatasource(action.Id);
       _selectedAgency = action.Id;
       AgencyStore.emitChange();
     break;
 
     case ActionTypes.RECEIVE_UPLOADJOBS:
+      //console.log('RECEIVE_UPLOADJOBS',action);
       if(action.data[0]  && action.data[0].source){
         //action['data'].reverse();
         action['data'].sort(function(a, b){
@@ -137,6 +141,7 @@ AgencyStore.dispatchToken = AppDispatcher.register(function(payload) {
     break;
 
     case ActionTypes.DELETE_AGENCY:
+      console.log('where actions go to die',action)
       _deleteUser(action.Id);
       AgencyStore.emitChange();
     break;

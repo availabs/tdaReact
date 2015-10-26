@@ -1,177 +1,290 @@
 'use strict';
 
 var React = require('react'),
-    
-    
-    // -- Action Creators
-    SailsWebApi = require('../../utils/api/SailsWebApi'),
+    assign = require("object-assign"),
 
-    // -- Stores
-    UserStore = require('../../stores/UserStore');
+    AgencyStore = require("../../stores/AgencyStore"),
 
+    UserActions = require("../../actions/UserActions"),
 
-function getStateFromStores(){
-    return {
-        users: UserStore.getAll(),
-        editUser: UserStore.getEditUserId(),
-    }
-};
+    FormComponents = require("./FormComponents.react"),
+    FormGroup = FormComponents.FormGroup,
+    InputGroup = FormComponents.InputGroup,
+    InlineCheckbox =  FormComponents.InlineCheckbox,
+    CheckboxGroup = FormComponents.CheckboxGroup;
 
-var UserForm = React.createClass({
+var PanelBody = React.createClass({
 
     getInitialState: function() {
-
         return {
-            user:{name:'',username:'',email:'',password:'',confirmation:'',admin:false}
-        };
-               
-    },
-
-    componentDidMount: function() {
-        UserStore.addChangeListener(this._userChange);
-        
-    },
-
-    componentWillUnmount: function() {
-        UserStore.removeChangeListener(this._userChange);
-    },
-
-    _userChange: function(){
-        //if this is an edit form, update the user on user events
-        if(this.props.data.formType !== 'create'){
-                        
-            var user = getStateFromStores().users[getStateFromStores().editUser];
-            if(user){
-                this.setState({user:user});    
-            }
+            name: null,
+            username: null,
+            email: null,
+            group: null,
+            password: null,
+            confirmation: null,
+            admin: false
         }
     },
 
-    handleSubmit:function(e){
-        var scope = this;
+    componentWillReceiveProps: function(newProps) {
+        if (newProps.mode == "update" && newProps.editTarget) {
+            this.setState({
+                name: newProps.editTarget.name,
+                username: newProps.editTarget.username,
+                email: newProps.editTarget.email,
+                group: newProps.editTarget.group,
+                admin: newProps.editTarget.admin,
+            })
+        }
+        else if (newProps.mode == "create") {
+            this.setState(this.getInitialState());
+        }
+    },
+
+    handleSubmit: function(e) {
         e.preventDefault();
-        
-            setTimeout(function(){
-                var errors = document.getElementsByClassName('parsley-errors-list filled');
-                
-                /*
-                /50ms timout to let parsley parse
-                /I don't love this solution
-                /but it still seems better than forcing
-                /jquery and parsley through commonjs
-                */
-                
-                console.log(errors.length,errors[0],errors);
-                
-                
-                if(errors.length === 0){
-                    if(scope.props.data.formType == 'create'){
-                        SailsWebApi.create('user',scope.state.user);
-                        scope.setState({user:{name:'',username:'',email:'',password:'',confirmation:'',admin:false}});
-                    }else if(scope.props.data.formType == 'update'){
-                        SailsWebApi.update('user',scope.state.user)
-                    }
-                }
-            },50);
-    
-    },
-    
-    handleChange: function(event) {
-        var el = event.target,
-            name = el.name,
-            type = el.type,
-            newState = this.state;
 
-        if(el.type=='checkbox'){
-
-            newState.user[name] = el.checked;
-            //console.log('handle change',newState);
-            this.setState(newState);
-
-        }else{
-            
-            newState.user[name] = event.target.value;
-            this.setState(newState);
-        }
-    },
-
-    render: function(){
-        var password = this._getPassword();
-           
-        return (
-            <form data-parsley-validate onSubmit={this.handleSubmit}>
-                
-                <div className="form-group">
-                    <div className="input-group input-group">
-                        <span className="input-group-addon"><i className="fa fa-bars"></i></span>
-                        <input className="form-control" size="16" type="text" name='name' placeholder="your name" 
-                            value={this.state.user.name} onChange={this.handleChange} 
-                            required="required" />
-                    </div>
-                </div>
-
-                <div className="form-group">
-                    <div className="input-group input-group">
-                        <span className="input-group-addon"><i className="fa fa-user"></i></span>
-                        <input className="form-control" size="16" type="text" name='username' placeholder="username" 
-                            value={this.state.user.username} onChange={this.handleChange} 
-                            required="required" />
-                    </div>
-                </div>
-
-                <div className="form-group">
-                    <div className="input-group input-group">
-                        <span className="input-group-addon"><i className="fa fa-envelope"></i></span>
-                        <input className="form-control" size="16" type="email" name="email" placeholder="email address"
-                            value={this.state.user.email}
-                            onChange={this.handleChange}
-                            data-parsley-trigger="change"
-                            data-parsley-validation-threshold="1"
-                            required="required"/>
-                    </div>
-                </div>
-                {password}
-                <input type='submit' className="btn btn-lg btn-primary btn-block" value={this.props.data.buttonText} />
-            </form>
-        );
-    },
-    
-    
-    _getPassword:function(){
-        if(this.props.data.formType == 'create'){
-            return (
-                <div>
-                    <div className="form-group">
-                        <div className="input-group input-group">
-                            <span className="input-group-addon"><i className="fa fa-lock"></i></span>
-                            <input className="form-control" size="16" id="password" name="password" type="password" placeholder="password"
-                                value={this.state.user.password}
-                                onChange={this.handleChange}
-                                data-parsley-trigger="change"
-                                data-parsley-minlength="6"
-                                required="required" />
-                        </div>
-                    </div>
-
-                    <div className="form-group">
-                        <div className="input-group input-group">
-                            <span className="input-group-addon"><i className="fa fa-unlock-alt"></i></span>
-                            <input className="form-control" size="16" name="confirmation" type="password" placeholder="confirm password"
-                                value={this.state.user.confirmation}
-                                onChange={this.handleChange}
-                                data-parsley-trigger="change"
-                                data-parsley-minlength="6"
-                                data-parsley-equalto="#password"
-                                required="required"/>
-                        </div>
-                    </div>
-                </div>
-            );
-        }else{
+        if ($("#group").val() == "default") {
+            alert("You must select a user group!");
+            $("#group").focus();
             return;
         }
+
+        if (this.props.mode == 'create') {
+            var user = {
+                name: this.state.name,
+                username: this.state.username,
+                email: this.state.email,
+                group: this.state.group || $("#group").val(),
+                admin: this.state.admin,
+                password: this.state.password,
+                confirmation: this.state.confirmation
+            }
+            UserActions.createUser(user);
+        }
+        else if (this.props.mode == 'update') {
+            var data = {
+                name: this.state.name,
+                username: this.state.username,
+                email: this.state.email,
+                group: this.state.group || $("#group").val(),
+                admin: this.state.admin,
+            }
+            if (this.state.password) {
+                data.password = this.state.password;
+            }
+            if (this.state.confirmation) {
+                data.confirmation = this.state.confirmation;
+            }
+            var user = assign({}, this.props.editTarget, data);
+            UserActions.updateUser(user);
+        }
+    },
+    handleChange: function(e) {
+        var state = this.state;
+
+        switch (e.target.name) {
+            case "name":
+                state.name = e.target.value;
+                break;
+            case "username":
+                state.username = e.target.value;
+                break;
+            case "email":
+                state.email = e.target.value;
+                break;
+            case "group":
+                state.group = e.target.value;
+                break;
+            case "password":
+                state.password = e.target.value;
+                break;
+            case "confirmation":
+                state.confirmation = e.target.value;
+                break;
+            case "admin":
+                state.admin = e.target.checked;
+                break;
+        }
+
+        this.setState(state);
+    },
+
+    inputGroup: function(e) {
+        var state = this.state;
+        state.group = $(e.target).text();
+        this.setState(state);
+    },
+
+    render: function() {
+        var name = this.state.name,
+            username = this.state.username,
+            email = this.state.email,
+            group = this.state.group,
+            admin = this.state.mode == "create" ? null : this.state.admin,
+            password = this.state.password,
+            confirmation = this.state.confirmation,
+            submitText = this.props.mode === "create" ? "Create User" : "Update User",
+            userGroups = Object.keys(AgencyStore.getAll()).map(function(d) { return { value: AgencyStore.getAll()[d].name, display: AgencyStore.getAll()[d].name }; });
+
+        userGroups.unshift({ value: "default", display: "user group" });
+
+        var groups = userGroups.map(function(d, i) {
+            var hidden = { display: "none" };
+            return <option key={i} value={ d.value } style={ !i ? hidden : null }>{ d.display }</option>;
+        }, this);
+
+        var groupDisabled = null;
+        if (this.props.user && this.props.user.agency && this.props.user.agency[0]) {
+            groupDisabled = "disabled";
+            group = this.props.user.agency[0].name;
+        }
+
+        return (
+            <form onSubmit={ this.handleSubmit }>
+                <div className="panel-body">
+
+                    <FormGroup>
+                        <InputGroup icon="fa fa-user">
+                            <input className="form-control" type="text" name='name'
+                                placeholder={ "user name" } value={ name }
+                                onChange={ this.handleChange } required="required"
+                                id="name"/>
+                        </InputGroup>
+                    </FormGroup>
+
+                    <FormGroup>
+                        <InputGroup icon="fa fa-sign-in">
+                            <input className="form-control" type="text" name='username'
+                                placeholder={ "sign in name" } value={ username }
+                                onChange={ this.handleChange } required="required"
+                                id="username"/>
+                        </InputGroup>
+                    </FormGroup>
+
+                    <FormGroup>
+                        <InputGroup icon="fa fa-envelope">
+                            <input className="form-control" type="email" name="email"
+                                placeholder={ "email" } value={ email }
+                                onChange={ this.handleChange } required="required"
+                                id="email"/>
+                        </InputGroup>
+                    </FormGroup>
+
+                    <FormGroup>
+                        <InputGroup icon="fa fa-users">
+                            <select className="form-control" name="group"
+                                placeholder={ "user group" } value={ group }
+                                onChange={ this.handleChange } required="required"
+                                id="group" list="groupList" disabled={ groupDisabled }>
+                                { groups }
+                            </select>
+                        </InputGroup>
+                    </FormGroup>
+
+                    <FormGroup>
+                        <InlineCheckbox label="Administrator Privileges">
+                            <input type="checkbox" name="admin" onChange={ this.handleChange }
+                                id="admin" checked={ admin }/>
+                        </InlineCheckbox>
+                    </FormGroup>
+
+
+                    <FormGroup>
+                        <InputGroup icon="fa fa-lock">
+                            <input className="form-control" type="password" name="password"
+                                placeholder={ "password" } onChange={ this.handleChange } id="password"
+                                value={ password }
+                                required={ this.props.mode == "create" ? "required" : null }/>
+                        </InputGroup>
+                    </FormGroup>
+
+
+                    <FormGroup>
+                        <InputGroup icon="fa fa-check">
+                            <input className="form-control" type="password" name="confirmation"
+                                placeholder={ "confirm password" } onChange={ this.handleChange }
+                                value={ confirmation }
+                                required={ this.props.mode == "create" ? "required" : null }/>
+                        </InputGroup>
+                    </FormGroup>
+                </div>
+
+                <div className="panel-footer">
+                    <input type='submit' className="btn btn-primary btn-block" value={ submitText }/>
+                </div>
+
+            </form>
+        )
     }
+})
 
-});
+var PanelHeading = React.createClass({
 
-module.exports = UserForm;
+    createMode: function() {
+        this.props.clickHandler("create");
+    },
+    editMode: function() {
+        this.props.clickHandler("update");
+    },
+
+    render: function() {
+        var createButtonClass = this.props.mode === "create" ? "btn btn-success" : "btn btn-info";
+
+        if (this.props.mode === "update" && this.props.editTarget) {
+            var editButtonClass = "btn btn-success";
+        }
+        else if (this.props.mode === "create" && this.props.editTarget) {
+            var editButtonClass = "btn btn-info";
+        }
+        else {
+            var editButtonClass = "btn";
+        }
+        var disabled = this.props.editTarget ? "" : "disabled";
+
+        return (
+            <div className="panel-heading">
+                <div className="btn-group">
+                    <button className={ createButtonClass } onClick={ this.createMode }>Create</button>
+                    <button className={ editButtonClass } disabled={ disabled } onClick={ this.editMode }>Update</button>
+                </div>
+            </div>
+        )
+    }
+})
+
+module.exports = React.createClass({
+
+    getInitialState: function() {
+        return { mode: "create" };
+    },
+
+    componentWillReceiveProps: function(newProps) {
+        if (newProps.editTarget && this.state.mode == "create") {
+            this.setState({ mode: "update" })
+        }
+    },
+
+    handleClick: function(mode) {
+        if (mode != this.state.mode) {
+            this.setState({ mode: mode });
+        }
+    },
+
+    render: function() {
+        var target = this.state.mode === "update" ? this.props.editTarget : null;
+
+        return (
+            <div className="panel panel-default">
+
+                <PanelHeading mode={ this.state.mode } editTarget={ this.props.editTarget }
+                    clickHandler={ this.handleClick }/>
+
+                <PanelBody mode={ this.state.mode } editTarget={ target }
+                    users={ this.props.users } user={ this.props.user }/>
+
+            </div>
+        )
+    }
+})

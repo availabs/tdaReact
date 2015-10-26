@@ -47,20 +47,32 @@ var GraphContainer = React.createClass({
     },
     _loadData:function(fips){
         var scope = this;
-
-        d3.json('/tmgClass/stateAADT/'+fips+'?database=allWim')
-            .post(JSON.stringify({filters:scope.props.filters}),function(err,data){
-            
-            if(data.loading){
-                    console.log('reloading')
-                    setTimeout(function(){ scope._loadData(fips,stationId) }, 2000);
-                    
+        if(fips){
+            d3.json('/tmgClass/stateAADT/'+fips+'?database=allWim')
+                .post(JSON.stringify({filters:scope.props.filters}),function(err,data){
                 
-            }else{
+                if(data.loading){
+                        console.log('reloading')
+                        setTimeout(function(){ scope._loadData(fips,stationId) }, 2000);
+                        
+                    
+                }else{
+                    AdtScale.domain(data.map(function(ADT){
+                        return ADT.value;
+                    }));
 
-                scope.setState({currentData:data});
-            }
-        })
+                    var output = data.map(function(d){
+                        d.color = AdtScale(d.value)
+                        return d
+                    }).sort(function(a,b){
+                        return b.value - a.value
+                    })
+
+                    scope.setState({currentData:output});
+                }
+            })
+        }
+
     },
     _updateGraph: function(){
         var scope = this;

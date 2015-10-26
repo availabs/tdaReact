@@ -36,7 +36,12 @@ module.exports = {
     
     //-------User--------------------------------------------
     RECEIVE_USERS: null,
-    SET_SESSION_USER:null,
+    SET_SESSION_USER: null,
+    CREATE_USER: null,
+    DELETE_USER: null,
+    UPDATE_USER: null,
+    GET_ALL_USERS: null,
+    SET_EDIT_TARGET: null,
 
     //-------Data--------------------------------------------
     GET_DATA_OVERVIEW:null,

@@ -4,7 +4,7 @@
  * @description :: Server-side logic for managing users
  * @help        :: See http://links.sailsjs.org/docs/controllers
  */
-var bcrypt = require('bcrypt');
+var bcrypt = require('bcryptjs');
 
 module.exports = {
 
@@ -12,12 +12,15 @@ module.exports = {
 	
 	changeDatabase: function(req,res){
 
-		Agency.findOneByDatasource(req.param('database'), function foundUser(err, agency) {
-			if (err) return next(err);
-			req.session.database = agency
-			res.send({'status':'updated'});
+		var agencyId = req.param('agencyId');
+
+		req.session.Datasource = agencyId;
+		req.session.save(function(){
 			
+			res.send({'status':'updated'});
+		
 		});
+		
 		// req.session.database = req.param('database');
 		// console.log(req.param('database'))
 		// res.send({'status':'updated'});
@@ -84,7 +87,8 @@ module.exports = {
 				// Log user in
 				req.session.authenticated = true;
 				req.session.User = user;
-				req.session.Datasource = 'allWim';
+				console.log('agency',user.agency[0] ? user.agency[0].id : 1)
+				req.session.Datasource = user.agency[0]? user.agency[0].id : 1;
 
 				// Change status to online
 				user.online = true;

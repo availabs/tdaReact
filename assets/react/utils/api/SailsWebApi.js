@@ -8,6 +8,7 @@
 
 //var io =                    require('./sails.io.js')();
 var ServerActionCreators =    require('../../actions/ServerActionsCreator'),
+    ClientActionCreators =    require('../../actions/ClientActionsCreator'),
     d3 =                      require('d3'),
     fips2state =              require('../data/fips2state');
 
@@ -30,10 +31,12 @@ function listenToSockets(sessionUser){
 
 var api = {
 
-  initAdmin: function(user){
+  initAdmin: function(user,agencyId){
 
     ServerActionCreators.setAppSection('admin');
     ServerActionCreators.setSessionUser(user);
+    ClientActionCreators.setSelectedAgency(agencyId)
+
 
     this.read('user');
     this.read('agency');
@@ -41,6 +44,15 @@ var api = {
     listenToSockets();
     
   
+  },
+  //--------------------------------------------------
+  // Set Session Database
+  //--------------------------------------------------
+  setDatasource:function(agencyId){
+    d3.json('/database/set/'+agencyId,function(err,data){
+      if(err){ console.log('setDatasource error:',err)}
+      console.log('setDatasource',data)
+    })
   },
   //--------------------------------------------------
   // Class Data Routes
