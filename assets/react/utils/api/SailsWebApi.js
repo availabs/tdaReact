@@ -1,3 +1,4 @@
+
 'use strict';
 /*
  * This file is provided by Facebook for testing and evaluation purposes
@@ -64,6 +65,7 @@ var api = {
       return []
     }
     var url = '/tmgClass/byDay';
+    console.log('get CLASS BY DAY')
     var postData = {database:agency.datasource,fips:fips};
     d3.json(url).post(JSON.stringify(postData),function(err,data){
      ServerActionCreators.getClassByDay(data,fips);
@@ -76,6 +78,7 @@ var api = {
       //console.log('Error: No Agency Datasource Selected');
       return []
     }
+    console.log('get CLASS BY MONTH')
     var postData ={database:agency.datasource,fips:fips};
     d3.json('/tmgClass/byMonth').post(JSON.stringify(postData),function(err,data){
       ServerActionCreators.getClassByMonth(data,fips);
@@ -86,7 +89,7 @@ var api = {
     if(!agency){
       return []
     }
-
+    console.log('get CLASS BY HOUR')
     var postData ={database:agency.datasource,stationId:stationId,fips:fips};
     d3.json('/tmgClass/byHour').post(JSON.stringify(postData),function(err,data){
       if(err){console.log('classbyHour error',err)}
@@ -125,6 +128,7 @@ var api = {
   getHpms : function(fips){
     var state = fips2state[fips].name.replace(/\s/g,'').toLowerCase()+'2012';
     d3.json('/hpms/'+state,function(err,data){
+      console.log('get HPMS',data.length)
       ServerActionCreators.getHpms(data,fips);
     });
   },

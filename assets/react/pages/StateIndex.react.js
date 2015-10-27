@@ -52,6 +52,8 @@ var StateIndex = React.createClass({
         var activeStation = '',
             type='class',
             wimGraphs = <span />;
+       
+
         if(this.props.selectedStation){
 
             if(d3.select(".station_"+this.props.selectedStation).classed("type_WIM")){
@@ -71,6 +73,8 @@ var StateIndex = React.createClass({
                 </li>
             )
         }
+
+
         return (
             <div className="content container">
                 <div className="row">
@@ -78,7 +82,11 @@ var StateIndex = React.createClass({
                     <div className="col-xs-6" >
                         <section className="widget whitesmoke no-padding mapaffix"  >
                             <div className="body no-margin">
-                                <StateWideMap activeView={this.state.activeComponent}/>
+                                <StateWideMap 
+                                    activeView={this.state.activeComponent}
+                                    agency={this.props.currentAgency.datasource}
+                                    selectedState={this.props.selectedState}
+                                    filters={this.props.activeFilters} />
                             </div>
                         </section>
                     </div>
@@ -103,7 +111,7 @@ var StateIndex = React.createClass({
                             </header>
                             <section style={{backgroundColor:'#fff',padding:'10px'}}>
                                 <Filters
-                                     agency={this.props.currentAgency.datasource}
+                                    agency={this.props.currentAgency.datasource}
                                     selectedState={this.props.selectedState} />
                             </section>
                             <div className="body tab-content">

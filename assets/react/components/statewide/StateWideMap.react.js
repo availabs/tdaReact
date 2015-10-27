@@ -50,13 +50,13 @@ var StateWideMap = React.createClass({
                 type:"FeatureCollection",
                 features: []
             },
-            classByMonth : StateWideStore.getClassByMonth()
+            //classByMonth : StateWideStore.getClassByMonth()
         };
     },
     
     componentWillReceiveProps:function(nextProps){
         if(nextProps.activeView !== this.props.activeView){
-            console.log('new view')
+            //console.log('new view')
             if(nextProps.activeView === 'wim'){
                 d3.selectAll('.type_Class').style('display','none')
             }else{
@@ -64,12 +64,14 @@ var StateWideMap = React.createClass({
             }
         
         }
+        this._loadData(this.props.selectedState,this.props.agency)
     },
     
     componentDidMount: function() {
 
-        StationStore.addChangeListener(this._onStationsLoad);
-        StateWideStore.addChangeListener(this._newData);
+        //StationStore.addChangeListener(this._onStationsLoad);
+        this._loadData(this.props.selectedState,this.props.agency)
+
         var scope = this;
 
         //var height = this.props.height
@@ -154,7 +156,27 @@ var StateWideMap = React.createClass({
     
     componentWillUnmount: function() {
         StationStore.removeChangeListener(this._onStationsLoad);
-        StateWideStore.removeChangeListener(this._newData);
+        //StateWideStore.removeChangeListener(this._newData);
+    },
+
+
+    _loadData:function(fips,agency){
+        var scope = this;
+        if(fips && agency){
+            var url = '/tmgClass/stateAADT/'+fips+'?database='+agency;
+            d3.json(url)
+                .post(JSON.stringify({filters:scope.props.filters}),function(err,data){
+                if(data.loading){
+                        //console.log('reloading')
+                        setTimeout(function(){ scope._loadData(fips) }, 2000);
+                        
+                }else{
+                    
+                    scope._newData(data);
+                }
+            })
+        }
+
     },
 
     _onStationsLoad:function(){
@@ -165,38 +187,35 @@ var StateWideMap = React.createClass({
 
     },
 
-    _newData:function(){
+    _newData:function(stationADT){
         var scope = this;
+  
+        var stationData = {};
 
-        this.setState({classByDay:StateWideStore.getClassByMonth()})
-        if(Object.keys(this.state.classByDay.getDimensions()).length > 0){
-            
-            var stationData = {};
+        // var stationADT = scope.state.classByDay.getGroups()
+        //     .ADT.order(function(p){return p.avg})
+        //     .top(Infinity)
+        stationADT
+            .forEach(function (ADT){
+                stationData[ADT.label] = ADT.value;
+            })
 
-            var stationADT = scope.state.classByDay.getGroups()
-                .ADT.order(function(p){return p.avg})
-                .top(Infinity)
-            
-            stationADT
-                .forEach(function (ADT){
-                    stationData[ADT.key] = ADT.value.avg;
-                })
+        AdtScale.domain(stationADT.map(function(ADT){
+            return ADT.value;
+        }));
 
-            AdtScale.domain(stationADT.map(function(ADT){
-                return ADT.value.avg;
-            }));
+                
 
-
-
-            scope.state.stations.features = scope.state.stations.features.map(function(station){
-                station.properties.ADT = stationData[station.properties.station_id] || 0;
-                return station;
-            });
-            
-            scope._updateStations(scope.state.stations);
+        var newStations = scope.state.stations;
+        newStations.features = scope.state.stations.features.map(function(station){
+            station.properties.ADT = stationData[station.properties.station_id] || 0;
+            return station;
+        });
+        
+        scope._updateStations(newStations);
             
 
-        }
+        
     },
 
     //----------------------------------------------------------------------------------------------------------------
@@ -278,17 +297,17 @@ var StateWideMap = React.createClass({
                 
                 layer.on({
                     click: function(e){
-                       console.log('station_click',e.target.feature.geometry);
+                       //console.log('station_click',e.target.feature.geometry);
                        ClientActionsCreator.setSelectedStation(feature.properties.station_id,feature.properties.state_fips);
                        map.setView(e.target.feature.geometry.coordinates.reverse(),16);
 
-                       console.log("selecting base layers",map.options.baseLayers[0]);
+                       //console.log("selecting base layers",map.options.baseLayers[0]);
 
 
                        if(!map.hasLayer(map.options.baseLayers[0]["Dark Terrain (only terrain)"])){
 
                         //Want to Switch to a specific base layer
-                        console.log("Switching to Satillite");  
+                        //console.log("Switching to Satillite");  
 
                         Object.keys(map.options.baseLayers[0]).forEach(function(layerName){
 
@@ -305,7 +324,7 @@ var StateWideMap = React.createClass({
                     },
                     
                     dblclick: function(e){
-                        console.log('dbl click',feature.properties.station_id);
+                        //console.log('dbl click',feature.properties.station_id);
                        //scope.transitionTo('singleStation', {stationId: feature.properties.station_id,fips:feature.properties.state_fips});
                         
                     },
