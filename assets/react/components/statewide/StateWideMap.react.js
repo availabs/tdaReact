@@ -64,12 +64,17 @@ var StateWideMap = React.createClass({
             }
         
         }
+        if(nextProps.selectedState !== this.state.selectedState){
+
+            this.setState({selectedState:nextProps.selectedState});
+        
+        }
         this._loadData(this.props.selectedState,this.props.agency)
     },
     
     componentDidMount: function() {
 
-        //StationStore.addChangeListener(this._onStationsLoad);
+        StationStore.addChangeListener(this._onStationsLoad);
         this._loadData(this.props.selectedState,this.props.agency)
 
         var scope = this;
@@ -181,8 +186,14 @@ var StateWideMap = React.createClass({
 
     _onStationsLoad:function(){
         if(this.state.selectedState){
+            this._loadHPMS();
             var newState = this.state;
-            newState.stations.features = StationStore.getStateStations(this.state.selectedState);    
+            newState.stations.features = StationStore.getStateStations(this.state.selectedState);
+
+            var bounds= d3.geo.bounds(newState.stations);
+            map.fitBounds([bounds[1].reverse(),bounds[0].reverse()]);
+
+
         }
 
     },
@@ -222,6 +233,9 @@ var StateWideMap = React.createClass({
     // Render Components
     //----------------------------------------------------------------------------------------------------------------
     render: function() {
+        d3.select('.geo-'+this.state.selectedState)
+            .attr('fill','none')
+            .classed('active_geo',true);
 
         return (
             <div id="map">
@@ -241,7 +255,7 @@ var StateWideMap = React.createClass({
 
             var bounds= d3.geo.bounds(e.target.feature)
             
-
+            console.log('what the map',map)
             map.fitBounds([bounds[1].reverse(),bounds[0].reverse()]);
             var d = e.target.feature;
             
@@ -397,7 +411,7 @@ var StateWideMap = React.createClass({
     //----------------------------------------------------------------------------------------------------------------
     // HPMS
     //----------------------------------------------------------------------------------------------------------------
-    _loadHPMS:function(stateFips){
+    _loadHPMS:function(){
         var scope = this;
         if(map.hasLayer(vectorLayer)){
             map.removeLayer(vectorLayer);

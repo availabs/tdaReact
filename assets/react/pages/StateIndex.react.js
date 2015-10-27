@@ -137,22 +137,7 @@ var StateIndex = React.createClass({
                                 </div>
                                 <div id="wim" className="tab-pane clearfix">
                                  WIM
-                                    <TonnageGraph 
-                                        agency={this.props.currentAgency.datasource}
-                                        selectedState={this.props.selectedState}
-                                        filters={this.props.activeFilters} />
-
-                                    <MadTonnageGraph 
-                                        agency={this.props.currentAgency.datasource}
-                                        selectedState={this.props.selectedState}
-                                        filters={this.props.activeFilters} />
-
-                                     <MadTonnageGraph 
-                                        agency={this.props.currentAgency.datasource}
-                                        selectedState={this.props.selectedState}
-                                        filters={this.props.activeFilters} 
-                                        index="2"
-                                        type="season" />
+                                    
 
                                 </div>
                                 <div id="hpms" className="tab-pane clearfix">

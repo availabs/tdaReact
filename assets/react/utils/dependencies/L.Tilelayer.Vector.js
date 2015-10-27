@@ -474,8 +474,9 @@ L.TileLayer.Vector = L.TileLayer.extend({
         }
         tileLayer.addData(tile.parsed);
         tile.layer = tileLayer;
-        this.vectorLayer.addLayer(tileLayer);
-
+        if(this.vectorLayer){
+            this.vectorLayer.addLayer(tileLayer);
+        }
         tile.loading = false;
         this.fire('tileload', {tile: tile});
         this._tileLoaded();
