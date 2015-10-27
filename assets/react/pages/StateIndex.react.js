@@ -141,9 +141,7 @@ var StateIndex = React.createClass({
 
                                 </div>
                                 <div id="hpms" className="tab-pane clearfix">
-                                    <HpmsTypeGraph  hpmsData={this.props.hpmsData} selectedState={this.props.selectedState} groupKey='route_vdt' />
-
-                                    <HpmsTypeGraph  hpmsData={this.props.hpmsData} selectedState={this.props.selectedState} groupKey='route_length' />
+                                    
                                 </div>
                                 <div id="selection" className="tab-pane clearfix">
                                     {this.props.selectedStation} {type}

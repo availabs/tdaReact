@@ -186,7 +186,7 @@ var StateWideMap = React.createClass({
 
     _onStationsLoad:function(){
         if(this.state.selectedState){
-            this._loadHPMS();
+            //this._loadHPMS();
             var newState = this.state;
             newState.stations.features = StationStore.getStateStations(this.state.selectedState);
 
@@ -271,7 +271,7 @@ var StateWideMap = React.createClass({
 
             this.setState(newState);
             ClientActionsCreator.setSelectedState(newState.selectedState);
-            scope._loadHPMS();
+            //scope._loadHPMS();
             
         }
 
