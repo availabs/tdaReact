@@ -43,7 +43,8 @@ module.exports  = function WimTonsbyDayFilter(){
 			else if(dataset !== currentDataSet){
 				//console.log('class By Month Init',dataset,currentDataSet,data.length);
 				//console.log('before data',data.length,data);
-				var total_data = data.map(function(d){
+				var total_data = [];
+				data.forEach(function(d){
 					
 					var normalForm = [];
 					for(var i = 4; i <= 13; i++){
@@ -63,13 +64,12 @@ module.exports  = function WimTonsbyDayFilter(){
 						}
 
 						row['f0_'] = +d['c'+i];
-						normalForm.push(row);
+						total_data.push(row);
 					}
-					return normalForm;
+					
 				});
-				console.log('how big is this data?',total_data.length)
-				var total_data = [].concat.apply([],total_data);
-				console.log('after data',total_data.length,total_data[0]);
+				//var total_data = [].concat.apply([],total_data);
+				console.log('after data',data.length,total_data.length);
 				
 				//console.time('CBM crossFIlterData')
 				currentDataSet = dataset;
