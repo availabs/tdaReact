@@ -1,6 +1,7 @@
 <script>
 	User = <%- JSON.stringify( session.User ) %>;
 	Datasource = <%- JSON.stringify( session.Datasource ) %>;
+	Fips = <%- JSON.stringify( session.State ) %>;
 </script>
 <% if (devEnv) { %>
     <script src="http://localhost:11233/bundle.js"></script>

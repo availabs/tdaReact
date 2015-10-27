@@ -31,11 +31,12 @@ function listenToSockets(sessionUser){
 
 var api = {
 
-  initAdmin: function(user,agencyId){
+  initAdmin: function(user,agencyId,fips){
 
     ServerActionCreators.setAppSection('admin');
     ServerActionCreators.setSessionUser(user);
     ClientActionCreators.setSelectedAgency(agencyId)
+    ClientActionCreators.setSelectedState(fips);
 
 
     this.read('user');

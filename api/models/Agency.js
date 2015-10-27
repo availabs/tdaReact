@@ -8,13 +8,19 @@
 module.exports = {
 
   attributes: {
-  	name:"STRING",
-  	datasource:"STRING",
-  	users:{
+  	
+    name:"STRING",
+  	
+    datasource:"STRING",
+  	
+    users:{
         collection: 'User',
         via: 'agency'
     },
+    
     settings:"ARRAY",
+
+    fips:'string'
   	
   }
 

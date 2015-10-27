@@ -89,12 +89,11 @@ module.exports = {
 				req.session.User = user;
 				console.log('agency',user.agency[0] ? user.agency[0].id : 1)
 				req.session.Datasource = user.agency[0]? user.agency[0].id : 1;
+				req.session.State = user.agency[0] ? user.agency[0].fips : null;
 
 				// Change status to online
-				user.online = true;
-				user.save(function(err, user) {
-					if (err) return next(err);
-
+				req.session.save(function() {
+					
 					// Inform other sockets (e.g. connected sockets that are subscribed) that this user is now logged in
 					// User.publishUpdate(user.id, {
 					// 	loggedIn: true,
@@ -108,11 +107,7 @@ module.exports = {
 				});
 			});
 		});
-		Agency.findOneByDatasource('allWim', function foundUser(err, agency) {
-			if (err) return next(err);
-			req.session.database = agency
-			//console.log(agency)
-		});
+		
 	},
 
 	logout: function(req, res, next) {
