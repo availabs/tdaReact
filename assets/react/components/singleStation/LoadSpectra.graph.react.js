@@ -65,7 +65,7 @@ var SpectraGraph = React.createClass({
                     
                 
                 }else{
-                    console.log('ls data',data)
+                    //console.log('ls data',data)
                     scope.setState({
                         currentData:data,
                         loading:false
@@ -148,7 +148,8 @@ var SpectraGraph = React.createClass({
         var svg = <svg style={svgStyle}/>
         if(this.state.loading){
            
-            svg = <div style={{height:'256px',margin:'0 auto'}}>Loading {this.props.selectedStation}</div> 
+            svg = <div style={{position:'relative',top:'20%',left:'40%',width:'200px'}}>Loading {this.props.selectedStation}<br /> <img src={'/images/loading.gif'} /></div> 
+            
             
         }
         

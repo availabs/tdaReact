@@ -49,11 +49,11 @@ var Filters = React.createClass({
                 .post(JSON.stringify({filters:StateWideStore.activeFilters(),fips:fips}),function(err,data){
             
                 if(data.loading){
-                        console.log('reloading')
-                        setTimeout(function(){ scope._getClassByMonthFilters(fips) }, 2000);
+                        //console.log('reloading')
+                    setTimeout(function(){ scope._getClassByMonthFilters(fips) }, 3000);
                         
                 }else{
-                    console.log("In d3.json call",data);
+                    //console.log("In d3.json call",data);
                     scope.setState({classByMonth:data});
                 }
             })
