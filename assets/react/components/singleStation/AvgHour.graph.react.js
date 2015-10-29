@@ -40,7 +40,10 @@ var AvgHourGraph = React.createClass({
     
     componentWillReceiveProps:function(nextProps){
         //console.log(nextProps.filters.year,this.props.filters.year,nextProps.filters.year !== this.props.filters.year)
-        this._loadData(nextProps.fips,nextProps.selectedStation);
+        if( nextProps.selectedStation !== this.props.selectedStation ){ 
+            this._loadData(nextProps.fips,nextProps.selectedStation);
+        }
+
         // if(nextProps.fips+''+nextProps.selectedStation !== this.props.fips+''+this.props.selectedStation){
         //     this._loadData(nextProps.fips,nextProps.selectedStation);
         // }else if(nextProps.filters.year !== this.props.filters.year){

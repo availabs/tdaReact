@@ -3,19 +3,36 @@ var React = require('react'),
 
 var StationGraph = React.createClass({
 
+	getInitialState:function(){
+		return {
+			stationId:this.props.selectedStation
+		}
+	},
 
 	componentDidMount:function(){
 		
-		stationgraph.grapher('#wimGraph').drawGraph(this.props.selectedStation, this.props.type,this.props.fips);
+		stationgraph.grapher('#wimGraph_'+this.state.stationId).drawGraph(this.state.stationId, this.props.type,this.props.fips);
 	    
 	},
 
+	componentWillReceiveProps : function(nextProps){
+
+		if(this.props.selectedStation !== nextProps.selectedStation ){
+			this.setState({stationId:nextProps.selectedStation})
+			d3.select('#graphDIV').remove();
+			d3.selectAll('#legendDIV').remove();
+			stationgraph.grapher('#wimGraph_'+this.state.stationId).drawGraph(this.state.stationId, this.props.type,this.props.fips);
+		}
+	},
+
+
+
+
 	render: function() {
-		console.log('stationgraph render');
-	    return (
+		return (
 	    	<div >
-                <div id="wimGraph" />
-                Station Graph
+                <div id={"wimGraph_"+this.state.stationId} />
+               
             </div>
 	    );
 	}
