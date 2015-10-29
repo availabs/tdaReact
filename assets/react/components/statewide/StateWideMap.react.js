@@ -80,13 +80,24 @@ var StateWideMap = React.createClass({
         
         // console.log('selectedState',nextProps.selectedState,this.props.selectedState ,nextProps.selectedState !== this.props.selectedState );
         // console.log('agency',nextProps.agency,this.props.agency ,nextProps.agency !== this.props.agency );
-        // //console.log('activeView',nextProps.activeView,this.props.activeView ,nextProps.activeView !== this.props.activeView );
-        // console.log('----------------------------')
+        console.log('activeView',nextProps.activeView,this.props.activeView ,nextProps.activeView !== this.props.activeView );
+        //console.log('----------------------------')
+         if(nextProps.activeView !== this.props.activeView ){
+            if(nextProps.activeView === 'hpms' && this.state.selectedState){
+                this._loadHPMS();
+            }else if(this.props.activeView){
+                if(map.hasLayer(vectorLayer)){
+                    map.removeLayer(vectorLayer);
+                }
+            }
+        }
 
         if( nextProps.selectedState !== this.props.selectedState || nextProps.agency !== this.props.agency ){ 
             console.log('loading data',nextProps.selectedState,nextProps.agency);
             this._loadData(nextProps.selectedState,nextProps.agency)
         }
+
+       
     },
     
     componentDidMount: function() {
@@ -206,7 +217,7 @@ var StateWideMap = React.createClass({
 
     _onStationsLoad:function(){
         if(this.state.selectedState){
-            //this._loadHPMS();
+            
             var newState = this.state;
             newState.stations.features = StationStore.getStateStations(this.state.selectedState);
 
@@ -423,6 +434,7 @@ var StateWideMap = React.createClass({
     // HPMS
     //----------------------------------------------------------------------------------------------------------------
     _loadHPMS:function(){
+        console.log('load hpms')
         var scope = this;
         if(map.hasLayer(vectorLayer)){
             map.removeLayer(vectorLayer);

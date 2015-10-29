@@ -9,7 +9,7 @@ var React = require('react'),
     SingleStationPanel = require('../components/statewide/panels/SingleStationPanel.react'),
 
     WidgetHeader = require('../components/WidgetHeader.react'),
-    HpmsTypeGraph = require('../components/statewide/graphs/HpmsType.graph.react'),
+    
     
 
     
@@ -72,7 +72,7 @@ var StateIndex = React.createClass({
             break;
 
             case 'hpms':
-                currentPanel = <HpmsPanel currentAgency={this.props.currentAgency} selectedState={this.props.selectedState} selectedStation={this.props.selectedStation} activeFilters={this.props.activeFilters} />;
+                currentPanel = <HpmsPanel hpmsData={this.props.hpmsData} currentAgency={this.props.currentAgency} selectedState={this.props.selectedState} selectedStation={this.props.selectedStation} activeFilters={this.props.activeFilters} />;
             break;
 
             case 'singleStation':
@@ -112,7 +112,7 @@ var StateIndex = React.createClass({
                         <section className="widget">
                             <header>
                                 
-                                <ul className="nav nav-tabs" onClick={this._setActiveComponent}>
+                                <ul className="nav nav-tabs" onClick={this._setActiveComponent} style={{cursor:'pointer'}}>
                                     <li value="class" className={this.state.activeComponent === 'class' ? 'active' : ''}>
                                         <a value="class">Class</a>
                                     </li>

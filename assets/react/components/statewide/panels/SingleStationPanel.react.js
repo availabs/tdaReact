@@ -38,11 +38,6 @@ var SingleStationPanel = React.createClass({
                     type = {type} />
 
 
-                <VehicleClassPie
-                    fips={this.props.selectedState} 
-                    selectedStation={this.props.selectedStation} 
-                    filters={this.props.activeFilters}/>
-
                 <StationCountByTimeGraph 
                     fips={this.props.selectedState} 
                     selectedStation={this.props.selectedStation} 

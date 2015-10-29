@@ -409,21 +409,21 @@
 						 	text = (d*20).toString()+'k+ lbs.';
 						 }
 					} else {
-						text = 'Cls '+classScale.domain()[d];
+						text = ''+classScale.domain()[d];
 					}
 					return text;
 				})
 
-			legend.style('width', function() {
-					var w = parseInt(d3.select('.'+attr+'-label').style('width'));
-					if(w < 100){
-						return ((61.3) * values.length) + 'px';
-					}
-					else{
-						return ((117.3) * values.length) + 'px';	
-					}
-				})
-				.style('background-color', '#000');
+			// legend.style('width', function() {
+			// 		var w = parseInt(d3.select('.'+attr+'-label').style('width'));
+			// 		if(w < 100){
+			// 			return ((61.3) * values.length) + 'px';
+			// 		}
+			// 		else{
+			// 			return ((117.3) * values.length) + 'px';	
+			// 		}
+			// 	})
+			// 	.style('background-color', '#000');
 		}
 
 
