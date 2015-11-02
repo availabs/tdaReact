@@ -15,7 +15,9 @@ var React = require('react'),
     //-- Utils
     colorRange = colorbrewer.RdYlBu[5],
     AdtScale = d3.scale.quantile().domain([0,70000]).range(colorRange),
-    saveSvgAsPng = require('save-svg-as-png');
+    saveSvgAsPng = require('save-svg-as-png'),
+    json2csv = require('json2csv'),
+    downloadFile = require('../../utils/downloadHelper');
 
 
 var removeLabels = function(){
@@ -127,31 +129,50 @@ var GraphContainer = React.createClass({
                 </button>
                 <ul className="dropdown-menu">
                     <li><a onClick={scope.downloadPng} href="#">PNG</a></li>
-                    <li><a onClick={scope.downloadCsv} href="#">CSV</a></li>
+                    <li><a onClick={scope.downloadCsv.bind(null,this.props.id)} href="#">CSV</a></li>
                 </ul>
             </div>
         )
+    },
+    formatData : function(){
+        var scope = this,            
+            fieldNames = ['Station ID','AADT'],
+            lines = '',
+            line = '';
+
+        Object.keys(scope.state.currentData).forEach(function(station){
+            line = station + "," + scope.state.currentData[station].value;
+
+            if(navigator.msSaveBlob){ //IF WE R IN IE :(
+                lines += line + '\r\n';
+            }else{
+                lines += line + '%0A';
+            }
+
+        })
+
+        if(navigator.msSaveBlob){ //IF WE R IN IE :(
+            lines = fieldNames.join(',') + '\r\n' + lines;
+        }else{
+            lines = fieldNames.join(',') + '%0A' + lines;
+        }
+        return lines;
     },
     downloadPng : function(){
         console.log("downloading png");
         saveSvgAsPng.saveSvgAsPng(document.getElementById("adtchart-graph"), "adtchart.png");
     },
-    donwloadCsv : function(){
-        var scope = this,
-            fields = ['label','value'],
-            fieldNames = ['Station ID','AADT'];
+    downloadCsv : function(id){
+        var scope = this;
 
         console.log("downloading csv");
-        json2csv({ data: scope.state.currentData, fields: fields, fieldNames: fieldNames }, function(err, csv) {
-          if (err) console.log(err);
-          
-          console.log(csv);
-          fs.writeFile("./adtchart.csv",csv, function(err) {
-            if (err) throw err;
-            console.log('file saved');
-          });
 
-        });
+        var type = "data:text/csv;charset=utf-8,";
+        var fname = "adtGraph.csv";
+        var formattedData =  scope.formatData();
+
+        downloadFile(type,formattedData,fname,id);
+
     },
 
     render: function() {
