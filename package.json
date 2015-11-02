@@ -50,6 +50,7 @@
     "sails": "~0.10.5",
     "sails-disk": "~0.10.0",
     "sails-postgresql": "~0.10.11",
+    "save-svg-as-png": "^1.0.1",
     "superagent": "^1.2.0",
     "topojson": "~1.6.18",
     "tree-kill": "^0.1.1",

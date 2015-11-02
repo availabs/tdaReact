@@ -14,7 +14,8 @@ var React = require('react'),
 
     //-- Utils
     colorRange = colorbrewer.RdYlBu[5],
-    AdtScale = d3.scale.quantile().domain([0,70000]).range(colorRange);
+    AdtScale = d3.scale.quantile().domain([0,70000]).range(colorRange),
+    saveSvgAsPng = require('save-svg-as-png');
 
 
 var removeLabels = function(){
@@ -118,6 +119,7 @@ var GraphContainer = React.createClass({
     },
 
     renderDownload : function(){
+        var scope=this;
         return (
             <div className="btn-group pull-right">
                 
@@ -125,11 +127,32 @@ var GraphContainer = React.createClass({
                     <span className="fa fa-download"></span>
                 </button>
                 <ul className="dropdown-menu">
-                    <li><a href="#">PNG</a></li>
-                    <li><a href="#">CSV</a></li>
+                    <li><a onClick={scope.downloadPng} href="#">PNG</a></li>
+                    <li><a onClick={scope.downloadCsv} href="#">CSV</a></li>
                 </ul>
             </div>
         )
+    },
+    downloadPng : function(){
+        console.log("downloading png");
+        saveSvgAsPng.saveSvgAsPng(document.getElementById("adtchart-graph"), "adtchart.png");
+    },
+    donwloadCsv : function(){
+        var scope = this,
+            fields = ['label','value'],
+            fieldNames = ['Station ID','AADT'];
+
+        console.log("downloading csv");
+        json2csv({ data: scope.state.currentData, fields: fields, fieldNames: fieldNames }, function(err, csv) {
+          if (err) console.log(err);
+          
+          console.log(csv);
+          fs.writeFile("./adtchart.csv",csv, function(err) {
+            if (err) throw err;
+            console.log('file saved');
+          });
+
+        });
     },
 
     render: function() {
@@ -154,7 +177,7 @@ var GraphContainer = React.createClass({
            
                 <div className="body">
                     <div id="adtchart">
-                        <svg style={svgStyle}></svg>
+                        <svg id="adtchart-graph" style={svgStyle}></svg>
                     </div>
                     {this._updateGraph()}
                     
