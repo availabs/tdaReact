@@ -6,6 +6,7 @@ var React = require('react'),
     ClassPanel = require('../components/statewide/panels/ClassPanel.react'),
     WimPanel = require('../components/statewide/panels/WimPanel.react'),
     HpmsPanel = require('../components/statewide/panels/HpmsPanel.react'),
+    EnforcementPanel = require('../components/statewide/panels/EnforcementPanel.react'),
     SingleStationPanel = require('../components/statewide/panels/SingleStationPanel.react'),
 
     WidgetHeader = require('../components/WidgetHeader.react'),
@@ -78,6 +79,11 @@ var StateIndex = React.createClass({
             case 'singleStation':
                 currentPanel = <SingleStationPanel currentAgency={this.props.currentAgency} selectedState={this.props.selectedState} selectedStation={this.props.selectedStation} activeFilters={this.props.activeFilters} />;
             break;
+
+             case 'enforcement':
+                currentPanel = <EnforcementPanel currentAgency={this.props.currentAgency} selectedState={this.props.selectedState} selectedStation={this.props.selectedStation} activeFilters={this.props.activeFilters} />;
+            break;
+
         
         }
 
@@ -121,6 +127,9 @@ var StateIndex = React.createClass({
                                     </li>
                                     <li className={this.state.activeComponent === 'hpms' ? 'active' : ''}>
                                         <a  value="hpms">HPMS</a>
+                                    </li>
+                                    <li className={this.state.activeComponent === 'enforcement' ? 'active' : ''}>
+                                        <a  value="enforcement">Enforcement</a>
                                     </li>
                                     {activeStation}
                                 </ul>
