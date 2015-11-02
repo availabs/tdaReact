@@ -40,7 +40,10 @@ var AvgHourGraph = React.createClass({
     
     componentWillReceiveProps:function(nextProps){
         //console.log(nextProps.filters.year,this.props.filters.year,nextProps.filters.year !== this.props.filters.year)
-        this._loadData(nextProps.fips,nextProps.selectedStation);
+        if( nextProps.selectedStation !== this.props.selectedStation ){ 
+            this._loadData(nextProps.fips,nextProps.selectedStation);
+        }
+
         // if(nextProps.fips+''+nextProps.selectedStation !== this.props.fips+''+this.props.selectedStation){
         //     this._loadData(nextProps.fips,nextProps.selectedStation);
         // }else if(nextProps.filters.year !== this.props.filters.year){
@@ -126,7 +129,7 @@ var AvgHourGraph = React.createClass({
         var svg = <svg style={svgStyle}/>
         if(this.state.loading){
            
-            svg = <div style={{height:'256px',margin:'0 auto'}}>Loading {this.props.selectedStation}</div> 
+             svg = <div style={{position:'relative',top:'20%',left:'40%',width:'200px'}}>Loading {this.props.selectedStation}<br /> <img src={'/images/loading.gif'} /></div> 
             
         }
         

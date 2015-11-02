@@ -2,7 +2,7 @@
 
 var React = require('react'),
     Navigation = require('react-router').Navigation,
-    
+    equal = require('deep-equal'),
     
     // -- Stores
     StationStore = require('../../stores/StationStore'),
@@ -50,13 +50,21 @@ var StateWideMap = React.createClass({
                 type:"FeatureCollection",
                 features: []
             },
-            classByMonth : StateWideStore.getClassByMonth()
+            filters:{
+                "year":this.props.filters.year,
+                "month":this.props.filters.month,
+                "class":this.props.filters.class,
+                "dir":this.props.filters.dir,
+                "stations":this.props.filters.stations
+            }
+            
         };
     },
     
+    
     componentWillReceiveProps:function(nextProps){
         if(nextProps.activeView !== this.props.activeView){
-            console.log('new view')
+            //console.log('new view')
             if(nextProps.activeView === 'wim'){
                 d3.selectAll('.type_Class').style('display','none')
             }else{
@@ -64,12 +72,40 @@ var StateWideMap = React.createClass({
             }
         
         }
+        if(nextProps.selectedState !== this.state.selectedState){
+
+            this.setState({selectedState:nextProps.selectedState});
+        
+        }
+        
+        // console.log('selectedState',nextProps.selectedState,this.props.selectedState ,nextProps.selectedState !== this.props.selectedState );
+        // console.log('agency',nextProps.agency,this.props.agency ,nextProps.agency !== this.props.agency );
+        console.log('activeView',nextProps.activeView,this.props.activeView ,nextProps.activeView !== this.props.activeView );
+        //console.log('----------------------------')
+         if(nextProps.activeView !== this.props.activeView ){
+            if(nextProps.activeView === 'hpms' && this.state.selectedState){
+                this._loadHPMS();
+            }else if(this.props.activeView){
+                if(map.hasLayer(vectorLayer)){
+                    map.removeLayer(vectorLayer);
+                }
+            }
+        }
+
+        if( nextProps.selectedState !== this.props.selectedState || nextProps.agency !== this.props.agency ){ 
+            console.log('loading data',nextProps.selectedState,nextProps.agency);
+            this._loadData(nextProps.selectedState,nextProps.agency)
+        }
+
+       
     },
     
     componentDidMount: function() {
 
-        StationStore.addChangeListener(this._onStationsLoad);
-        StateWideStore.addChangeListener(this._newData);
+        StationStore.addStationListener(this._onStationsLoad);
+        console.log('component did mount',this.props.selectedState,this.props.agency)
+        
+
         var scope = this;
 
         //var height = this.props.height
@@ -153,56 +189,86 @@ var StateWideMap = React.createClass({
     },
     
     componentWillUnmount: function() {
-        StationStore.removeChangeListener(this._onStationsLoad);
-        StateWideStore.removeChangeListener(this._newData);
+        StationStore.removeStationListener(this._onStationsLoad);
+        //StateWideStore.removeChangeListener(this._newData);
+    },
+
+
+    _loadData:function(fips,agency){
+        var scope = this;
+        if(fips && agency){
+            var url = '/tmgClass/stateAADT/'+fips+'?database='+agency;
+            console.log('the url',url)
+            d3.json(url)
+                .post(JSON.stringify({filters:scope.props.filters}),function(err,data){
+                if(err){console.log('map data error',err)}
+                if(data.loading){
+                        //console.log('reloading')
+                        setTimeout(function(){ scope._loadData(fips) }, 2000);
+                        
+                }else{
+                    
+                    scope._newData(data);
+                }
+            })
+        }
+
     },
 
     _onStationsLoad:function(){
         if(this.state.selectedState){
+            
             var newState = this.state;
-            newState.stations.features = StationStore.getStateStations(this.state.selectedState);    
+            newState.stations.features = StationStore.getStateStations(this.state.selectedState);
+
+            var bounds= d3.geo.bounds(newState.stations);
+            map.fitBounds([bounds[1].reverse(),bounds[0].reverse()]);
+            this._loadData(this.props.selectedState,this.props.agency);
+
         }
 
     },
 
-    _newData:function(){
+    _newData:function(stationADT){
         var scope = this;
+  
+        var stationData = {};
 
-        this.setState({classByDay:StateWideStore.getClassByMonth()})
-        if(Object.keys(this.state.classByDay.getDimensions()).length > 0){
-            
-            var stationData = {};
+        stationADT
+            .forEach(function (ADT){
+                stationData[ADT.label] = ADT.value;
+            })
 
-            var stationADT = scope.state.classByDay.getGroups()
-                .ADT.order(function(p){return p.avg})
-                .top(Infinity)
-            
-            stationADT
-                .forEach(function (ADT){
-                    stationData[ADT.key] = ADT.value.avg;
-                })
+        AdtScale.domain(stationADT.map(function(ADT){
+            return ADT.value;
+        }));
 
-            AdtScale.domain(stationADT.map(function(ADT){
-                return ADT.value.avg;
-            }));
+                
 
-
-
-            scope.state.stations.features = scope.state.stations.features.map(function(station){
-                station.properties.ADT = stationData[station.properties.station_id] || 0;
-                return station;
-            });
-            
-            scope._updateStations(scope.state.stations);
+        var newStations = scope.state.stations;
+        newStations.features = scope.state.stations.features.map(function(station){
+            station.properties.ADT = stationData[station.properties.station_id] || 0;
+            return station;
+        });
+        console.log('update stations ',newStations)
+        scope._updateStations(newStations);
             
 
-        }
+        
     },
 
     //----------------------------------------------------------------------------------------------------------------
     // Render Components
     //----------------------------------------------------------------------------------------------------------------
     render: function() {
+        d3.select('.geo-'+this.state.selectedState)
+            .attr('fill','none')
+            .classed('active_geo',true);
+
+        if(this.props.selectedStation){
+            console.log('.station_'+this.props.selectedStation)
+            d3.selectAll('.station_'+this.props.selectedStation).classed('selected_station',true)
+        }
 
         return (
             <div id="map">
@@ -222,7 +288,7 @@ var StateWideMap = React.createClass({
 
             var bounds= d3.geo.bounds(e.target.feature)
             
-
+            //console.log('what the map',map)
             map.fitBounds([bounds[1].reverse(),bounds[0].reverse()]);
             var d = e.target.feature;
             
@@ -238,7 +304,7 @@ var StateWideMap = React.createClass({
 
             this.setState(newState);
             ClientActionsCreator.setSelectedState(newState.selectedState);
-            scope._loadHPMS();
+            //scope._loadHPMS();
             
         }
 
@@ -248,6 +314,7 @@ var StateWideMap = React.createClass({
     //---------------------------------------------------------------------------------------------------------------
     _updateStations : function(stationsGeo){
         var scope = this;
+        console.log('update stations')
         if(map.hasLayer(stationLayer)){
             map.removeLayer(stationLayer)
         }
@@ -278,34 +345,20 @@ var StateWideMap = React.createClass({
                 
                 layer.on({
                     click: function(e){
-                       console.log('station_click',e.target.feature.geometry);
                        ClientActionsCreator.setSelectedStation(feature.properties.station_id,feature.properties.state_fips);
-                       map.setView(e.target.feature.geometry.coordinates.reverse(),16);
+                       var d = e.target.feature;
+                       d3.selectAll('.selected_station').classed('selected_station',false)
 
-                       console.log("selecting base layers",map.options.baseLayers[0]);
-
-
-                       if(!map.hasLayer(map.options.baseLayers[0]["Dark Terrain (only terrain)"])){
-
-                        //Want to Switch to a specific base layer
-                        console.log("Switching to Satillite");  
-
-                        Object.keys(map.options.baseLayers[0]).forEach(function(layerName){
-
-                            map.removeLayer(map.options.baseLayers[0][layerName]);
-                        })
-                        map.addLayer(map.options.baseLayers[0]["Dark Terrain (only terrain)"]);
-                       }
-
-
-
+                       d3.selectAll('.station_'+d.properties.station_id).classed('selected_station',true)
+                       //d3.selectAll('.selected_station').classed('selected_station',false)
+                    
 
 
                         d3.select('.ToolTip').style({display:'none'});
                     },
                     
                     dblclick: function(e){
-                        console.log('dbl click',feature.properties.station_id);
+                        //console.log('dbl click',feature.properties.station_id);
                        //scope.transitionTo('singleStation', {stationId: feature.properties.station_id,fips:feature.properties.state_fips});
                         
                     },
@@ -347,6 +400,8 @@ var StateWideMap = React.createClass({
             }
         });
         stationLayer.addTo(map);
+        
+        //console.log('.station_'+d.properties.station_id,d3.selectAll('.station_'+d.properties.station_id).classed('selected_station'))
     },
     _StationToolTipContent:function(props){
         
@@ -378,7 +433,8 @@ var StateWideMap = React.createClass({
     //----------------------------------------------------------------------------------------------------------------
     // HPMS
     //----------------------------------------------------------------------------------------------------------------
-    _loadHPMS:function(stateFips){
+    _loadHPMS:function(){
+        console.log('load hpms')
         var scope = this;
         if(map.hasLayer(vectorLayer)){
             map.removeLayer(vectorLayer);

@@ -53,7 +53,6 @@ var GraphContainer = React.createClass({
         var scope = this;
         if(fips && agency){
             var url = '/tmgClass/stateAADT/'+fips+'?database='+agency;
-            console.log('adt graph get data',url)
             d3.json(url)
                 .post(JSON.stringify({filters:scope.props.filters}),function(err,data){
                 //console.log('adtGraph data',data)

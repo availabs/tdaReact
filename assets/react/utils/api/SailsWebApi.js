@@ -1,3 +1,4 @@
+
 'use strict';
 /*
  * This file is provided by Facebook for testing and evaluation purposes
@@ -31,11 +32,12 @@ function listenToSockets(sessionUser){
 
 var api = {
 
-  initAdmin: function(user,agencyId){
+  initAdmin: function(user,agencyId,fips){
 
     ServerActionCreators.setAppSection('admin');
     ServerActionCreators.setSessionUser(user);
     ClientActionCreators.setSelectedAgency(agencyId)
+    ClientActionCreators.setSelectedState(fips);
 
 
     this.read('user');
@@ -58,41 +60,43 @@ var api = {
   // Class Data Routes
   //--------------------------------------------------
   
-  getClassByDay : function(fips,agency){
-    if(!agency){
-      return []
-    }
-    var url = '/tmgClass/byDay';
-    var postData = {database:agency.datasource,fips:fips};
-    d3.json(url).post(JSON.stringify(postData),function(err,data){
-     ServerActionCreators.getClassByDay(data,fips);
-    });
+  // getClassByDay : function(fips,agency){
+  //   if(!agency){
+  //     return []
+  //   }
+  //   var url = '/tmgClass/byDay';
+  //   console.log('get CLASS BY DAY')
+  //   var postData = {database:agency.datasource,fips:fips};
+  //   d3.json(url).post(JSON.stringify(postData),function(err,data){
+  //    ServerActionCreators.getClassByDay(data,fips);
+  //   });
 
-  },
+  // },
 
-  getClassByMonth : function(fips,agency){
-    if(!agency){
-      //console.log('Error: No Agency Datasource Selected');
-      return []
-    }
-    var postData ={database:agency.datasource,fips:fips};
-    d3.json('/tmgClass/byMonth').post(JSON.stringify(postData),function(err,data){
-      ServerActionCreators.getClassByMonth(data,fips);
-    });
-  },
+  // getClassByMonth : function(fips,agency){
+  //   if(!agency){
+  //     //console.log('Error: No Agency Datasource Selected');
+  //     return []
+  //   }
+  //   console.log('get CLASS BY MONTH')
+  //   var postData ={database:agency.datasource,fips:fips};
+  //   d3.json('/tmgClass/byMonth').post(JSON.stringify(postData),function(err,data){
+  //     ServerActionCreators.getClassByMonth(data,fips);
+  //   });
+  // },
 
-  getClassByHour : function(stationId,fips,agency){
-    if(!agency){
-      return []
-    }
-
-    var postData ={database:agency.datasource,stationId:stationId,fips:fips};
-    d3.json('/tmgClass/byHour').post(JSON.stringify(postData),function(err,data){
-      if(err){console.log('classbyHour error',err)}
-      //console.log('getClassByHour',data)
-      ServerActionCreators.getClassByHour(data,stationId,fips);
-    });
-  },
+  // getClassByHour : function(stationId,fips,agency){
+  //   if(!agency){
+  //     return []
+  //   }
+  //   console.log('get CLASS BY HOUR')
+  //   var postData ={database:agency.datasource,stationId:stationId,fips:fips};
+  //   d3.json('/tmgClass/byHour').post(JSON.stringify(postData),function(err,data){
+  //     if(err){console.log('classbyHour error',err)}
+  //     //console.log('getClassByHour',data)
+  //     ServerActionCreators.getClassByHour(data,stationId,fips);
+  //   });
+  // },
 
   getDataOverview : function(agency){
     
@@ -124,6 +128,7 @@ var api = {
   getHpms : function(fips){
     var state = fips2state[fips].name.replace(/\s/g,'').toLowerCase()+'2012';
     d3.json('/hpms/'+state,function(err,data){
+      console.log('get HPMS',data.length)
       ServerActionCreators.getHpms(data,fips);
     });
   },
@@ -163,7 +168,7 @@ var api = {
       if(! (data instanceof Array)){
         data = [data];
       }
-      console.log('READS',type,where,data.length);
+      //console.log('READS',type,where,data.length);
     
       //onsole.log('got data','/'+type+where,loadChildren,data)
 

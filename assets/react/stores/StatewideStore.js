@@ -62,7 +62,7 @@ function _setStation(stationId,fips){
 
 function _filterYear(year){
   //ClassByDayFilter.getDimension('year').filter(year);
-  ClassByMonthFilter.getDimension('year').filter(year);
+  //ClassByMonthFilter.getDimension('year').filter(year);
   if(_classbyHour.initialized()){
     _classbyHour.getDimension('year').filter(year);
   }
@@ -71,7 +71,7 @@ function _filterYear(year){
 
 function _filterMonth(data){
   //ClassByDayFilter.getDimension('year').filter(year);
-  ClassByMonthFilter.getDimension('month').filter(data);
+  //ClassByMonthFilter.getDimension('month').filter(data);
   if(_classbyHour.initialized()){
     _classbyHour.getDimension('month').filter(data);
   }
@@ -82,14 +82,14 @@ function _filterMonth(data){
 function _filterClass(data){
   //ClassByDayFilter.getDimension('year').filter(year);
 
-  ClassByMonthFilter.getDimension('class').filter(data);
+  //ClassByMonthFilter.getDimension('class').filter(data);
   _filters.class = data;
 }
 
 function _filterDir(data){
   //ClassByDayFilter.getDimension('year').filter(year);
 
-  ClassByMonthFilter.getDimension('dir').filter(data);
+  //ClassByMonthFilter.getDimension('dir').filter(data);
   _filters.dir = data;
 }
 
@@ -111,15 +111,12 @@ function _filterClassGroup(data){
 
 function _filterStations(stations){
   if(!stations){
-    ClassByMonthFilter.getDimension('stationId').filter(null);
+    //ClassByMonthFilter.getDimension('stationId').filter(null);
     _filters.stations = [];
   }else if(stations.length > 0){
 
     _filters.stations = stations;
-    ClassByMonthFilter.getDimension('stationId').filterFunction(function(d){
-      //console.log('filter stations',stations.indexOf(d),d)
-      return stations.indexOf(d) >= 0;
-    });
+    
   }
 }
 

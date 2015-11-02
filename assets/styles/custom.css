@@ -98,7 +98,6 @@ body.background-dark{
   
   font-weight: normal;
   padding-bottom: 100px;
-  background-color: rgba(74, 121, 147, 0.89);
   background: radial-gradient(farthest-side ellipse at 10% 0, rgba(255,255,255, 0.89), rgba(226, 226, 226, 0.87), rgba(200,200,200, 0.87)), url("/images/bgnoise_lg_dark.png");
   background: -webkit-radial-gradient(10% 0, farthest-side ellipse, rgba(255,255,255, 0.89), rgba(226, 226, 226, 0.87), rgba(200,200,200, 0.87)), url("/images/bgnoise_lg_dark.png");
   background: -moz-radial-gradient(10% 0, farthest-side ellipse, rgba(255,255,255, 0.89), rgba(226, 226, 226, 0.87), rgba(200,200,200, 0.87)), url("/images/bgnoise_lg_dark.png");
@@ -324,7 +323,7 @@ toolTip
   font-weight:bold;  
   color:#666;
  text-align:center;  
- display:inline;
+display:inline;
 }
 #nytg-tooltip .nytg-valuesContainer {
   padding-top:7px;
@@ -336,3 +335,176 @@ toolTip
 #nytg-tooltip.nytg-plus .nytg-change{
   color:#090;
 }
+
+.selected_station{
+  stroke:#000;
+  stroke-width:5px;
+}
+
+/* wimgraph */
+
+#wimgraph {
+  height: auto;
+  overflow: hidden;
+}
+#selectorDIV {
+  height: 50px;
+  margin: 20px;
+}
+.selector {
+  background-color: #000;
+  position: relative;
+  width: auto;
+  float: left;
+  padding-right: 5px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 12pt;
+}
+.selector a {
+  line-height:40px;
+  display: block;
+  float: left;
+  width: 200px;
+  height: 40px;
+  margin: 5px 0 5px 5px;
+  background-color: #0f0;
+  opacity: 0.75;
+  color: #000;
+  text-decoration: none;
+}
+.selector a:hover {
+  opacity: 1.0;
+}
+.selector a.active {
+  background-color: #1a9850;
+}
+.selector a.inactive {
+  background-color: #d73027;
+}
+.selector a.deactivated {
+  background-color: #666;
+}
+.selector a.deactivated:hover {
+  opacity: 0.75;
+}
+.legend{
+  color:#fff;
+}
+
+#graphDIV {
+  height: 500px;
+  background-color: #fff;
+  margin: 20px;
+  position: relative;
+}
+.tick text {
+  fill: #000;
+}
+.navBar {
+  text-align: center;
+  font-weight: bold;
+  font-size: 12pt;
+  padding-bottom: 5px;
+  position: absolute;
+  background-color: #000;
+}
+.navBar a {
+  line-height:40px;
+  display: block;
+  float: right;
+  width: 60px;
+  height: 40px;
+  margin: 5px 5px 0 5px;
+  text-decoration: none;
+  background-color: #f46d43;
+  opacity: 0.75;
+  color: #000;
+}
+.navBar a:hover {
+  opacity: 1.0;
+}
+.navBar a.active {
+  background-color: #1a9850;
+}
+.navBar a.inactive {
+  background-color: #d73027;
+}
+.navBar a.deactivated {
+  background-color: #666;
+}
+.navBar a.deactivated:hover {
+  opacity: 0.75;
+}
+#legendDIV {
+  margin: 20px;
+  position: relative;
+  height: 100px;
+}
+.legend {
+  text-align: center;
+  font-weight: bold;
+  font-size: 12pt;
+  height: 50px;
+  margin: auto;
+  padding: 5px;
+  position: absolute;
+  right: 0;
+  left: 0;
+  color
+}
+.legend a {
+  line-height:40px;
+  display: block;
+  float: left;
+  height: 40px;
+  text-decoration: none;
+  opacity: 0.75;
+  color: #000;
+  padding-left: 3px;
+}
+.legend a.class-label {
+  width: 40px;
+}
+.legend a.weight-label {
+  width: 100px;
+}
+.legend a:hover {
+  opacity: 1.0;
+}
+.legend a.inactive {
+  background-color: #d73027;
+}
+#loader {
+  height: 200px;
+  width: 200px;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  margin: auto;
+  background-color: rgba(255, 255, 255, 0.75);
+  color: rgba(0, 0, 0, 1.0);
+  position: absolute;
+  line-height: 50px;
+  padding: 50px 0;
+  text-align: center;
+  font-weight: bold;
+  font-size: 24pt;
+  display: none;
+}
+.graph-popup {
+  width: 250px;
+  height: 60px;
+  font-size: 12pt;
+  display: none;
+  line-height: 20px;
+  padding: 5px 10px 5px 10px;
+  text-align: left;
+  position: absolute;
+  background-color: #6baed6;
+  color: #000;
+  border: solid 5px #081d58;
+}
+
+/* end wimgraph */

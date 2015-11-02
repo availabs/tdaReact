@@ -66,10 +66,22 @@ var StationStore = assign({}, EventEmitter.prototype, {
   emitChange: function() {
     this.emit(CHANGE_EVENT);
   },
+
+  StationsAdded: function() {
+    this.emit('new_stations');
+  },
   
   /**
    * @param {function} callback
    */
+
+  addStationListener: function(callback) {
+    this.on('new_stations', callback);
+  },
+  
+  removeStationListener: function(callback) {
+    this.removeListener('new_stations', callback);
+  },
 
   addChangeListener: function(callback) {
     this.on(CHANGE_EVENT, callback);
@@ -118,7 +130,7 @@ StationStore.dispatchToken = AppDispatcher.register(function(payload) {
     case ActionTypes.RECEIVE_STATIONS:
       //console.log('StationStore / receieve_stations')
       _addStations(action.data);
-      StationStore.emitChange();
+      StationStore.StationsAdded();
     break;
 
     default:
