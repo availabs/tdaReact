@@ -5,6 +5,11 @@ var React = require('react'),
     nv = require('../../../utils/dependencies/nvd3'), 
     fips2state = require('../../../utils/data/fips2state'),
 
+    //-- for making the chart
+    ChartBuilder = require('../../charts/chartMaker.react.js'),
+    DataTable = require('../../utils/DataTable.react'),
+
+
     //-- Stores
 
     //-- Utils
@@ -24,6 +29,7 @@ var GraphContainer = React.createClass({
 
     getInitialState:function(){
         return{
+            toggleChart:false,
             currentData:[]
         }
     },
@@ -54,6 +60,48 @@ var GraphContainer = React.createClass({
                 }
             })
         }
+    },
+    toggleChartClick:function(){
+        console.log('toggleChart')
+        this.setState({toggleChart:!this.state.toggleChart})
+    },
+    renderDownload : function(){
+        var scope=this;
+        return (
+            <div className="btn-group pull-right">
+                
+                <button className="btn btn-info btn-sm dropdown-toggle" data-toggle="dropdown" data-original-title="" title="" aria-expanded="false">
+                    <span className="fa fa-download"></span>
+                </button>
+                <ul className="dropdown-menu">
+                    <li><a onClick={scope.downloadPng} href="#">PNG</a></li>
+                    <li><a onClick={scope.downloadCsv} href="#">CSV</a></li>
+                </ul>
+            </div>
+        )
+    },
+    chartData : function (){
+        //Function flattens data so that each station has a field for every month
+        //Rather than each station having an object that has a field for every month
+
+        var scope = this,
+            flatData = [];
+
+        flatData = Object.keys(scope.state.currentData).map(function(station){
+
+            var curStation = {};
+
+            curStation.key = scope.state.currentData[station].key;
+
+            scope.state.currentData[station].values.forEach(function(month){
+                curStation[month.month] = month.y;
+            })
+
+            return curStation;
+
+        })
+        return flatData;
+
     },
     
     _updateGraph: function(){
@@ -89,6 +137,11 @@ var GraphContainer = React.createClass({
             });
     },
 
+    //DOWNLOADS
+    //Col 1 = Station Id (every row gets a station ID)
+    //Col 2-14 = months (each row has 12 months)
+    //Seasonal will follow suit
+
     render: function() {
         var scope = this;
         var svgStyle = {
@@ -110,21 +163,60 @@ var GraphContainer = React.createClass({
             //display: Object.keys(scope.props.classByMonth.getDimensions()).length > 0 ? 'block' : 'none'
         }
 
+
+
+        var chartData = scope.chartData();
+
+
         var title = this.props.graphType === 'count' ?  ' Monthly Average Daily Traffic' : ' Seasonal Adjustment Factor (MADT / AADT) ';
-        
-        return (
-        	<section className="widget large" style={{ background:'none'}}>
-                <header>
-                    <h4 style={headerStyle}>
-                        {title} {this.props.agency}
-                    </h4>
-                    
-                </header>
+        var graph = (
+           
                 <div className="body">
                     <div id={id} >
                         <svg style={svgStyle}></svg>
                     </div>
                 </div>
+           
+        ),
+        chart = (
+             <div>
+                <DataTable 
+                data={chartData} 
+                pageLength={5}
+                columns={ [
+                    {key:'key', name:'Station ID'},
+                    {key:'0', name:'January'},
+                    {key:'1', name:'February'},
+                    {key:'2', name:'March'},
+                    {key:'3', name:'April'},
+                    {key:'4', name:'May'},
+                    {key:'5', name:'June'},
+                    {key:'6', name:'July'},
+                    {key:'7', name:'August'},
+                    {key:'8', name:'September'},
+                    {key:'9', name:'October'},
+                    {key:'10', name:'November'},
+                    {key:'11', name:'December'},
+                ]} />
+            </div>
+        );
+
+
+
+        return (
+            <section className="widget large" style={{ background:'none'}}>
+                <header>
+                    <h4 style={headerStyle}>
+                        {title} {this.props.agency}
+
+                        {this.renderDownload()}
+                        <a onClick={this.toggleChartClick} className='btn btn-sm btn-success pull-right' style={{marginRight:'5px'}}>
+                            {scope.state.toggleChart ? <span className='fa fa-bar-chart'/> : <span className='fa fa-list'/>}
+                        </a>
+                    </h4>
+                    
+                </header>
+                {scope.state.toggleChart ? chart : graph}
             </section>
         );
     }
