@@ -7,7 +7,9 @@ var React = require('react'),
 
     //-- for making the chart
     ChartBuilder = require('../../charts/chartMaker.react.js'),
-    DataTable = require('../../utils/DataTable.react'),
+    DataTable = require('../../utils/DataTable.react'),    
+    saveSvgAsPng = require('save-svg-as-png'),
+    downloadFile = require('../../utils/downloadHelper'),
 
 
     //-- Stores
@@ -80,6 +82,31 @@ var GraphContainer = React.createClass({
             </div>
         )
     },
+    formatData : function(){
+        var scope = this,            
+            months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+            lines = '',
+            line = '';
+
+        Object.keys(scope.chartData()).forEach(function(station){
+            console.log(station);
+            line = station + "," + scope.state.currentData[station].value;
+
+            if(navigator.msSaveBlob){ //IF WE R IN IE :(
+                lines += line + '\r\n';
+            }else{
+                lines += line + '%0A';
+            }
+
+        })
+
+        if(navigator.msSaveBlob){ //IF WE R IN IE :(
+            lines = fieldNames.join(',') + '\r\n' + lines;
+        }else{
+            lines = fieldNames.join(',') + '%0A' + lines;
+        }
+        return lines;
+    },
     chartData : function (){
         //Function flattens data so that each station has a field for every month
         //Rather than each station having an object that has a field for every month
@@ -103,7 +130,24 @@ var GraphContainer = React.createClass({
         return flatData;
 
     },
-    
+    downloadPng : function(){
+        console.log("downloading png");
+        var svgId = "madt-graph"+this.props.graphType;
+        var chartFileName = svgId + ".png";
+        saveSvgAsPng.saveSvgAsPng(document.getElementById(svgId), chartFileName);
+    },
+    downloadCsv : function(id){
+        var scope = this;
+
+        console.log("downloading csv");
+
+        var type = "data:text/csv;charset=utf-8,";
+        var fname = "adtGraph.csv";
+        var formattedData =  scope.formatData();
+
+        //downloadFile(type,formattedData,fname,id);
+
+    },
     _updateGraph: function(){
         var scope = this;
 
@@ -154,6 +198,7 @@ var GraphContainer = React.createClass({
         this._updateGraph();
         
         var id = "madtchart_"+this.props.index;
+        var svgId = "madt-graph"+this.props.graphType;
         var headerStyle = {
             backgroundColor:'none',
             width:'100%',
@@ -173,7 +218,7 @@ var GraphContainer = React.createClass({
            
                 <div className="body">
                     <div id={id} >
-                        <svg style={svgStyle}></svg>
+                        <svg id={svgId} style={svgStyle}></svg>
                     </div>
                 </div>
            
@@ -185,18 +230,18 @@ var GraphContainer = React.createClass({
                 pageLength={5}
                 columns={ [
                     {key:'key', name:'Station ID'},
-                    {key:'0', name:'January'},
-                    {key:'1', name:'February'},
-                    {key:'2', name:'March'},
-                    {key:'3', name:'April'},
+                    {key:'0', name:'Jan'},
+                    {key:'1', name:'Feb'},
+                    {key:'2', name:'Mar'},
+                    {key:'3', name:'Apr'},
                     {key:'4', name:'May'},
-                    {key:'5', name:'June'},
-                    {key:'6', name:'July'},
-                    {key:'7', name:'August'},
-                    {key:'8', name:'September'},
-                    {key:'9', name:'October'},
-                    {key:'10', name:'November'},
-                    {key:'11', name:'December'},
+                    {key:'5', name:'Jun'},
+                    {key:'6', name:'Jul'},
+                    {key:'7', name:'Aug'},
+                    {key:'8', name:'Sep'},
+                    {key:'9', name:'Oct'},
+                    {key:'10', name:'Nov'},
+                    {key:'11', name:'Dec'},
                 ]} />
             </div>
         );

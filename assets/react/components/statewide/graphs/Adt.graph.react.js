@@ -16,7 +16,6 @@ var React = require('react'),
     colorRange = colorbrewer.RdYlBu[5],
     AdtScale = d3.scale.quantile().domain([0,70000]).range(colorRange),
     saveSvgAsPng = require('save-svg-as-png'),
-    json2csv = require('json2csv'),
     downloadFile = require('../../utils/downloadHelper');
 
 
