@@ -84,20 +84,36 @@ var GraphContainer = React.createClass({
     },
     formatData : function(){
         var scope = this,            
-            months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+            fieldNames = ['Station Id','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
             lines = '',
             line = '';
 
-        Object.keys(scope.chartData()).forEach(function(station){
-            console.log(station);
-            line = station + "," + scope.state.currentData[station].value;
+        var chartData = scope.chartData();
+
+        Object.keys(chartData).forEach(function(station){
+            //console.log(chartData[station]);
+
+            Object.keys(chartData[station]).forEach(function(column){
+                //console.log(chartData[station][column]);
+
+                if(column === 'key'){
+                    line = chartData[station][column] + "," + line;
+                }
+                else if(column === '11'){
+                    line = line + chartData[station][column];
+                }
+                else{
+                    line = line + chartData[station][column] + ',';
+                }
+            })
 
             if(navigator.msSaveBlob){ //IF WE R IN IE :(
                 lines += line + '\r\n';
             }else{
                 lines += line + '%0A';
             }
-
+            line = '';
+            //console.log(line);
         })
 
         if(navigator.msSaveBlob){ //IF WE R IN IE :(
@@ -142,10 +158,11 @@ var GraphContainer = React.createClass({
         console.log("downloading csv");
 
         var type = "data:text/csv;charset=utf-8,";
-        var fname = "adtGraph.csv";
+        var fname = "madtgraph"+this.props.graphType+".csv";
         var formattedData =  scope.formatData();
 
-        //downloadFile(type,formattedData,fname,id);
+        // /console.log(formattedData);
+        downloadFile(type,formattedData,fname,id);
 
     },
     _updateGraph: function(){
