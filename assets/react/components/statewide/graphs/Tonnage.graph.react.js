@@ -13,7 +13,9 @@ var React = require('react'),
 
     //-- Utils
     colorRange = colorbrewer.RdYlBu[5],
-    AdtScale = d3.scale.quantile().domain([0,70000]).range(colorRange);
+    AdtScale = d3.scale.quantile().domain([0,70000]).range(colorRange),   
+    saveSvgAsPng = require('save-svg-as-png'),
+    downloadFile = require('../../utils/downloadHelper');
 
 
 var removeLabels = function(){
@@ -123,6 +125,7 @@ var GraphContainer = React.createClass({
     },
 
     renderDownload : function(){
+        var scope = this;
         return (
             <div className="btn-group pull-right">
                 
@@ -130,12 +133,53 @@ var GraphContainer = React.createClass({
                     <span className="fa fa-download"></span>
                 </button>
                 <ul className="dropdown-menu">
-                    <li><a href="#">PNG</a></li>
-                    <li><a href="#">CSV</a></li>
+                    <li><a onClick={scope.downloadPng} href="#">PNG</a></li>
+                    <li><a onClick={scope.downloadCsv} href="#">CSV</a></li>
                 </ul>
             </div>
         )
+    },    
+    formatData : function(){
+        var scope = this,            
+            fieldNames = ['Station ID','AAD Tonnage'],
+            lines = '',
+            line = '';
+
+        Object.keys(scope.state.currentData).forEach(function(station){
+            line = station + "," + scope.state.currentData[station].value;
+
+            if(navigator.msSaveBlob){ //IF WE R IN IE :(
+                lines += line + '\r\n';
+            }else{
+                lines += line + '%0A';
+            }
+
+        })
+
+        if(navigator.msSaveBlob){ //IF WE R IN IE :(
+            lines = fieldNames.join(',') + '\r\n' + lines;
+        }else{
+            lines = fieldNames.join(',') + '%0A' + lines;
+        }
+        return lines;
     },
+    downloadPng : function(){
+        console.log("downloading png");
+        saveSvgAsPng.saveSvgAsPng(document.getElementById("tonnagechart-graph"), "tonnagechart.png");
+    },
+    downloadCsv : function(id){
+        var scope = this;
+
+        console.log("downloading csv");
+
+        var type = "data:text/csv;charset=utf-8,";
+        var fname = "tonnagechart.csv";
+        var formattedData =  scope.formatData();
+
+        downloadFile(type,formattedData,fname,id);
+
+    },
+
 
     render: function() {
         var scope = this;
@@ -159,7 +203,7 @@ var GraphContainer = React.createClass({
            
                 <div className="body">
                     <div id="tonnagechart">
-                        <svg style={svgStyle}></svg>
+                        <svg id= "tonnagechart-graph" style={svgStyle}></svg>
                     </div>
                     {this._updateGraph()}
                     
