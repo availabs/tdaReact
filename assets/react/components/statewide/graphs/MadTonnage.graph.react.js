@@ -7,6 +7,8 @@ var React = require('react'),
 
     //-- for making the chart
     DataTable = require('../../utils/DataTable.react'),
+    saveSvgAsPng = require('save-svg-as-png'),
+    downloadFile = require('../../utils/downloadHelper'),
 
     //-- Stores
     StateWideStore = require('../../../stores/StatewideStore'),
@@ -79,7 +81,6 @@ var GraphContainer = React.createClass({
 
     _updateGraph: function(){
         var scope = this;
-        
         nv.addGraph(function() {
             var chart = nv.models.lineChart()
               .x(function(d) { return d.month })    //Specify the data accessors.
@@ -115,8 +116,8 @@ var GraphContainer = React.createClass({
         //console.log('toggleChart')
         this.setState({toggleChart:!this.state.toggleChart})
     },
-
     renderDownload : function(){
+        var scope=this;
         return (
             <div className="btn-group pull-right">
                 
@@ -124,11 +125,98 @@ var GraphContainer = React.createClass({
                     <span className="fa fa-download"></span>
                 </button>
                 <ul className="dropdown-menu">
-                    <li><a href="#">PNG</a></li>
-                    <li><a href="#">CSV</a></li>
+                    <li><a onClick={scope.downloadPng} href="#">PNG</a></li>
+                    <li><a onClick={scope.downloadCsv} href="#">CSV</a></li>
                 </ul>
             </div>
         )
+    },
+    formatData : function(){
+        var scope = this,            
+            fieldNames = ['Station Id','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+            lines = '',
+            line = '';
+
+
+        var chartData = scope.chartData();
+
+        Object.keys(chartData).forEach(function(station){
+            //console.log(chartData[station]);
+
+            Object.keys(chartData[station]).forEach(function(column){
+                //console.log(chartData[station][column]);
+
+                if(column === 'key'){
+                    line = chartData[station][column] + "," + line;
+                }
+                else if(column == '7'){
+                    line = line + chartData[station][column] + ', ,';
+                }
+                else if(column === '12'){
+                    line = line + chartData[station][column];
+                }
+                else{
+                    line = line + chartData[station][column] + ',';
+                }
+            })
+
+            if(navigator.msSaveBlob){ //IF WE R IN IE :(
+                lines += line + '\r\n';
+            }else{
+                lines += line + '%0A';
+            }
+            line = '';
+            //console.log(line);
+        })
+
+        if(navigator.msSaveBlob){ //IF WE R IN IE :(
+            lines = fieldNames.join(',') + '\r\n' + lines;
+        }else{
+            lines = fieldNames.join(',') + '%0A' + lines;
+        }
+        return lines;
+    },
+    chartData : function (){
+        //Function flattens data so that each station has a field for every month
+        //Rather than each station having an object that has a field for every month
+
+        var scope = this,
+            flatData = [];
+        //console.log(scope.state.currentData);
+        flatData = Object.keys(scope.state.currentData).map(function(station){
+
+            var curStation = {};
+
+            curStation.key = scope.state.currentData[station].key;
+
+            scope.state.currentData[station].values.forEach(function(month){
+                curStation[month.month] = month.y;
+            })
+
+            return curStation;
+
+        })
+        return flatData;
+
+    },
+    downloadPng : function(){
+        console.log("downloading png");
+        var svgId = "madtonnage-graph"+this.props.type;
+        var chartFileName = svgId + ".png";
+        saveSvgAsPng.saveSvgAsPng(document.getElementById(svgId), chartFileName);
+    },
+    downloadCsv : function(id){
+        var scope = this;
+
+        console.log("downloading csv");
+
+        var type = "data:text/csv;charset=utf-8,";
+        var fname = "madtonnagegraph"+this.props.graphType+".csv";
+        var formattedData =  scope.formatData();
+
+        // /console.log(formattedData);
+        downloadFile(type,formattedData,fname,id);
+
     },
 
     render: function() {
@@ -146,14 +234,14 @@ var GraphContainer = React.createClass({
             //display: Object.keys(scope.props.classByMonth.getDimensions()).length > 0 ? 'block' : 'none'
         }, 
         title = this.props.type === 'season' ? 'Seasonality of Tonnage':'Monthly Average Daily Tonnage';
-        
-
+        var svgId = "madtonnage-graph"+this.props.type;
+        var chartData = scope.chartData();
         //console.log('_processData',this._processData())
         var graph = (
            
                 <div className="body">
                     <div id={'madTonchart_'+scope.props.index}>
-                        <svg style={svgStyle}></svg>
+                        <svg id={svgId} style={svgStyle}></svg>
                     </div>
                     {this._updateGraph()}
                     
@@ -163,11 +251,22 @@ var GraphContainer = React.createClass({
         chart = (
              <div>
                 <DataTable 
-                data={scope.state.currentData} 
-                pageLength={7}
+                data={chartData} 
+                pageLength={5}
                 columns={ [
-                    {key:'label', name:'Station ID'},
-                    {key:'value', name:'AAD Tonnage'}
+                    {key:'key', name:'Station ID'},
+                    {key:'1', name:'Jan'},
+                    {key:'2', name:'Feb'},
+                    {key:'3', name:'Mar'},
+                    {key:'4', name:'Apr'},
+                    {key:'5', name:'May'},
+                    {key:'6', name:'Jun'},
+                    {key:'7', name:'Jul'},
+                    {key:'8', name:'Aug'},
+                    {key:'9', name:'Sep'},
+                    {key:'10', name:'Oct'},
+                    {key:'11', name:'Nov'},
+                    {key:'12', name:'Dec'},
                 ]} />
             </div>
         );
