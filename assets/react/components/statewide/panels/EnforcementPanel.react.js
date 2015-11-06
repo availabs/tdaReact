@@ -1,12 +1,12 @@
 var React = require('react'),
-	HpmsTypeGraph = require('../graphs/HpmsType.graph.react');
+	EnforcementTable = require('../../enforcement/EnforcementTable.react');
 
 var HpmsPanel = React.createClass({
 
 	render: function() {
 	    return (
-	    	<div >
-	    		Enforcement
+	    	<div>
+	    		<EnforcementTable currentAgency={this.props.currentAgency} selectedState={this.props.selectedState} />
             </div>
 	    );
 	}

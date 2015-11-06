@@ -33,6 +33,37 @@ function getClassStations(database){
 
 module.exports = {
 	
+	getEnforcementDashData:function(){
+		var fips = req.param('fips'),
+			database = req.param('database'),
+			filters = req.param('filters') || {};
+
+		var sql = "select station_id,"+
+			"       SUM(CASE WHEN a.total_weight*220.462 >= 90000 and a.class > 8 THEN 1 ELSE 0 END) as overTT,"+
+			"       SUM(CASE WHEN a.total_weight*220.462 >= 90000 and a.class <= 8 THEN 1 ELSE 0 END) as oversingle,"+
+			"       SUM(CASE WHEN a.class > 8 THEN 1 ELSE 0 END) as TT,"+
+			"       SUM(CASE WHEN a.class <= 8 THEN 1 ELSE 0 END) as single,"+
+			"       month,"+
+			"       year"+
+			"  from [tmasWIM12."+database+"] as a"+
+			"  where state_fips = '"+fips+"'"+
+			"	group by station_id,year,month, order by station_id,year,month";
+
+		BQuery(sql,function(data){
+				
+			var fullData = data.rows.map(function(row,index){
+				var outrow = {}
+				
+				data.schema.fields.forEach(function(field,i){
+					outrow[field.name] = row.f[i].v;
+				});
+				return outrow;
+			});
+
+			res.json(fullData);
+		});
+	},
+
 	getWimStationData:function(req,res){
 
  		//console.log('getWimStationData');
@@ -100,6 +131,8 @@ module.exports = {
  			return preds;
  		}
 	},
+
+
 
 	TonageMonthGraph:function(req,res){
 		var fips = req.param('fips'),
