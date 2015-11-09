@@ -1,38 +1,22 @@
 var React = require('react'),
     
     // -- AgencyStore
-    AgencyStore = require('../../stores/AgencyStore'),
+  
 
     // -- Utils
     ClientActionsCreator = require('../../actions/ClientActionsCreator');
 
-function getSelectedAgencyfromStore(){
-    return{
-        selectedAgency : AgencyStore.getSelectedAgency()
-    }
-}
+
 
 var AgencyListing = React.createClass({
-    getInitialState: function() {
-      return getSelectedAgencyfromStore();
-    },
-    componentDidMount: function() {
-        AgencyStore.addChangeListener(this._onChange);
-    },
-
-    componentWillUnmount: function() {
-        AgencyStore.removeChangeListener(this._onChange);
-    },
-    _onChange :function(){
-        this.setState(getSelectedAgencyfromStore());
-    },
+    
     _onClick : function(){
         ClientActionsCreator.setSelectedAgency(this.props.data.id);
     },
     render:function(){
         var selected = <span />;
 
-        if(this.props.data.id === this.state.selectedAgency.id){
+        if(this.props.data.id === this.props.currentAgency.id){
             //console.log('AgencyListing / Render ',this.props.data.id , this.state.selectedAgency)
             selected = <i className="listCheck glyphicon glyphicon-ok"></i>;
         }
@@ -53,33 +37,17 @@ var AgencyListing = React.createClass({
     }
 })
 
-function getStatefromStores(){
-    return {
-        agencies : AgencyStore.getAll()
-    }
-}
+
 
 var AgencyMenu = React.createClass({
-    getInitialState: function() {
-      return getStatefromStores();
-    },
-    componentDidMount: function() {
-        AgencyStore.addChangeListener(this._onChange);
-    },
-
-    componentWillUnmount: function() {
-        AgencyStore.removeChangeListener(this._onChange);
-    },
-    _onChange :function(){
-        this.setState(getStatefromStores());
-    },
+   
     render: function(){
         var scope = this;        
         //console.log('AgencyMenu / Render',this.state.agencies)
 
-        var messages = Object.keys(this.state.agencies).map(function(key){
+        var messages = Object.keys(this.props.agencies).map(function(key){
             return (
-                <AgencyListing key={key} data={scope.state.agencies[key]} />
+                <AgencyListing key={key} data={scope.props.agencies[key]} currentAgency={scope.props.currentAgency} />
             );
         });
 

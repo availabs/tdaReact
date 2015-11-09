@@ -74,7 +74,10 @@ var App = React.createClass({
     return (
         <div>
             <div className="wrap">
-                <Header />
+                <Header  
+                    agencies={this.state.agencies}
+                    currentAgency = {this.state.currentAgency} />
+                    
                   <RouteHandler
                     agencies={this.state.agencies}
                     currentAgency = {this.state.currentAgency}

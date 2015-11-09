@@ -34,7 +34,9 @@ var Header = React.createClass({
                 <div className="navbar">
                     <ul className="nav navbar-nav navbar-right pull-right">
                         <Logo />
-                        <AgencyMenu />
+                        <AgencyMenu  
+                            agencies={this.props.agencies}
+                            currentAgency = {this.props.currentAgency} />
                         <UserMenu />
                         
                         <li className="visible-xs">

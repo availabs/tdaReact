@@ -33,7 +33,7 @@ function getClassStations(database){
 
 module.exports = {
 	
-	getEnforcementDashData:function(){
+	getEnforcementDashData:function(req,res){
 		var fips = req.param('fips'),
 			database = req.param('database'),
 			filters = req.param('filters') || {};
@@ -49,6 +49,8 @@ module.exports = {
 			"  where state_fips = '"+fips+"'"+
 			"	group by station_id,year,month, order by station_id,year,month";
 
+		console.log('getEnforcementDashData')
+		console.log('------------------------------------------------')
 		BQuery(sql,function(data){
 				
 			var fullData = data.rows.map(function(row,index){
@@ -66,7 +68,8 @@ module.exports = {
 
 	getWimStationData:function(req,res){
 
- 		//console.log('getWimStationData');
+ 		console.log('getWimStationData');
+ 		console.log('++++++++++++++++++++++++++++++++++++++++++++')
  		if(typeof req.param('stationId') == 'undefined'){
  			res.send('{status:"error",message:"station_id required"}',500);
  			return;
