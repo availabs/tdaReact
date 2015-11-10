@@ -365,7 +365,7 @@ function TonageData(fips,database,cb){
 	 			'SUM(case when ((total_weight*220.462)-40000) >= 0 and class = 13 then total_weight else 0 end) c13,'+
 	 			'station_id, '+
 	 			' dir,year,month,day, '+
-	 			' FROM [tmasWIM12.'+database+'] where state_fips = "'+fips+'"'+
+	 			' FROM [tmasWIM12.'+database+'] where state_fips = "'+fips+'" where year < 16'+
 	 			' group by station_id,dir,year,month,day'
 
 	 		console.time('getTonageInfoQuery')

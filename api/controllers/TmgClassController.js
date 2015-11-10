@@ -178,10 +178,11 @@ module.exports = {
 			var dataClass = dataType === 'class' ? 'Class' :'';
 
 			var sql = 	'SELECT state_fips,station_id,year '+
-						'from [tmasWIM12.'+database+dataClass+'] '+ 
+						'from [tmasWIM12.'+database+dataClass+'] where year < 2016  '+ 
 						'group by state_fips,station_id,year '+
 						'order by state_fips,station_id,year;';
 						
+			console.log('datasetOverview --- ',sql);
 			BQuery(sql,function(data){
 
 					var fullData = data.rows.map(function(row,index){
@@ -204,10 +205,11 @@ module.exports = {
 			var dataClass = dataType === 'class' ? 'Class' :'';
 
 			var sql = 	'SELECT year,month,day,count(distinct CONCAT(state_fips,station_id)) '+
-						'from [tmasWIM12.'+database+dataClass+'] '+ 
+						'from [tmasWIM12.'+database+dataClass+']  where year < 2016 '+ 
 						'group by year,month,day '+
 						'order by year,month,day;';
-						
+			
+			console.log('datasetOverviewDay --- ',sql);
 			BQuery(sql,function(data){
 
 					var fullData = data.rows.map(function(row,index){
