@@ -70,7 +70,8 @@ if (process.env.NODE_ENV === 'development') {
           loaders: [{
             test: /\.jsx?$|react\.js/,
             loaders: ['babel'],
-            include: path.join(__dirname, 'assets')
+            include: path.join(__dirname, 'assets'),
+            exclude: /sails\.io\.js$|nvd3\.js|node_modules$|\w+\.topo\.js/
           }]
         }
     };
