@@ -131,6 +131,7 @@ StationStore.dispatchToken = AppDispatcher.register(function(payload) {
       //console.log('StationStore / receieve_stations')
       _addStations(action.data);
       StationStore.StationsAdded();
+      StationStore.emitChange();
     break;
 
     default:

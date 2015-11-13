@@ -1,3 +1,5 @@
+var wimgraphOut = {};
+
 (function() {
 	var wimgraph = {
 		version: "0.1.0"
@@ -29,7 +31,7 @@
 
 			_formatData,
 		
-			classType = ''					//Used to keep track of page type(class/wim)
+			classType = '',				//Used to keep track of page type(class/wim)
 
 			route = ['url','station',''],	// URL to retrieve graph data from
 			
@@ -92,7 +94,7 @@
 				wdheight = parseInt(graphDIV.style('height')),
 
 				wdwdth = wdwidth - wdmargin.left - wdmargin.right,
-			    wdhght = wdheight - wdmargin.top - wdmargin.bottom;
+			    wdhght = wdheight - wdmargin.top - wdmargin.bottom,
 
 			// create wdpopup div
 				wdpopup = d3.select("#wimSpectra").append('div')
@@ -165,7 +167,7 @@
 		// initialize weight distribution SVG
 		var wdSVG = wdgraphDIV.append('svg')
 				.attr('width', wdwidth + 'px')
-				.attr('height', wdheight + 'px')
+				.attr('height', wdheight + 'px'),
 			wdGraphSVG = wdSVG.append('g')
 				.attr("transform", "translate("+wdmargin.left+", "+wdmargin.top+")");
 
@@ -207,11 +209,11 @@
 	    	.attr('class', 'y-axis');
 
 		// initialize nav bar div
-			navBar = graphDIV.append('div')
+		var	navBar = graphDIV.append('div')
 				.attr('class', 'navBar')
 				.style('right', margin.right +'px')
 				.style('top', margin.top+'px')
-				.style('width', navBarWidth+'px');
+				.style('width', navBarWidth+'px'),
 
 		// initialize nav bar div for load spectra
 			wdnavBar = wdgraphDIV.append('div')
@@ -294,8 +296,8 @@
 
 			_CONVERT = 220.462;  // multiplier to convert tenths of metric tons to pounds
 
-		var WDbandSize = 1000;
-			WDmaxWeight = 140000;
+		var WDbandSize = 1000,
+			WDmaxWeight = 140000,
 			WDnumBands = (WDmaxWeight+WDbandSize) / WDbandSize,
 			WDrange = [];
 
@@ -746,7 +748,7 @@
 		function _reduce(data, attr, keeper) {
 			var dataObj = {
 					total: 0
-				}
+				},
 				reducedData = [],
 				obj = null,
 				cur = null;
@@ -798,7 +800,7 @@
 		    //Below is where volume table is created.
 		   	$('#wimgraphTable').html('')
 		   	var timeRow = ""
-		   	for(x = 0;x<data.length;x++){
+		   	for(var x = 0;x<data.length;x++){
 		   		if(time === "year"){
 		   			timeRow = timeRow+"<th style='color:#fff'>"+(2000+data[x][time])+"</th>"
 		   			ticks[x] = ticks[x]+2000
@@ -814,10 +816,10 @@
 		   	var zero = true
 		   	var htmlCode = '<table id="seasonal_Table" class="table table-hover"><thead style="background:#618fb0;""><tr   ><th style="color:#fff">'+groupBy+'/'+time+'</th>'+timeRow+'</tr></th></thead>'
 			if(groupBy === "class"){   	
-			   	for(k = 0;k<13;k++){
+			   	for(var k = 0;k<13;k++){
 					htmlCode = htmlCode + '<tr><th>Class '+(k+1)+'</th>'
-					for(l = 0;l<data.length;l++){
-						for(m = 0;m<data[l]["data"].length;m++){
+					for(var l = 0;l<data.length;l++){
+						for(var m = 0;m<data[l]["data"].length;m++){
 							if(data[l]["data"][m].class == k){
 								htmlCode = htmlCode + '<th>'+Math.floor(data[l]["data"][m].amount)+'</th>'
 								m = data[l]["data"].length
@@ -833,10 +835,10 @@
 				}
 			}
 			else{
-				for(k = 0;k<7;k++){
+				for(var k = 0;k<7;k++){
 					htmlCode = htmlCode + '<tr><th>'+weightRange(k)+'</th>'
-					for(l = 0;l<data.length;l++){
-						for(m = 0;m<data[l]["data"].length;m++){
+					for(var l = 0;l<data.length;l++){
+						for(var m = 0;m<data[l]["data"].length;m++){
 							if(data[l]["data"][m].weight == k){
 								htmlCode = htmlCode + '<th>'+Math.floor(data[l]["data"][m].amount)+'</th>'
 								m = data[l]["data"].length
@@ -985,7 +987,7 @@
 		    	return data;
 		    }
 		}
-		_NAV_COLORS = {
+		var _NAV_COLORS = {
 			class: ["#2171b5", "#6baed6", "#bdd7e7", "#eff3ff"],
 			weight: ["#d94701","#fd8d3c","#fdbe85","#feedde"]
 		}
@@ -1166,9 +1168,9 @@
 			else if(date == 11){
 				return "December"
 			}
-		}
-
-	this.wimgraph = wimgraph;
+	}
+	
+	wimgraphOut = wimgraph;
 })()
 
-module.exports = wimgraph;
+module.exports = wimgraphOut;

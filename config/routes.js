@@ -63,6 +63,8 @@ module.exports.routes = {
   '/tmgWim/tonnage/madt/:fips/' :'TmgWimController.TonageMadtGraph',
   '/tmgWim/:fips/:stationId':'TmgWimController.getWimStationData',
   '/enforcement/:fips' : 'TmgWimController.getEnforcementDashData',
+  '/heatmap/:fips/:stationId' : 'TmgWimController.getEnforcementHeatData',
+  '/heatcalendar/:fips/:stationId' : 'TmgWimController.getEnforcementCalendarData',
   
 
 

@@ -33,6 +33,72 @@ function getClassStations(database){
 
 module.exports = {
 	
+	getEnforcementCalendarData:function(req,res){
+		var fips = req.param('fips'),
+			station = req.param('stationId'),
+			database = req.param('database'),
+			threshold = req.param('threshold') || 90000,
+			filters = req.param('filters') || {};
+
+		var sql = 'select '+
+ 		' dir,year as y,month as m,day as d,count(1) as t, SUM(CASE WHEN total_weight*220.462 >= '+threshold+' THEN 1 ELSE 0 END) as o '+
+ 		' from [tmasWIM12.'+database+'] '+
+ 		' where class >= 8 and station_id = "'+station+'" and state_fips="'+fips+'"'+
+ 		' group by dir,y,m,d order by dir,y,m,d'
+
+ 		console.log('------------------------------------------------')
+		console.log('getEnforcementCalendarData')
+		console.log('------------------------------------------------')
+		console.log(sql)
+		console.log('------------------------------------------------')
+		BQuery(sql,function(data){
+				
+			var fullData = data.rows.map(function(row,index){
+				var outrow = {}
+				
+				data.schema.fields.forEach(function(field,i){
+					outrow[field.name] = row.f[i].v;
+				});
+				return outrow;
+			});
+
+			res.json(fullData);
+		});
+	},
+
+	getEnforcementHeatData:function(req,res){
+		var fips = req.param('fips'),
+			station = req.param('stationId'),
+			database = req.param('database'),
+			threshold = req.param('threshold') || 90000,
+			filters = req.param('filters') || {};
+
+		var sql = 'select DAYOFWEEK(TIMESTAMP(concat(STRING(year),"-",STRING(month),"-",STRING(day)))) as dow,'+
+ 		' hour,count(1), dir, SUM(CASE WHEN total_weight*220.462 >= '+threshold+' THEN 1 ELSE 0 END) '+
+ 		' from [tmasWIM12.'+database+'] '+
+ 		' where class >= 8 and station_id = "'+station+'" and state_fips="'+fips+'"'+
+ 		' group by dow,hour,dir order by dow,hour,dir'
+
+ 		console.log('------------------------------------------------')
+		console.log('getEnforcementHeatData')
+		console.log('------------------------------------------------')
+		console.log(sql)
+		console.log('------------------------------------------------')
+		BQuery(sql,function(data){
+				
+			var fullData = data.rows.map(function(row,index){
+				var outrow = {}
+				
+				data.schema.fields.forEach(function(field,i){
+					outrow[field.name] = row.f[i].v;
+				});
+				return outrow;
+			});
+
+			res.json(fullData);
+		});
+	},
+
 	getEnforcementDashData:function(req,res){
 		var fips = req.param('fips'),
 			database = req.param('database'),
@@ -41,8 +107,8 @@ module.exports = {
 		var sql = "select station_id,"+
 			"       SUM(CASE WHEN a.total_weight*220.462 >= 90000 and a.class > 8 THEN 1 ELSE 0 END) as overTT,"+
 			"       SUM(CASE WHEN a.total_weight*220.462 >= 90000 and a.class <= 8 THEN 1 ELSE 0 END) as oversingle,"+
-			"       SUM(CASE WHEN a.class > 8 THEN 1 ELSE 0 END) as TT,"+
-			"       SUM(CASE WHEN a.class <= 8 THEN 1 ELSE 0 END) as single,"+
+			"       SUM(CASE WHEN a.class >= 8 THEN 1 ELSE 0 END) as TT,"+
+			"       SUM(CASE WHEN a.class < 8 THEN 1 ELSE 0 END) as single,"+
 			"       month,"+
 			"       year"+
 			"  from [tmasWIM12."+database+"] as a"+
@@ -420,8 +486,8 @@ function BQuery(sql,cb){
     function(err, response) {
   		if (err) console.log('Error:',err);
   		console.timeEnd('TmgClassController - byDay - query');
-    	if(response.rows){
-	    	console.log(response.rows.length,response.totalRows)
+    	if(response && response.rows){
+	    	//console.log(response.rows.length,response.totalRows)
 	    	
       		output = response;
 			

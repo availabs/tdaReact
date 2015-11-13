@@ -10,7 +10,7 @@ var React = require('react'),
     AppStore = require('../stores/AppStore'),
     AgencyStore = require('../stores/AgencyStore'),
     UserStore = require('../stores/UserStore'),
-    JobStore = require('../stores/JobStore')
+    JobStore = require('../stores/JobStore'),
     StationStore = require('../stores/StationStore'),
     StateWideStore = require('../stores/StatewideStore'),
     HpmsStore = require('../stores/HpmsStore');
@@ -30,7 +30,8 @@ function getState(){
       selectedStation : StateWideStore.getSelectedStation(),
       hpmsData : HpmsStore.getStateData(),
       activeFilters : StateWideStore.activeFilters(),
-      uploadJobs : AgencyStore.getUploads()
+      uploadJobs : AgencyStore.getUploads(),
+      stations : StationStore.getAll()
   
   };
 
@@ -87,7 +88,7 @@ var App = React.createClass({
                     activeJobs = {this.state.activeJobs}
                     selectedState = {this.state.selectedState}
                     selectedStation = {this.state.selectedStation}
-                    
+                    stations={this.state.stations}
                     hpmsData = {this.state.hpmsData}
                     activeFilters = {this.state.activeFilters}
                     uploads = {this.state.uploadJobs} />

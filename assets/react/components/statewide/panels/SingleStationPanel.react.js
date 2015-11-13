@@ -4,7 +4,7 @@ var React = require('react'),
 	StationCountByTimeGraph = require('../../singleStation/CountByTime.graph.react'),
     StationAvgHourGraph = require('../../singleStation/AvgHour.graph.react'),
     VehicleClassPie = require('../../singleStation/VehicleClassPie.graph.react'),
-    LoadSpectraGraph =  require('../../singleStation/LoadSpectra.graph.react')
+    LoadSpectraGraph =  require('../../singleStation/LoadSpectra.graph.react'),
     SingleStationGraph =  require('../../singleStation/Station.graph.react');
 
 var SingleStationPanel = React.createClass({

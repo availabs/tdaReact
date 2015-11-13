@@ -14,7 +14,7 @@ var GraphContainer = React.createClass({
     
     getDefaultProps:function(){
         return {
-            height: 100,
+            height: 150,
             divId: 'calChart0',
             year:2015
         }
@@ -23,6 +23,12 @@ var GraphContainer = React.createClass({
     componentDidMount:function(){
         this._renderGraph();
         this._updateData();
+        if(this.props.domain) {
+            DataScale.domain(this.props.domain)
+        }
+        if(this.props.range) {
+            DataScale.range(this.props.range)
+        }
     },
 
     componentWillReceiveProps:function(nextProps){
@@ -86,9 +92,10 @@ var GraphContainer = React.createClass({
 
     _renderGraph: function(){
         var scope = this;
-        var width = 400,
-            height  = 70,
-            cellSize = 7; // cell size
+        var width = this.props.width || 400,
+            cellSize = Math.floor(width/52),
+            height  = cellSize * 10;
+             // cell size
 
         var day = d3.time.format("%w"),
             week = d3.time.format("%U"),
@@ -123,10 +130,30 @@ var GraphContainer = React.createClass({
             .attr("height", cellSize)
             .attr("x", function(d) { return week(d) * cellSize; })
             .attr("y", function(d) { return day(d) * cellSize; })
-            .datum(format);
+            .on('mouseover',function(e,y){
+                
+                console.log()
+                if(scope.props.dayOver){
+                    scope.props.dayOver(e,[d3.event.clientX,d3.event.clientY])
+                }
+            })
+            .on('mousemove',function(e,y){
+                
+                if(scope.props.dayMove){
+                    scope.props.dayMove([d3.event.clientX,d3.event.clientY])
+                }
+            })
+            .on('mouseout',function(e,y){
+                
+                if(scope.props.dayOut){
+                    scope.props.dayOut()
+                }
+            })
+            .datum(format)
+            
 
-        rect.append("title")
-            .text(function(d) { return d; });
+        // rect.append("title")
+        //     .text(function(d) { return d; });
 
         svg.selectAll(".month")
             .data(function(d) { return d3.time.months(new Date(d, 0, 1), new Date(d + 1, 0, 1)); })

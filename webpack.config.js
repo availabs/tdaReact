@@ -15,7 +15,6 @@ if (process.env.NODE_ENV === 'development') {
         output: {
           path: path.join(__dirname, '.tmp/public'),
           filename: 'bundle.js',
-          //crossOriginLoading: "use-credentials",
           publicPath: 'http://localhost:11233/',
         },
         plugins: [
@@ -30,8 +29,9 @@ if (process.env.NODE_ENV === 'development') {
         module: {
           loaders: [{
             test: /\.jsx?$|react\.js/,
-            loaders: ['react-hot', 'jsx'],
-            include: path.join(__dirname, 'assets')
+            loaders: ['react-hot', 'babel'],
+            include: path.join(__dirname, 'assets'),
+            exclude: /sails\.io\.js$|nvd3\.js|node_modules$|\w+\.topo\.js/
           }]
         }
     };
@@ -69,7 +69,7 @@ if (process.env.NODE_ENV === 'development') {
         module: {
           loaders: [{
             test: /\.jsx?$|react\.js/,
-            loaders: ['jsx'],
+            loaders: ['babel'],
             include: path.join(__dirname, 'assets')
           }]
         }

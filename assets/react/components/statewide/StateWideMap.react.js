@@ -65,7 +65,7 @@ var StateWideMap = React.createClass({
     componentWillReceiveProps:function(nextProps){
         if(nextProps.activeView !== this.props.activeView){
             //console.log('new view')
-            if(nextProps.activeView === 'wim'){
+            if(nextProps.activeView === 'wim' || nextProps.activeView === 'enforcement'){
                 d3.selectAll('.type_Class').style('display','none')
             }else{
                  d3.selectAll('.type_Class').style('display','block')

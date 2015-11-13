@@ -61,7 +61,6 @@ var StateIndex = React.createClass({
        
 
         var currentPanel = <span />;
-
         switch(this.state.activeComponent){
 
             case 'class':
@@ -81,7 +80,7 @@ var StateIndex = React.createClass({
             break;
 
              case 'enforcement':
-                currentPanel = <EnforcementPanel currentAgency={this.props.currentAgency} selectedState={this.props.selectedState} selectedStation={this.props.selectedStation} activeFilters={this.props.activeFilters} />;
+                currentPanel = <EnforcementPanel stations={this.props.stations} currentAgency={this.props.currentAgency} selectedState={this.props.selectedState} selectedStation={this.props.selectedStation} activeFilters={this.props.activeFilters} />;
             break;
 
         
@@ -108,7 +107,8 @@ var StateIndex = React.createClass({
                                     activeView={this.state.activeComponent}
                                     agency={this.props.currentAgency.datasource}
                                     selectedState={this.props.selectedState}
-                                    filters={this.props.activeFilters} />
+                                    filters={this.props.activeFilters}
+                                    stations={this.props.stations} />
                             </div>
                         </section>
                     </div>

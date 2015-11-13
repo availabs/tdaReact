@@ -3,10 +3,10 @@
 var React = require('react'),
     
     //--Actions
-    ClientActionsCreator = require('../../actions/ClientActionsCreator');
+    ClientActionsCreator = require('../../actions/ClientActionsCreator'),
 
     //--Stores 
-
+    StateWideStore = require('../../stores/StatewideStore');
 
 
 var labelStyle = {
