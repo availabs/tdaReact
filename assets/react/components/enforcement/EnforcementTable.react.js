@@ -248,7 +248,7 @@ var GraphContainer = React.createClass({
             <section className="widget" style={{ background:'none'}}>
                
                  {this.props.selectedState}<br /> {this.props.agency}<br />
-                 <table className='table table-hover'>
+                 <table className='table table-hover' style={{backgroundColor:'#fff'}} >
                     <thead>
                     <tr>
                          <th colSpan={3} style={{textAlign:'center'}}>Station</th>

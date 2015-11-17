@@ -286,7 +286,7 @@ var GraphContainer = React.createClass({
            
             <section className="widget" style={{ background:'none'}}>
                  <DashHeader setMonth={this.setCurrentMonth} months={this.state.months} currentMonth={this.state.currentMonth} />
-                 <table className='table table-hover'>
+                 <table className='table table-hover' style={{backgroundColor:'#fff'}} >
                     <thead>
                     <tr>
                          <th colSpan={3} style={{textAlign:'center'}}>Station</th>
