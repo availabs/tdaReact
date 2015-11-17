@@ -14,21 +14,21 @@ var ServerActionCreators =    require('../../actions/ServerActionsCreator'),
     fips2state =              require('../data/fips2state');
 
 
-function listenToSockets(sessionUser){
+// function listenToSockets(sessionUser){
   
-  var io = require('./sails.io.js')();
+//   var io = require('./sails.io.js')();
 
-  io.socket.on("job_created", function(e){
-    console.log('job_created',e)
-    ServerActionCreators.receiveData('job',[e])
-  });
+//   io.socket.on("job_created", function(e){
+//     console.log('job_created',e)
+//     ServerActionCreators.receiveData('job',[e])
+//   });
 
-  io.socket.on("job_updated", function(e){
-    console.log('job_updated',e)
-    ServerActionCreators.receiveData('job',e)
-  });
+//   io.socket.on("job_updated", function(e){
+//     console.log('job_updated',e)
+//     ServerActionCreators.receiveData('job',e)
+//   });
 
-}  
+// }  
 
 var api = {
 
@@ -43,7 +43,7 @@ var api = {
     this.read('user');
     this.read('agency');
     this.readStations();
-    listenToSockets();
+    //listenToSockets();
     
   
   },

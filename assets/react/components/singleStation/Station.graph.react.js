@@ -10,7 +10,6 @@ var StationGraph = React.createClass({
 	},
 
 	componentDidMount:function(){
-		console.log('StationGraph Mount',this.state.stationId)
 		stationgraph.grapher('#wimGraph_'+this.state.stationId).drawGraph(this.state.stationId, this.props.type,this.props.fips);
 	},
 
