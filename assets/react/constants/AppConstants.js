@@ -1,4 +1,4 @@
-
+'use strict';
 
 var keyMirror = require('keymirror');
 
@@ -14,8 +14,7 @@ module.exports = {
     SET_SELECTED_STATE:null,
     SET_SELECTED_STATION:null,
     CBM_INITIALIZED:null,
-    DELETE_USER:null,
-
+    
     // -- Filters
     FILTER_YEAR:null,
     FILTER_MONTH:null,
