@@ -52,23 +52,25 @@ var WidgetHeader = React.createClass({
         }).reverse();
         var select = <span />
         if(selectMonths.length > 0){
-            console.log(selectMonths)
-            select =  <ReactSelect options={selectMonths} value={this.props.currentMonth} onChange={this.logChange} />
-        }
-
-        return (
-    	    <div style={{fontSize:24}}> 
-               <div className='row'>
+            //console.log(selectMonths)
+            select = (
+                <div className='row'>
                     <div className='col-sm-1'>
                         <span onClick={this.prevMonth} style={pointerStyle}> {' < '} </span>
                     </div>
                     <div className='col-sm-5'>
-                        {select}
+                        <ReactSelect options={selectMonths} value={this.props.currentMonth} onChange={this.logChange} />
                     </div>
                     <div className='col-sm-1'>
                         <span  style={pointerStyle}  onClick={this.nextMonth}> {' > '} </span>
                     </div>
                 </div>
+            )
+        }
+
+        return (
+    	    <div style={{fontSize:24}}> 
+               {select}
             </div>
         );
     }

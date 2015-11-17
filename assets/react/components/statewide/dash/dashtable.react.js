@@ -5,6 +5,7 @@ var React = require('react'),
     Sparklines = require('../../charts/sparklines').Sparklines,
     SparklinesLine  = require('../../charts/sparklines').SparklinesLine,
     DashHeader = require('./dashheader.react'),
+    SingleStationGraph =  require('../../singleStation/Station.graph.react'),
     //, SparklinesBars, SparklinesLine, SparklinesNormalBand, SparklinesReferenceLine, SparklinesSpots }
 
     //-- Stores
@@ -59,7 +60,7 @@ var GraphContainer = React.createClass({
         if(!this.state.loading && fips && agency){
             var url = '/tmgClass/byMonthTable/'+fips+'?database='+agency;
 
-            console.log('load data',fips,agency,url)
+            //console.log('load data',fips,agency,url)
             this.setState({
                 currentData:[],
                 loading:true
@@ -70,7 +71,7 @@ var GraphContainer = React.createClass({
                 //console.log('adtGraph data',data)
                    
                 var newData = scope.processData(data);
-                console.log('got data',newData);
+                //console.log('got data',newData);
                 scope.setState({
                     currentData:newData.data,
                     months:newData.months,
@@ -118,7 +119,7 @@ var GraphContainer = React.createClass({
         })
         var thisYear = new Date().getFullYear().toString().substr(2,2);
 
-        console.log(months,thisYear)
+        //console.log(months,thisYear)
         months = months.filter((d) => parseInt( d.split('_')[0] ) < +thisYear  ).sort()
         return {data:rows,months:months}
     },
@@ -136,6 +137,19 @@ var GraphContainer = React.createClass({
         this.setState({
             currentMonth:m
         })
+    },
+
+    getSingleStation:function(){
+        return (
+            <div>
+              <SingleStationGraph 
+                    fips={this.props.selectedState} 
+                    selectedStation={this.state.activeStation} 
+                    
+                    type = 'class' />
+
+            </div>
+        )
     },
 
     render: function() {
@@ -220,6 +234,7 @@ var GraphContainer = React.createClass({
                     <tr>
                         <td colSpan={10} style={{height:300}}>
                             Single Station View
+                            {scope.getSingleStation()}
                         </td>
                     </tr>
                 )

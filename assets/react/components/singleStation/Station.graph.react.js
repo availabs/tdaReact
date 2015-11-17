@@ -10,9 +10,7 @@ var StationGraph = React.createClass({
 	},
 
 	componentDidMount:function(){
-		console.log('test123',stationgraph)
 		stationgraph.grapher('#wimGraph_'+this.state.stationId).drawGraph(this.state.stationId, this.props.type,this.props.fips);
-	    
 	},
 
 	componentWillReceiveProps : function(nextProps){
@@ -26,7 +24,9 @@ var StationGraph = React.createClass({
 		}
 	},
 
-
+	shouldComponentUpdate:function(){
+		return false;
+	},
 
 
 	render: function() {
