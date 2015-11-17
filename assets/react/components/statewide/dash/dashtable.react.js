@@ -154,7 +154,7 @@ var GraphContainer = React.createClass({
               <SingleStationGraph 
                     fips={this.props.selectedState} 
                     selectedStation={this.state.activeStation} 
-                    
+                    agency={this.props.agency}
                     type = {type} />
 
             </div>
@@ -163,6 +163,19 @@ var GraphContainer = React.createClass({
 
     render: function() {
         var scope = this;
+        if(this.state.loading || this.state.currentData.length === 0){
+           
+            return (
+                <section className="widget" style={{ background:'none'}}>
+                     <div style={{position:'relative',top:'20%',left:'40%',width:'200px'}}>
+                         Loading {this.props.selectedStation}<br /> 
+                         <img src={'/images/loading.gif'} />
+                     </div> 
+                </section>
+            )
+
+            
+        }
        
         
         //console.log('adtGraph',this._processData())
@@ -262,7 +275,7 @@ var GraphContainer = React.createClass({
                     <td>{station.routeSign}</td>
                     <td style={{width:150}}>
                         <Sparklines style={{position:'relateive'}}>
-                            <SparklinesLine  data={station[scope.state.sortBy]}  />
+                            <SparklinesLine  data={station[scope.state.sortBy]}  max={max[scope.state.sortBy]} />
                         </Sparklines>
                     </td>
                     <td style={{textAlign:'right'}}> current: <br /> avg : </td>
@@ -288,7 +301,7 @@ var GraphContainer = React.createClass({
             )
         }).filter((d) => d);
 
-
+        
 
         return (
            

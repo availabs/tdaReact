@@ -65,7 +65,7 @@ var GraphContainer = React.createClass({
             this.setState({loading:true,currentData:[]})
             var url = '/tmgWim/tonnage/'+fips+'/?monthly=true&database='+agency,
                 old = '/tmgWim/tonnage/madt/'+fips+'/?database='+agency;
-                console.log('get data madt',url)
+                //console.log('get data madt',url)
             d3.json(url)
                 .post(JSON.stringify({monthly:true}),function(err,data){
                 
@@ -232,7 +232,7 @@ var GraphContainer = React.createClass({
     },
     
     downloadPng : function(){
-        console.log("downloading png");
+       
         var svgId = "madtonnage-graph"+this.props.type;
         var chartFileName = svgId + ".png";
         saveSvgAsPng.saveSvgAsPng(document.getElementById(svgId), chartFileName);
@@ -241,7 +241,7 @@ var GraphContainer = React.createClass({
     downloadCsv : function(id){
         var scope = this;
 
-        console.log("downloading csv");
+       
 
         var type = "data:text/csv;charset=utf-8,";
         var fname = "madtonnagegraph"+this.props.graphType+".csv";

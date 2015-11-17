@@ -10,6 +10,7 @@ var StationGraph = React.createClass({
 	},
 
 	componentDidMount:function(){
+		console.log('test123',stationgraph,this.props.agency)
 		stationgraph.grapher('#wimGraph_'+this.state.stationId).drawGraph(this.state.stationId, this.props.type,this.props.fips);
 	},
 
@@ -19,8 +20,8 @@ var StationGraph = React.createClass({
 			this.setState({stationId:nextProps.selectedStation})
 			d3.select('#graphDIV').remove();
 			d3.selectAll('#legendDIV').remove();
-			console.log('test123',stationgraph)
-			stationgraph.grapher('#wimGraph_'+this.state.stationId).drawGraph(this.state.stationId, this.props.type,this.props.fips);
+			
+			stationgraph.grapher('#wimGraph_'+this.state.stationId).drawGraph(this.state.stationId, this.props.type,this.props.fips,this.props.agency);
 		}
 	},
 

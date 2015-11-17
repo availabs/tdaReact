@@ -31,6 +31,7 @@ var GraphContainer = React.createClass({
 
     getInitialState:function(){
         return {
+            loading:false,
             toggleChart:false,
             currentData:[],
             sortBy:'percent',
@@ -53,23 +54,25 @@ var GraphContainer = React.createClass({
     _loadData:function(fips,agency){
         var scope = this;
        
-        if(fips && agency){
+        if(!this.state.loading && fips && agency){
             var url = '/enforcement/'+fips+'?database='+agency;
 
-             console.log('load data',fips,agency,url)
-            this.setState({currentData:[]});
+            this.setState({
+                loading:true,
+                currentData:[]
+            });
+
             d3.json(url)
                 .post(JSON.stringify({filters:scope.props.filters}),function(err,data){
                 //console.log('adtGraph data',data)
-                if(data.loading){
-                        console.log('reloading')
-                        setTimeout(function(){ scope._loadData(fips) }, 2000);
-                        
-                }else{
+                
                    
 
-                    scope.setState({currentData:scope.processData(data)});
-                }
+                scope.setState({
+                    loading:false,
+                    currentData:scope.processData(data)
+                });
+                
             })
         }
 
@@ -120,7 +123,19 @@ var GraphContainer = React.createClass({
     render: function() {
         var scope = this;
        
-        
+        if(this.state.loading || this.state.currentData.length === 0){
+           
+            return (
+                <section className="widget" style={{ background:'none'}}>
+                     <div style={{position:'relative',top:'20%',left:'40%',width:'200px'}}>
+                         Loading {this.props.selectedStation}<br /> 
+                         <img src={'/images/loading.gif'} />
+                     </div> 
+                </section>
+            )
+
+            
+        }
         //console.log('adtGraph',this._processData())
 
         var trafficMax = false,
@@ -247,7 +262,7 @@ var GraphContainer = React.createClass({
            
             <section className="widget" style={{ background:'none'}}>
                
-                 {this.props.selectedState}<br /> {this.props.agency}<br />
+                
                  <table className='table table-hover' style={{backgroundColor:'#fff'}} >
                     <thead>
                     <tr>

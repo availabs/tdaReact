@@ -60,7 +60,6 @@ var GraphContainer = React.createClass({
             d3.json(url)
                 .post(JSON.stringify({filters:scope.props.filters}),function(err,data){
                 
-                    console.log('tonnage data',data)
                     AdtScale.domain(data.map(function(ADT){
                         return +ADT.value;
                     }));
@@ -168,14 +167,12 @@ var GraphContainer = React.createClass({
         return lines;
     },
     downloadPng : function(){
-        console.log("downloading png");
         saveSvgAsPng.saveSvgAsPng(document.getElementById("tonnagechart-graph"), "tonnagechart.png");
     },
     downloadCsv : function(id){
         var scope = this;
 
-        console.log("downloading csv");
-
+        
         var type = "data:text/csv;charset=utf-8,";
         var fname = "tonnagechart.csv";
         var formattedData =  scope.formatData();
