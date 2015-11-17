@@ -140,13 +140,22 @@ var GraphContainer = React.createClass({
     },
 
     getSingleStation:function(){
+        var scope = this;
+        var type = 'class',
+            wimGraphs = null;
+        if(d3.select(".station_"+this.state.activeStation).classed("type_WIM")){
+            type='wim'
+        }
         return (
             <div>
+             <h3>Station {this.state.activeStation} </h3>
+             Type:{type.toUpperCase()}<br />
+             <small>{scope.props.stations[scope.props.selectedState][this.state.activeStation].properties.station_location} </small>
               <SingleStationGraph 
                     fips={this.props.selectedState} 
                     selectedStation={this.state.activeStation} 
                     
-                    type = 'class' />
+                    type = {type} />
 
             </div>
         )
@@ -233,7 +242,6 @@ var GraphContainer = React.createClass({
                 singleStation = (
                     <tr>
                         <td colSpan={10} style={{height:300}}>
-                            Single Station View
                             {scope.getSingleStation()}
                         </td>
                     </tr>

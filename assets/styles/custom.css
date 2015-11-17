@@ -516,6 +516,19 @@ display:inline;
 }
 
 
+
+.domain{
+  fill:none;
+  stroke-width:1px;
+  stroke:#000;
+}
+
+.range{
+  fill:none;
+  stroke-width:1px;
+  stroke:#000;
+}
+
 /*---------------------
 nytimes tool tip 
 -----------------------*/
