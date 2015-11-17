@@ -72,9 +72,15 @@ var GraphContainer = React.createClass({
                     var output = {}
                     data.forEach(function(d){
                         if(!output[d.label]){ output[d.label] = {key:d.label,values:[]} }
-                        output[d.label].values.push({month:d.month,y:+d.value})
+                        output[d.label].values.push({month:d.month,y:+(d.value)})
                     })
                     var output = Object.keys(output).map(function(k){
+                        if(season){
+                            var mean = d3.mean(output[k].values,function(d){ return d.y} )
+                            output[k].values = output[k].values.map(function(v){
+                                return {y:(v.y / mean).toFixed(2),month:v.month}
+                            })
+                        }
                         output[k].values = output[k].values.sort(function(a,b){ return b.month - a.month});
                         return output[k]
                     })
@@ -90,7 +96,7 @@ var GraphContainer = React.createClass({
                     })
 
                     
-                    console.log('madt tonnage',output)
+                    console.log('madt tonnage',season,output)
                     scope.setState({
                         loading:false,
                         currentData:output
@@ -304,8 +310,6 @@ var GraphContainer = React.createClass({
             );
         }
         
-        //console.log('adtGraph',this.props.selectedState,this.state.currentData)
-
         return (
             
             <section className="widget large" style={{ background:'none'}}>
