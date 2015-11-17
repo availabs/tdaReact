@@ -33,6 +33,54 @@ function getClassStations(database){
 
 module.exports = {
 	
+	TonageNew:function(req,res){
+		var fips = req.param('fips'),
+			database = req.param('database'),
+			timescale = req.param('monthly') ? ',month' : '';
+
+
+		var sql = 	'SELECT'+
+					'(SUM(case when ((total_weight*220.462)-19539) >= 0 and class = 4 then total_weight else 0 end) + '+
+					'SUM(case when ((total_weight*220.462)-31464) >= 0 and class = 5 then total_weight else 0 end) + '+
+					'SUM(case when ((total_weight*220.462)-39739) >= 0 and class = 6 then total_weight else 0 end) + '+
+					'SUM(case when ((total_weight*220.462)-37000) >= 0 and class = 7 then total_weight else 0 end) + '+
+					'SUM(case when ((total_weight*220.462)-40000) >= 0 and class = 8 then total_weight else 0 end) + '+
+					'SUM(case when ((total_weight*220.462)-51935) >= 0 and class = 9 then total_weight else 0 end) + '+
+					'SUM(case when ((total_weight*220.462)-31000) >= 0 and class = 10 then total_weight else 0 end) + '+
+					'SUM(case when ((total_weight*220.462)-40000) >= 0 and class = 11 then total_weight else 0 end) + '+
+					'SUM(case when ((total_weight*220.462)-40000) >= 0 and class = 12 then total_weight else 0 end) + '+
+					'SUM(case when ((total_weight*220.462)-40000) >= 0 and class = 13 then total_weight else 0 end)) / '+
+					'count(DISTINCT concat(STRING(year),"-",STRING(month),"-",STRING(day)))  as value, '+
+					'station_id as label '+ 
+					timescale + 
+	 			' FROM [tmasWIM12.'+database+'] where state_fips = "'+fips+'" and year < 16'+
+	 			' group by label '+timescale
+
+	 	console.log('------------------------------------------------')
+		console.log('TonageNew')
+		console.log('------------------------------------------------')
+		console.log(sql)
+		console.log('------------------------------------------------')
+		BQuery(sql,function(data){
+				
+			var fullData = data.rows.map(function(row,index){
+				var outrow = {}
+				
+				data.schema.fields.forEach(function(field,i){
+					outrow[field.name] = row.f[i].v;
+					if(field.name === 'station_id' &&  row.f[i].v.length < 6 ){
+						outrow[field.name] = fixStationId(row.f[i].v);
+					}
+				});
+				return outrow;
+			});
+
+			res.json(fullData);
+		});
+	
+	},
+
+
 	getEnforcementCalendarData:function(req,res){
 		var fips = req.param('fips'),
 			station = req.param('stationId'),
@@ -252,7 +300,7 @@ module.exports = {
 	TonageMadtGraph:function(req,res){
 		var fips = req.param('fips'),
 			database = req.param('database'),
-			filters = req.param('filters'),
+			filters = req.param('filters') || {},
 			season = req.param('season'),
 			
     		AdtScale = d3.scale.quantile().domain([0,70000]).range(colorRange);
@@ -335,6 +383,7 @@ module.exports = {
 		})
 
 	},
+	
 
 	Tonage: function(req,res) {
  		if(typeof req.param('fips') == 'undefined'){
@@ -615,3 +664,21 @@ function ensureExists(path, mask, cb) {
     });
 }
 
+
+function fixStationId(id){
+	
+	if(id.length === 6){
+		return id
+	}else if(id.length === 5){
+		return '0'+id;
+	}else if(id.length === 4){
+		return '00'+id;
+	}else if(id.length === 3){
+		return '000'+id;
+	}else if(id.length === 2){
+		return '0000'+id;
+	}else if(id.length === 1){
+		return '000000'+id;
+	}
+
+}

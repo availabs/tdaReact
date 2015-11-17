@@ -33,6 +33,7 @@ var GraphContainer = React.createClass({
 
     getInitialState:function(){
         return {
+            loading:false,
             toggleChart:false,
             currentData:[]
         }
@@ -52,29 +53,32 @@ var GraphContainer = React.createClass({
 
     _loadData:function(fips,agency){
         var scope = this;
-        if(fips && agency){
-            d3.json('/tmgWim/tonnage/month/'+fips+'/?database='+agency)
+        if(!this.state.loading && fips && agency){
+            this.setState({loading:true,currentData:[]})
+            var url = '/tmgWim/tonnage/'+fips+'/?database='+agency;
+            
+            d3.json(url)
                 .post(JSON.stringify({filters:scope.props.filters}),function(err,data){
                 
-                if(data.loading){
-                        console.log('reloading')
-                        setTimeout(function(){ scope._loadData(fips) }, 2000);
-                        
-                    
-                }else{
+                    console.log('tonnage data',data)
                     AdtScale.domain(data.map(function(ADT){
                         return ADT.value;
                     }));
 
                     var output = data.map(function(d){
+
                         d.color = AdtScale(d.value)
+                       
                         return d
                     }).sort(function(a,b){
                         return b.value - a.value
                     })
 
-                    scope.setState({currentData:output})
-                }
+                    scope.setState({
+                        loading:false,
+                        currentData:output
+                    })
+                
             })
         }
          
@@ -199,28 +203,36 @@ var GraphContainer = React.createClass({
         
 
         //console.log('_processData',this._processData())
-        var graph = (
+        var output = null;
+        if(this.state.loading || this.state.currentData.length === 0){
            
-                <div className="body">
-                    <div id="tonnagechart">
-                        <svg id= "tonnagechart-graph" style={svgStyle}></svg>
+            output = <div style={{position:'relative',top:'20%',left:'40%',width:'200px'}}>Loading {this.props.selectedStation}<br /> <img src={'/images/loading.gif'} /></div> 
+            
+        }else{
+            output = !scope.state.toggleChart ? (
+               
+                    <div className="body">
+                        <div id="tonnagechart">
+                            <svg id= "tonnagechart-graph" style={svgStyle}></svg>
+                        </div>
+                        {this._updateGraph()}
+                        
                     </div>
-                    {this._updateGraph()}
-                    
+               
+            ) :
+            (
+                 <div>
+                    <DataTable 
+                    data={scope.state.currentData} 
+                    pageLength={7}
+                    columns={ [
+                        {key:'label', name:'Station ID'},
+                        {key:'value', name:'AAD Tonnage'}
+                    ]} />
                 </div>
-           
-        ),
-        chart = (
-             <div>
-                <DataTable 
-                data={scope.state.currentData} 
-                pageLength={7}
-                columns={ [
-                    {key:'label', name:'Station ID'},
-                    {key:'value', name:'AAD Tonnage'}
-                ]} />
-            </div>
-        );
+            );
+        }
+        
         
         //console.log('adtGraph',this.props.selectedState,this.state.currentData)
 
@@ -239,9 +251,7 @@ var GraphContainer = React.createClass({
                     </h4>
                     
                 </header>
-             test
-                {this.props.selectedState}
-                {scope.state.toggleChart ? chart : graph}
+                { output }
             </section>
             
         );

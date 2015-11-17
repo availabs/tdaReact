@@ -35,6 +35,7 @@ var GraphContainer = React.createClass({
 
     getInitialState:function(){
         return {
+            loading:false,
             toggleChart:false,
             currentData:[]
         }
@@ -60,20 +61,42 @@ var GraphContainer = React.createClass({
         if(scope.props.type==='season'){
             season=true;
         }
-        if(fips && agency ){
-            //console.log('ld',JSON.stringify({filters:filters}))
-            d3.json('/tmgWim/tonnage/madt/'+fips+'/?database='+agency)
-                .post(JSON.stringify({filters:filters,season:season}),function(err,data){
+         if(!this.state.loading && fips && agency){
+            this.setState({loading:true,currentData:[]})
+            var url = '/tmgWim/tonnage/'+fips+'/?monthly=true&database='+agency,
+                old = '/tmgWim/tonnage/madt/'+fips+'/?database='+agency;
+                console.log('get data madt',url)
+            d3.json(url)
+                .post(JSON.stringify({monthly:true}),function(err,data){
                 
-                if(data.loading){
-                        console.log('reloading')
-                        setTimeout(function(){ scope._loadData(fips) }, 2000);
-                        
-                }else{
+                    var output = {}
+                    data.forEach(function(d){
+                        if(!output[d.label]){ output[d.label] = {key:d.label,values:[]} }
+                        output[d.label].values.push({month:d.month,y:+d.value})
+                    })
+                    var output = Object.keys(output).map(function(k){
+                        output[k].values = output[k].values.sort(function(a,b){ return b.month - a.month});
+                        return output[k]
+                    })
 
-                    scope.setState({currentData:data})
+                    AdtScale.domain(output.map(function(station){
+                        return d3.mean(station.values, function(d) { return d.y } )
+                    }));
+
+                    var output = output.map(function(station){
+
+                        station.color = AdtScale( d3.mean(station.values,function(d){ return d.y}) )
+                        return station
+                    })
+
+                    
+                    console.log('madt tonnage',output)
+                    scope.setState({
+                        loading:false,
+                        currentData:output
+                    })
                 
-                }
+                
             })
         }
          
@@ -116,6 +139,7 @@ var GraphContainer = React.createClass({
         //console.log('toggleChart')
         this.setState({toggleChart:!this.state.toggleChart})
     },
+
     renderDownload : function(){
         var scope=this;
         return (
@@ -131,6 +155,7 @@ var GraphContainer = React.createClass({
             </div>
         )
     },
+
     formatData : function(){
         var scope = this,            
             fieldNames = ['Station Id','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
@@ -146,7 +171,7 @@ var GraphContainer = React.createClass({
             Object.keys(chartData[station]).forEach(function(column){
                 //console.log(chartData[station][column]);
 
-                if(column === 'key'){
+                if(column === 'label'){
                     line = chartData[station][column] + "," + line;
                 }
                 else if(column == '7'){
@@ -187,7 +212,7 @@ var GraphContainer = React.createClass({
 
             var curStation = {};
 
-            curStation.key = scope.state.currentData[station].key;
+            curStation.label = scope.state.currentData[station].label;
 
             scope.state.currentData[station].values.forEach(function(month){
                 curStation[month.month] = month.y;
@@ -199,12 +224,14 @@ var GraphContainer = React.createClass({
         return flatData;
 
     },
+    
     downloadPng : function(){
         console.log("downloading png");
         var svgId = "madtonnage-graph"+this.props.type;
         var chartFileName = svgId + ".png";
         saveSvgAsPng.saveSvgAsPng(document.getElementById(svgId), chartFileName);
     },
+
     downloadCsv : function(id){
         var scope = this;
 
@@ -236,8 +263,13 @@ var GraphContainer = React.createClass({
         title = this.props.type === 'season' ? 'Seasonality of Tonnage':'Monthly Average Daily Tonnage';
         var svgId = "madtonnage-graph"+this.props.type;
         var chartData = scope.chartData();
-        //console.log('_processData',this._processData())
-        var graph = (
+        var output = null;
+        if(this.state.loading || this.state.currentData.length === 0){
+           
+            output = <div style={{position:'relative',top:'20%',left:'40%',width:'200px'}}>Loading {this.props.selectedStation}<br /> <img src={'/images/loading.gif'} /></div> 
+            
+        }else{
+            output = !scope.state.toggleChart ? (
            
                 <div className="body">
                     <div id={'madTonchart_'+scope.props.index}>
@@ -247,29 +279,30 @@ var GraphContainer = React.createClass({
                     
                 </div>
            
-        ),
-        chart = (
-             <div>
-                <DataTable 
-                data={chartData} 
-                pageLength={5}
-                columns={ [
-                    {key:'key', name:'Station ID'},
-                    {key:'1', name:'Jan'},
-                    {key:'2', name:'Feb'},
-                    {key:'3', name:'Mar'},
-                    {key:'4', name:'Apr'},
-                    {key:'5', name:'May'},
-                    {key:'6', name:'Jun'},
-                    {key:'7', name:'Jul'},
-                    {key:'8', name:'Aug'},
-                    {key:'9', name:'Sep'},
-                    {key:'10', name:'Oct'},
-                    {key:'11', name:'Nov'},
-                    {key:'12', name:'Dec'},
-                ]} />
-            </div>
-        );
+            ) : 
+            (
+                 <div>
+                    <DataTable 
+                    data={chartData} 
+                    pageLength={5}
+                    columns={ [
+                        {key:'key', name:'Station ID'},
+                        {key:'1', name:'Jan'},
+                        {key:'2', name:'Feb'},
+                        {key:'3', name:'Mar'},
+                        {key:'4', name:'Apr'},
+                        {key:'5', name:'May'},
+                        {key:'6', name:'Jun'},
+                        {key:'7', name:'Jul'},
+                        {key:'8', name:'Aug'},
+                        {key:'9', name:'Sep'},
+                        {key:'10', name:'Oct'},
+                        {key:'11', name:'Nov'},
+                        {key:'12', name:'Dec'},
+                    ]} />
+                </div>
+            );
+        }
         
         //console.log('adtGraph',this.props.selectedState,this.state.currentData)
 
@@ -288,7 +321,7 @@ var GraphContainer = React.createClass({
                     </h4>
                     
                 </header>
-                {scope.state.toggleChart ? chart : graph}
+                {output}
             </section>
             
         );
