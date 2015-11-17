@@ -62,14 +62,7 @@ var GraphContainer = React.createClass({
 
             DataScale.domain([d3.min(values),d3.max(values)]);
             
-            // console.log('scale stuff',
-            //     DataScale,
-            //     DataScale.domain(),
-            //     DataScale.range(),
-            //     DataScale(d3.max(values)/2),
-            //     values.length
-            // );
-
+          
             
             var days = d3.select('#'+this.props.divId).selectAll("svg").selectAll(".day");
             //console.log('selection',days)

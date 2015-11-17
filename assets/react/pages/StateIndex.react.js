@@ -3,6 +3,7 @@
 var React = require('react'),
     
     //--Components
+    DashPanel = require('../components/statewide/panels/DashPanel.react'),
     ClassPanel = require('../components/statewide/panels/ClassPanel.react'),
     WimPanel = require('../components/statewide/panels/WimPanel.react'),
     HpmsPanel = require('../components/statewide/panels/HpmsPanel.react'),
@@ -32,7 +33,7 @@ var StateIndex = React.createClass({
     
     getInitialState: function() {
         return {
-            activeComponent:'class'
+            activeComponent:'dash'
         };
     },
     
@@ -63,6 +64,11 @@ var StateIndex = React.createClass({
         var currentPanel = <span />;
         switch(this.state.activeComponent){
 
+
+            case 'dash':
+                currentPanel = <DashPanel stations={this.props.stations} currentAgency={this.props.currentAgency} selectedState={this.props.selectedState} selectedStation={this.props.selectedStation} activeFilters={this.props.activeFilters} />;
+            break;
+
             case 'class':
                 currentPanel = <ClassPanel currentAgency={this.props.currentAgency} selectedState={this.props.selectedState} selectedStation={this.props.selectedStation} activeFilters={this.props.activeFilters} />;
             break;
@@ -79,7 +85,7 @@ var StateIndex = React.createClass({
                 currentPanel = <SingleStationPanel currentAgency={this.props.currentAgency} selectedState={this.props.selectedState} selectedStation={this.props.selectedStation} activeFilters={this.props.activeFilters} />;
             break;
 
-             case 'enforcement':
+            case 'enforcement':
                 currentPanel = <EnforcementPanel stations={this.props.stations} currentAgency={this.props.currentAgency} selectedState={this.props.selectedState} selectedStation={this.props.selectedStation} activeFilters={this.props.activeFilters} />;
             break;
 
@@ -119,6 +125,9 @@ var StateIndex = React.createClass({
                             <header>
                                 
                                 <ul className="nav nav-tabs" onClick={this._setActiveComponent} style={{cursor:'pointer'}}>
+                                    <li value="dash" className={this.state.activeComponent === 'dash' ? 'active' : ''}>
+                                        <a value="dash">Overview</a>
+                                    </li>
                                     <li value="class" className={this.state.activeComponent === 'class' ? 'active' : ''}>
                                         <a value="class">Class</a>
                                     </li>

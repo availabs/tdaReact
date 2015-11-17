@@ -55,6 +55,7 @@ module.exports.routes = {
   '/tmgClass/stateAADT/:fips' : 'TmgClassController.getStateAADT',
   '/tmgClass/stateMADT/:fips/:graphType' : 'TmgClassController.getStateMADT',
   '/tmgClass/classByMonthFilters':'TmgClassController.getClassByMonthFilters',
+  '/tmgClass/byMonthTable/:fips' :'TmgClassController.getClassTableData',
 
 
   // -- WIM data

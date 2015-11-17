@@ -1,4 +1,6 @@
-var React = require('react');
+var React = require('react'),
+    d3 = require('d3');
+
 import DataProcessor from './DataProcessor';
 
 export default class SparklinesLine extends React.Component {
@@ -8,26 +10,35 @@ export default class SparklinesLine extends React.Component {
         
     }
 
+    componentDidMount(){
+        
+    }
+
+
     render() {
+       
         const { data,limit, width, height, margin, color, style,max, min} = this.props;
 
         //console.log('whm',width, height, margin)
+        const newData = data.map((d) => (d > 0 ? d : null))
+        const points = DataProcessor.dataToPoints(newData, limit, width, height, margin, max, min);
 
-        const points = DataProcessor.dataToPoints(data, limit, width, height, margin, max, min);
 
-        const linePoints = points
-            .map((p) => [p.x, p.y])
-            .reduce((a, b) => a.concat(b));
-        const closePolyPoints = [
-            points[points.length - 1].x, height - margin,
-            margin, height - margin,
-            margin, points[0].y
-        ];
-        
+        const line = d3.svg.line()
+            .defined(function(d) { 
+                return d.y != null && +d.y > 0; })
+            .x(function(d) { return d.x; })
+            .y(function(d) { return d.y; });
 
-        const fillPoints = linePoints.concat(closePolyPoints);
+        const area = d3.svg.area()
+            .defined(line.defined())
+            .x(line.x())
+            .y1(line.y())
+            .y0(height);
 
-        //console.log('line points',fillPoints,linePoints);
+    
+
+        //console.log('line points',newData,points);
 
         const lineStyle = {
             stroke: color || style.stroke || 'slategray',
@@ -42,11 +53,11 @@ export default class SparklinesLine extends React.Component {
             fillOpacity: style.fillOpacity || '.1',
             fill: color || style.fill || 'slategray'
         };
-
+        // 
         return (
             <g>
-                <polyline points={fillPoints.join(' ')} style={fillStyle} />
-                <polyline points={linePoints.join(' ')} style={lineStyle} />
+                <path d={line(points)} style={lineStyle} />
+                <path d={area(points)} style={fillStyle} />
             </g>
         )
     }

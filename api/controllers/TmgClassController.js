@@ -38,6 +38,43 @@ function getClassStations(database){
 
 module.exports = {
 	
+
+	getClassTableData:function(req,res){
+		var fips = req.param('fips'),
+			database = req.param('database'),
+			filters = req.param('filters') || {};
+
+		var sql = "select"+
+			'  station_id, month,  year,'+
+			'  sum(total_vol) as ct,sum(class1) as c1, sum(class2) as c2,'+
+			'  sum(class3) as c3, sum(class4) as c4, sum(class5) as c5, sum(class6) as c6, '+
+			'  sum(class7) as c7, sum(class8) as c8, sum(class9) as c9, sum(class10) as c10, '+
+			'  sum(class11) as c11, sum(class12) as c12, sum(class13) as c13,'+
+			'  count(DISTINCT concat(STRING(year),"-",STRING(month),"-",STRING(day))) as days'+
+			"  from [tmasWIM12."+database+"Class] as a"+
+			"  where state_fips = '"+fips+"'"+
+			"  group by station_id,year,month, order by station_id,year,month";
+
+		console.log('getClassTableData')
+		console.log('------------------------------------------------')
+		console.log(sql)
+		console.log('------------------------------------------------')
+		
+		BQuery(sql,function(data){
+				
+			var fullData = data.rows.map(function(row,index){
+				var outrow = {}
+				
+				data.schema.fields.forEach(function(field,i){
+					outrow[field.name] = row.f[i].v;
+				});
+				return outrow;
+			});
+
+			res.json(fullData);
+		});
+	},
+
 	getClassStationData: function(req, res) {
  		if(typeof req.param('id') == 'undefined'){
  			res.send('{status:"error",message:"station_id required"}',500);

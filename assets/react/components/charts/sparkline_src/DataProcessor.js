@@ -14,7 +14,7 @@ export default class DataProcessor {
         return data.map((d, i) => {
             return {
                 x: i * hfactor + margin,
-                y: ((max === min ? height : max) - d) * vfactor + margin
+                y: d ? ((max === min ? height : max) - d) * vfactor + margin : null
             }
         });
     }

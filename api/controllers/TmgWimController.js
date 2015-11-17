@@ -117,6 +117,9 @@ module.exports = {
 
 		console.log('getEnforcementDashData')
 		console.log('------------------------------------------------')
+		console.log(sql)
+		console.log('------------------------------------------------')
+		
 		BQuery(sql,function(data){
 				
 			var fullData = data.rows.map(function(row,index){
