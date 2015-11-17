@@ -10,7 +10,6 @@ module.exports = {
     //View actions 
     //-------------------------------------------------------
     SELECT_USER: null,
-    CREATE_USER:null,
     SET_SELECTED_AGENCY:null,
     SET_SELECTED_STATE:null,
     SET_SELECTED_STATION:null,
