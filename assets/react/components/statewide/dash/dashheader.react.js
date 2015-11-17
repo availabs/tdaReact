@@ -40,7 +40,9 @@ var WidgetHeader = React.createClass({
     },
 
     logChange:function(val) {
+        if(val && !isNaN(val)){
          this.props.setMonth(val)
+        }
     },
 
     render: function() {
