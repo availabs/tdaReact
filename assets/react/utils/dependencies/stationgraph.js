@@ -2,10 +2,11 @@ var wimgraphOut = {};
 
 (function() {
 	var wimgraph = {
-		version: "0.1.0"
+		version: "0.1.0",
+		classType : ''
 	};
 
-	function _WIMGrapher(id) {
+	function _WIMGrapher(id,db) {
 		var self = this,
 
 		// Stores data retrieved from backend after being formatted.
@@ -31,9 +32,11 @@ var wimgraphOut = {};
 
 			_formatData,
 		
-			classType = '',				//Used to keep track of page type(class/wim)
+					//Used to keep track of page type(class/wim)
 
 			route = ['url','station',''],	// URL to retrieve graph data from
+
+			agency = db ? db : 'allWim', 
 			
 
 		// depth is an array object that is treated as a stack.
@@ -58,10 +61,66 @@ var wimgraphOut = {};
 		// this is used to keep track of which attribute to reduce
 			reduceBy = (groupBy === 'class' ? 'weight' : 'class');
 
-		
+		var selectorDIV = d3.select(id).append('div')
+				.append('div')
+				.attr('class', 'btn-group'),
+
+			classWeightButton = selectorDIV.append('a')
+				.style('color','#000')
+				.text('Classes & Weights')
+				.attr('class','btn')
+				.classed('active', true)
+				.on('click', _selectorToggle),
+
+			weightDistButton = selectorDIV.append('a')
+				.style('color','#000')
+				.text('Weight Distribution')
+				.attr('class','btn')
+				.classed('inactive', true)
+				.on('click', _selectorToggle);
+
+		// this function is used to toggle between
+		// the weight/class graph
+		// and the weight dist. graph
+		function _selectorToggle() {
+			var self = d3.select(this),
+				active = self.classed('active'),
+				deactivated = self.classed('deactivated');
+
+			if (!active && !clicked && !deactivated) {
+
+				selectorDIV.selectAll('a')
+					.classed('active', false)
+					.classed('inactive', true)
+				self.classed('active', true)
+					.classed('inactive', false)
+
+				if (classWeightButton.classed('active')) {
+					_toggleSVG(cwSVG);
+				} else {
+					_toggleSVG(wdSVG);
+				}
+			}
+		}
+		// this function displays which ever svg was passed as a parameter
+		// and hides the other svg
+		function _toggleSVG(svg) {
+			console.log('_toggleSVG',svg)
+			var hide = (svg === cwSVG ? wdSVG : cwSVG);
+
+			svg.style('display', 'block');
+
+			hide.style('display', 'none');
+
+			var cwSVGdisplay = cwSVG.style('display');
+
+			navBar.style('display', cwSVGdisplay);
+			togglesDiv.style('display', cwSVGdisplay);
+			//legendDIV.style('display', cwSVGdisplay);
+		}
+
 
 		// initialize graph div
-		console.log('id',id,d3.select(id) )
 		var graphDIV = d3.select(id).append('div')
 			.attr('id', 'graphDIV'),
 		// initialize measurements
@@ -81,8 +140,6 @@ var wimgraphOut = {};
 
 		
 
-
-		if(classType !== 'class'){	
 			// initialize wdgraph div
 			var wdgraphDIV = d3.select("#wimSpectra").append('div')
 				.attr('id', 'wdgraphDIV'),
@@ -100,7 +157,7 @@ var wimgraphOut = {};
 				wdpopup = d3.select("#wimSpectra").append('div')
 					.attr('class', 'graph-popup');
 				// console.log(wdwidth,wdhght,parseInt(wdgraphDIV.style('width')),wdgraphDIV.style('width'),wdgraphDIV)
-		}
+		
 
 		function _showPopup(json, DOMel) {
 			var html = '';
@@ -126,30 +183,18 @@ var wimgraphOut = {};
 			//     yPos = d3.event.offsetY;
 			// } else {
 			// 	console.log("Y")
-			    xPos = d3.event.layerX;
-			    yPos = d3.event.layerY;
+			    xPos = d3.event.clientX;
+			    yPos = d3.event.clientY;
 			//}
-			//xPos += 40;
-			yPos += 35;
+			xPos += 3;
+			yPos -= 65;
 			//console.log(xPos,yPos)
-			if (xPos+parseInt(popup.style('width')) > parseInt(graphDIV.style('width'))) {
-				popup.style('right', xPos + 'px')
-					.style('left', (parseInt(graphDIV.style('width'))-parseInt(popup.style('width')))+'px')
-					.style('top', yPos + 'px')
-			} else {
-				popup.style('left', xPos + 'px')
-					.style('right', '0px')
-					.style('top', yPos + 'px')
-			}
-			if (xPos+parseInt(wdpopup.style('width')) > parseInt(wdgraphDIV.style('width'))) {
-				wdpopup.style('right', xPos + 'px')
-					.style('left', (parseInt(wdgraphDIV.style('width'))-parseInt(wdpopup.style('width')))+'px')
-					.style('top', (yPos-20) + 'px')
-			} else {
-				wdpopup.style('left', xPos + 'px')
-					.style('right', '0px')
-					.style('top', (yPos-20) + 'px')
-			}
+			
+			popup.style('left', xPos + 'px')
+				.style('top', yPos + 'px')
+			
+			
+			
 		}
 		function _hidePopup() {
 			popup.style('display', 'none')
@@ -157,19 +202,21 @@ var wimgraphOut = {};
 		}
 
 		// initialize class and weight SVG
+		// initialize class and weight SVG
 		var	cwSVG = graphDIV.append('svg')
 				.attr('width', width + 'px')
 				.attr('height', height + 'px'),
 		// create cwSVG group. this is used to draw class/weight bars
 			cwGraphSVG = cwSVG.append('g')
-				.attr("transform", "translate("+margin.left+", "+margin.top+")");
+				.attr("transform", "translate("+margin.left+", "+margin.top+")"),
 
 		// initialize weight distribution SVG
-		var wdSVG = wdgraphDIV.append('svg')
-				.attr('width', wdwidth + 'px')
-				.attr('height', wdheight + 'px'),
+			wdSVG = graphDIV.append('svg')
+				.attr('width', width + 'px')
+				.attr('height', height + 'px')
+				.style('display', 'none'),
 			wdGraphSVG = wdSVG.append('g')
-				.attr("transform", "translate("+wdmargin.left+", "+wdmargin.top+")");
+				.attr("transform", "translate("+margin.left+", "+margin.top+")");
 
 	    // initialize x scale and axis
 	    var Xscale = d3.scale.ordinal()
@@ -189,6 +236,7 @@ var wimgraphOut = {};
 	    		.scale(wdXscale)
 	    		.orient('bottom');
 
+	    
 	    wdGraphSVG.append('g')
 	    	.attr('class', 'x-axis')
 	        .attr('transform', 'translate(0, '+(wdheight - wdmargin.top - wdmargin.bottom)+')');
@@ -436,9 +484,10 @@ var wimgraphOut = {};
 
 		// this function retrieves the requested data from the back end API
 		function _getData() {
-			console.log("getData",{'database': 'allWim', 'depth': depth,'id':route[1],'state_code':route[2]});
+			
+			console.log("getData",{'database': agency, 'depth': depth,'id':route[1],'state_code':route[2]});
 			loader.style('display', 'inline')
-			d3.json(route[0]).post(JSON.stringify({'database': 'allWim', 'depth': depth,'id':route[1],'state_code':route[2]}), function(error, data) {
+			d3.json(route[0]).post(JSON.stringify({'database': agency, 'depth': depth,'id':route[1],'state_code':route[2]}), function(error, data) {
             	if (error) {
             		console.log(error);
             		return;
@@ -605,7 +654,7 @@ var wimgraphOut = {};
 			return Math.min(Math.floor(i / (bandSize/WDbandSize)), maxIndex)
 		}
 		function _filterWeightDistributionData() {
-			filtered = [];
+			var filtered = [];
 
 			var obj = null,
 				current = null;
@@ -642,6 +691,7 @@ var wimgraphOut = {};
 		   		space = wdth - (barWidth * data.length),
 		   		gap = space / (data.length+1);
 
+		   	console.log('_drawWDGraph',data,wdGraphSVG);
 		   	var padding = (2*gap + barWidth) / (gap + barWidth);
 
 		    wdXscale.domain([])
@@ -1074,19 +1124,21 @@ var wimgraphOut = {};
 			return d+'th';
 		}
 
-		self.drawGraph = function(station, type, state) {
+		self.drawGraph = function(station, type, state,db) {
 			//stationID = station;
 			//stationType = type;
-			console.log('draw Graph',station,type,state)
+			console.log('draw Graph',station,type,state,db,agency)
 			route[0] = '/station/'+type;
-			route[1] = station
-			route[2] = state
-			classType = type
+			route[1] = station;
+			route[2] = state;
+			wimgraph.classType = type;
+			agency = db;
+
 
 			if (type == 'class') {
-				// weightDistButton.classed('active', false)
-				// 	.classed('inactive', false)
-				// 	.classed('deactivated', true);
+				weightDistButton.classed('active', false)
+					.classed('inactive', false)
+					.classed('deactivated', true);
 
 				weightToggle.classed('active', false)
 					.classed('inactive', false)
