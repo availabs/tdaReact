@@ -61,7 +61,6 @@ var StateWideMap = React.createClass({
         };
     },
     
-    
     componentWillReceiveProps:function(nextProps){
         if(nextProps.activeView !== this.props.activeView){
             //console.log('new view')
@@ -76,6 +75,10 @@ var StateWideMap = React.createClass({
 
             this.setState({selectedState:nextProps.selectedState});
         
+        }
+        if(nextProps.selectedStation !== this.props.selectedStation){
+            d3.selectAll('.selected_station').classed('selected_station',false)
+            d3.selectAll('.station_'+nextProps.selectedStation).classed('selected_station',true)
         }
         
         // console.log('selectedState',nextProps.selectedState,this.props.selectedState ,nextProps.selectedState !== this.props.selectedState );
@@ -133,7 +136,7 @@ var StateWideMap = React.createClass({
         map = L.map("map", {
           center: [39.8282, -98.5795],
           zoom: 4,
-          layers: [mapquestOSM],
+          layers: [streetMap],
           baseLayers: [baseMaps],
           zoomControl: true,
           attributionControl:false
@@ -345,11 +348,10 @@ var StateWideMap = React.createClass({
                 
                 layer.on({
                     click: function(e){
+                        console.log('sclick',feature.properties.station_id,feature.properties.state_fips)
                        ClientActionsCreator.setSelectedStation(feature.properties.station_id,feature.properties.state_fips);
                        var d = e.target.feature;
-                       d3.selectAll('.selected_station').classed('selected_station',false)
-
-                       d3.selectAll('.station_'+d.properties.station_id).classed('selected_station',true)
+                      
                        //d3.selectAll('.selected_station').classed('selected_station',false)
                     
 

@@ -37,12 +37,6 @@ var StateIndex = React.createClass({
         };
     },
     
-    componentWillReceiveProps : function(nextProps){
-        if(nextProps.selectedStation !== this.props.selectedStation){
-            console.log('new station')
-            this.setState({activeComponent:'singleStation'});
-        }
-    },
 
     _setActiveComponent : function(e){
         this.setState({activeComponent:e.target.getAttribute('value')})
@@ -66,7 +60,7 @@ var StateIndex = React.createClass({
 
 
             case 'dash':
-                currentPanel = <DashPanel stations={this.props.stations} currentAgency={this.props.currentAgency} selectedState={this.props.selectedState} selectedStation={this.props.selectedStation} activeFilters={this.props.activeFilters} />;
+                currentPanel = <DashPanel selectedStation={this.props.selectedStation} stations={this.props.stations} currentAgency={this.props.currentAgency} selectedState={this.props.selectedState} selectedStation={this.props.selectedStation} activeFilters={this.props.activeFilters} />;
             break;
 
             case 'class':
@@ -81,26 +75,12 @@ var StateIndex = React.createClass({
                 currentPanel = <HpmsPanel hpmsData={this.props.hpmsData} currentAgency={this.props.currentAgency} selectedState={this.props.selectedState} selectedStation={this.props.selectedStation} activeFilters={this.props.activeFilters} />;
             break;
 
-            case 'singleStation':
-                currentPanel = <SingleStationPanel currentAgency={this.props.currentAgency} selectedState={this.props.selectedState} selectedStation={this.props.selectedStation} activeFilters={this.props.activeFilters} />;
-            break;
-
             case 'enforcement':
-                currentPanel = <EnforcementPanel stations={this.props.stations} currentAgency={this.props.currentAgency} selectedState={this.props.selectedState} selectedStation={this.props.selectedStation} activeFilters={this.props.activeFilters} />;
+                currentPanel = <EnforcementPanel selectedStation={this.props.selectedStation} stations={this.props.stations} currentAgency={this.props.currentAgency} selectedState={this.props.selectedState} selectedStation={this.props.selectedStation} activeFilters={this.props.activeFilters} />;
             break;
 
         
         }
-
-        if(this.props.selectedStation){
-
-            activeStation = (
-                <li className={this.state.activeComponent === 'singleStation' ? 'active' : ''}>
-                    <a value="singleStation">Station {this.props.selectedStation}</a>
-                </li>
-            )
-        }
-
 
         return (
             <div className="content container">
@@ -109,7 +89,8 @@ var StateIndex = React.createClass({
                     <div className="col-xs-6" >
                         <section className="widget whitesmoke no-padding mapaffix"  >
                             <div className="body no-margin">
-                                <StateWideMap 
+                                <StateWideMap
+                                    selectedStation = {this.props.selectedStation}
                                     activeView={this.state.activeComponent}
                                     agency={this.props.currentAgency.datasource}
                                     selectedState={this.props.selectedState}

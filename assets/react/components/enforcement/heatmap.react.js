@@ -118,7 +118,7 @@ var GraphContainer = React.createClass({
     },
 
     drawGraph:function(){
-        if(!this.state.direction) return;
+        if(!this.state.direction || !this.state.currentData[this.state.direction]) return;
         var scope = this,
             days = d3.range(1,8),
             hours = d3.range(0,24),

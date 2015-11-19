@@ -14,7 +14,7 @@ var DashPanel = React.createClass({
         }
 	    return (
 	    	<div>
-	    		<DashTable stations={this.props.stations} agency={this.props.currentAgency.datasource} selectedState={this.props.selectedState} />
+	    		<DashTable selectedStation={this.props.selectedStation} stations={this.props.stations} agency={this.props.currentAgency.datasource} selectedState={this.props.selectedState} />
             </div>
 	    );
 	}

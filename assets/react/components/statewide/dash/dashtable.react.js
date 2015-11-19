@@ -8,8 +8,8 @@ var React = require('react'),
     SingleStationGraph =  require('../../singleStation/Station.graph.react'),
     //, SparklinesBars, SparklinesLine, SparklinesNormalBand, SparklinesReferenceLine, SparklinesSpots }
 
-    //-- Stores
-
+    //-- Actions
+    ClientActionsCreator = require('../../../actions/ClientActionsCreator'),
 
     //-- Utils
     colorRange = colorbrewer.RdYlBu[5],
@@ -43,15 +43,33 @@ var GraphContainer = React.createClass({
     },
 
     componentDidMount:function(){
+        console.log('mount')
         if(this.props.selectedState){
             this._loadData(this.props.selectedState,this.props.agency);
         }
     },
 
     componentWillReceiveProps:function(nextProps){
-        if(nextProps.selectedState && nextProps.agency){
-            this._loadData(nextProps.selectedState,nextProps.agency);
+        if(nextProps.selectedState  && nextProps.agency
+            && (nextProps.selectedState !== this.props.selectedState ||
+                nextProps.agency !== this.props.agency)){
+
+            console.log('load?',nextProps.selectedState !== this.props.selectedState, nextProps.agency !== this.props.agency)
+            //this._loadData(nextProps.selectedState,nextProps.agency);
         }
+       
+        if(nextProps.selectedStation !== this.props.selectedStation){
+            var el = $('#station_'+nextProps.selectedStation);
+            //console.log('new station scroll','#station_'+nextProps.selectedStation,el.offset().top)
+            if( el.offset() ){
+                setTimeout(function(){
+                    $('html,body').animate({
+                      scrollTop: el.offset().top
+                    }, 1000)
+                },300)
+            }
+        }
+    
     },
 
     _loadData:function(fips,agency){
@@ -85,7 +103,10 @@ var GraphContainer = React.createClass({
     },
 
     stationClick:function(id){
-        this.setState({activeStation:id})
+        ClientActionsCreator.setSelectedStation(id,this.props.selectedState);
+    },
+    toggleStation:function(){
+        ClientActionsCreator.setSelectedStation(null,this.props.selectedState)
     },
 
     sortClick:function(type){
@@ -138,26 +159,23 @@ var GraphContainer = React.createClass({
             currentMonth:m
         })
     },
-    toggleStation:function(){
-        console.log("togglestation");
-        this.setState({activeStation:null})
-    },
+  
 
     getSingleStation:function(){
         var scope = this;
         var type = 'class',
             wimGraphs = null;
-        if(d3.select(".station_"+this.state.activeStation).classed("type_WIM")){
+        if(d3.select(".station_"+this.props.selectedStation).classed("type_WIM")){
             type='wim'
         }
         return (
             <div>
-             <h3>Station {this.state.activeStation}  <i onClick={scope.toggleStation} className="fa fa-times pull-right" style={{cursor:'pointer'}}> </i></h3>
+             <h3>Station {this.props.selectedStation}  <i onClick={scope.toggleStation} className="fa fa-times pull-right" style={{cursor:'pointer'}}> </i></h3>
              Type:{type.toUpperCase()}<br />
-             <small>{scope.props.stations[scope.props.selectedState][this.state.activeStation].properties.station_location} </small>
+             <small>{scope.props.stations[scope.props.selectedState][this.props.selectedStation].properties.station_location} </small>
               <SingleStationGraph 
                     fips={this.props.selectedState} 
-                    selectedStation={this.state.activeStation} 
+                    selectedStation={this.props.selectedStation} 
                     agency={this.props.agency}
                     type = {type} />
 
@@ -256,7 +274,7 @@ var GraphContainer = React.createClass({
             
         }).map(function(station,i){
             var singleStation = null;
-            if(scope.state.activeStation === station.id){
+            if(scope.props.selectedStation === station.id){
                 singleStation = (
                     <tr>
                         <td colSpan={11} style={{height:300}}>
@@ -271,7 +289,7 @@ var GraphContainer = React.createClass({
                 <tbody
                     onMouseOut={scope.stationMouseOut.bind(null,station.id)}
                     onMouseOver={scope.stationMouseOver.bind(null,station.id)}>
-                <tr style={{height:40}}
+                <tr style={{height:40}} id ={'station_'+station.id}
                     onClick={scope.stationClick.bind(null,station.id)}>
                     <td>{i+1}</td>
                     <td>{station.id}</td>
@@ -313,6 +331,7 @@ var GraphContainer = React.createClass({
            
             <section className="widget" style={{ background:'none'}}>
                  <DashHeader setMonth={this.setCurrentMonth} months={this.state.months} currentMonth={this.state.currentMonth} />
+                    {this.props.selectedStation}
                  <table className='table table-hover' style={{backgroundColor:'#fff'}} >
                     <thead>
                     <tr>

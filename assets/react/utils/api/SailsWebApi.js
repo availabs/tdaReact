@@ -14,21 +14,21 @@ var ServerActionCreators =    require('../../actions/ServerActionsCreator'),
     fips2state =              require('../data/fips2state');
 
 
-// function listenToSockets(sessionUser){
+function listenToSockets(sessionUser){
   
-//   var io = require('./sails.io.js')();
+  var io = require('./sails.io.js')();
 
-//   io.socket.on("job_created", function(e){
-//     console.log('job_created',e)
-//     ServerActionCreators.receiveData('job',[e])
-//   });
+  io.socket.on("job_created", function(e){
+    console.log('job_created',e)
+    ServerActionCreators.receiveData('job',[e])
+  });
 
-//   io.socket.on("job_updated", function(e){
-//     console.log('job_updated',e)
-//     ServerActionCreators.receiveData('job',e)
-//   });
+  io.socket.on("job_updated", function(e){
+    console.log('job_updated',e)
+    ServerActionCreators.receiveData('job',e)
+  });
 
-// }  
+}  
 
 var api = {
 
@@ -43,7 +43,7 @@ var api = {
     this.read('user');
     this.read('agency');
     this.readStations();
-    //listenToSockets();
+    listenToSockets();
     
   
   },
@@ -60,43 +60,7 @@ var api = {
   // Class Data Routes
   //--------------------------------------------------
   
-  // getClassByDay : function(fips,agency){
-  //   if(!agency){
-  //     return []
-  //   }
-  //   var url = '/tmgClass/byDay';
-  //   console.log('get CLASS BY DAY')
-  //   var postData = {database:agency.datasource,fips:fips};
-  //   d3.json(url).post(JSON.stringify(postData),function(err,data){
-  //    ServerActionCreators.getClassByDay(data,fips);
-  //   });
 
-  // },
-
-  // getClassByMonth : function(fips,agency){
-  //   if(!agency){
-  //     //console.log('Error: No Agency Datasource Selected');
-  //     return []
-  //   }
-  //   console.log('get CLASS BY MONTH')
-  //   var postData ={database:agency.datasource,fips:fips};
-  //   d3.json('/tmgClass/byMonth').post(JSON.stringify(postData),function(err,data){
-  //     ServerActionCreators.getClassByMonth(data,fips);
-  //   });
-  // },
-
-  // getClassByHour : function(stationId,fips,agency){
-  //   if(!agency){
-  //     return []
-  //   }
-  //   console.log('get CLASS BY HOUR')
-  //   var postData ={database:agency.datasource,stationId:stationId,fips:fips};
-  //   d3.json('/tmgClass/byHour').post(JSON.stringify(postData),function(err,data){
-  //     if(err){console.log('classbyHour error',err)}
-  //     //console.log('getClassByHour',data)
-  //     ServerActionCreators.getClassByHour(data,stationId,fips);
-  //   });
-  // },
 
   getDataOverview : function(agency){
     

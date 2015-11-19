@@ -13,7 +13,7 @@ var HpmsPanel = React.createClass({
         }
 	    return (
 	    	<div>
-	    		<EnforcementTable stations={this.props.stations} agency={this.props.currentAgency.datasource} selectedState={this.props.selectedState} />
+	    		<EnforcementTable selectedStation={this.props.selectedStation} stations={this.props.stations} agency={this.props.currentAgency.datasource} selectedState={this.props.selectedState} />
             </div>
 	    );
 	}

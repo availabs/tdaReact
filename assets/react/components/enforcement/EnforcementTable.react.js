@@ -5,6 +5,7 @@ var React = require('react'),
     Sparklines = require('../charts/sparklines').Sparklines,
     SparklinesLine  = require('../charts/sparklines').SparklinesLine,
     Heatmap = require('./heatmap.react'),
+    ClientActionsCreator = require('../../actions/ClientActionsCreator'),
     //, SparklinesBars, SparklinesLine, SparklinesNormalBand, SparklinesReferenceLine, SparklinesSpots }
 
     //-- Stores
@@ -38,16 +39,34 @@ var GraphContainer = React.createClass({
             activeStation:null
         }
     },
-
+    
     componentDidMount:function(){
+        console.log('mount')
         if(this.props.selectedState){
             this._loadData(this.props.selectedState,this.props.agency);
         }
     },
 
     componentWillReceiveProps:function(nextProps){
-        if(nextProps.selectedState && nextProps.agency){
-            this._loadData(nextProps.selectedState,nextProps.agency);
+        if(nextProps.selectedState  && nextProps.agency
+            && (nextProps.selectedState !== this.props.selectedState ||
+                nextProps.agency !== this.props.agency)){
+
+            this._loadData(this.props.selectedState,this.props.agency);
+       
+        }
+
+
+        if(nextProps.selectedStation !== this.props.selectedStation){
+            var el = $('#station_'+nextProps.selectedStation);
+            //console.log('new station scroll','#station_'+nextProps.selectedStation,el.offset().top)
+            if( el.offset() ){
+                setTimeout(function(){
+                    $('html,body').animate({
+                      scrollTop: el.offset().top
+                    }, 1000)
+                },300)
+            }
         }
     },
 
@@ -79,7 +98,11 @@ var GraphContainer = React.createClass({
     },
 
     stationClick:function(id){
-        this.setState({activeStation:id})
+        ClientActionsCreator.setSelectedStation(id,this.props.selectedState);
+    },
+
+    toggleStation:function(){
+        ClientActionsCreator.setSelectedStation(null,this.props.selectedState)
     },
 
     sortClick:function(type){
@@ -118,10 +141,6 @@ var GraphContainer = React.createClass({
     stationMouseOut:function(id){
         d3.select('.station_'+id)
             .attr('stroke-width',0)
-    },
-    toggleStation:function(){
-        console.log("togglestation");
-        this.setState({activeStation:null})
     },
     render: function() {
         var scope = this;
@@ -222,13 +241,13 @@ var GraphContainer = React.createClass({
             return b.overTT[b.overTT.length-1] - a.overTT[a.overTT.length-1]; 
         }).map(function(station){
             var heatMap = null;
-            if(scope.state.activeStation === station.id){
+            if(scope.props.selectedStation === station.id){
                 heatMap = (
                     <tr>
                         <td colSpan={8} style={{height:300}}>
                              <i onClick={scope.toggleStation} className="fa fa-times pull-right" style={{cursor:'pointer',fontSize:14,padding:10}}> </i>
                                 <br />
-                             <Heatmap selectedState={scope.props.selectedState} agency={scope.props.agency} station={scope.state.activeStation} />
+                             <Heatmap selectedState={scope.props.selectedState} agency={scope.props.agency} station={scope.props.selectedStation} />
                         </td>
                     </tr>
                 )
@@ -237,7 +256,7 @@ var GraphContainer = React.createClass({
                 <tbody
                     onMouseOut={scope.stationMouseOut.bind(null,station.id)}
                     onMouseOver={scope.stationMouseOver.bind(null,station.id)}>
-                <tr style={{height:40}}
+                <tr style={{height:40}} id ={'station_'+station.id}
                     onClick={scope.stationClick.bind(null,station.id)}>
                     <td>{station.id}</td>
                     <td>{station.funcClass}</td>
@@ -266,7 +285,7 @@ var GraphContainer = React.createClass({
         return (
            
             <section className="widget" style={{ background:'none'}}>
-               
+                 {this.props.selectedStation}
                 
                  <table className='table table-hover' style={{backgroundColor:'#fff'}} >
                     <thead>

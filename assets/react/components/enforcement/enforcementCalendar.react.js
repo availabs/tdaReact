@@ -122,7 +122,7 @@ var GraphContainer = React.createClass({
                 return yearData[key] = out
             })
 
-            console.log('year data',yearData,colorRange);
+            //console.log('year data',yearData,colorRange);
 
             return (
                 <CalendarGraph
@@ -177,8 +177,7 @@ var GraphContainer = React.createClass({
             <div  className='row' id='calDiv'>
                 <div className='col-sm-12'>
                                     
-                    {JSON.stringify(this.state.currentData.years)}
-                    {scope.props.display}
+                    
                     {scope.drawGraphs()}
                 </div>
             </div>            
