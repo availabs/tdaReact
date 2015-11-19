@@ -247,7 +247,7 @@ var GraphContainer = React.createClass({
                     </td>
                     <td style={{textAlign:'right'}}> current: <br /> avg : </td>
                     <td style={{textAlign:'right',color:"#ee0000" }}>{station.overTT[station.overTT.length-1].toLocaleString()}%<br />{d3.mean(station.overTT).toFixed(2).toLocaleString()}%</td>
-                    <td style={{textAlign:'right',color:"#0000ee"}}>{station.overCount[station.overCount.length-1].toLocaleString('en-US',{maximumFractionDigits:0})}<br / >{d3.mean(station.overCount).toLocaleString('en-US',{maximumFractionDigits:0})}</td>
+                    <td style={{textAlign:'right',color:"#0000ee"}}>{station.overCount[station.overCount.length-1].toLocaleString('en-US',{maximumFractionDigits:0})}<br / >{d3.mean(station.overCount).toLocaleString('enUS',{maximumFractionDigits:0})}</td>
                     <td style={{textAlign:'right'}}>{station.TT[station.TT.length-1].toLocaleString('en-US',{maximumFractionDigits:0})}<br / >{d3.mean(station.TT).toLocaleString('en-US',{maximumFractionDigits:0})}</td>
                     
                 </tr>

@@ -561,6 +561,7 @@ var wimgraphOut = {};
 			// get the names of attributes
 				schema = [];
 
+
 			for (var i in data.schema.fields) {
 				schema.push(data.schema.fields[i].name)
 			}
@@ -1132,7 +1133,7 @@ var wimgraphOut = {};
 			route[1] = station;
 			route[2] = state;
 			wimgraph.classType = type;
-			agency = db;
+			//agency = db;
 
 
 			if (type == 'class') {
