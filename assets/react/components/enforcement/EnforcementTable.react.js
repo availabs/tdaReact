@@ -119,7 +119,10 @@ var GraphContainer = React.createClass({
         d3.select('.station_'+id)
             .attr('stroke-width',0)
     },
-
+    toggleStation:function(){
+        console.log("togglestation");
+        this.setState({activeStation:null})
+    },
     render: function() {
         var scope = this;
        
@@ -223,7 +226,9 @@ var GraphContainer = React.createClass({
                 heatMap = (
                     <tr>
                         <td colSpan={8} style={{height:300}}>
-                            <Heatmap selectedState={scope.props.selectedState} agency={scope.props.agency} station={scope.state.activeStation} />
+                             <i onClick={scope.toggleStation} className="fa fa-times pull-right" style={{cursor:'pointer',fontSize:14,padding:10}}> </i>
+                                <br />
+                             <Heatmap selectedState={scope.props.selectedState} agency={scope.props.agency} station={scope.state.activeStation} />
                         </td>
                     </tr>
                 )

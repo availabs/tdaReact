@@ -215,8 +215,9 @@ var GraphContainer = React.createClass({
                 su:dataSets['su'],
                 tt:dataSets['tt'],
                 routeSign : scope.props.stations[scope.props.selectedState][station] ? stnCardMeta.posted_route_sign_abbr[scope.props.stations[scope.props.selectedState][station].properties.posted_route_sign]+'-'+ parseInt(scope.props.stations[scope.props.selectedState][station].properties.posted_sign_route_num) : '',
-                funcClass : scope.props.stations[scope.props.selectedState][station] ? scope.props.stations[scope.props.selectedState][station].properties.func_class_code : ''
-            
+                funcClass : scope.props.stations[scope.props.selectedState][station] ? scope.props.stations[scope.props.selectedState][station].properties.func_class_code : '',
+                type : scope.props.stations[scope.props.selectedState][station] && scope.props.stations[scope.props.selectedState][station].properties.method_of_truck_weighing == 0 ? 'Class' : 'WIM'
+
             }
 
         });
@@ -258,7 +259,7 @@ var GraphContainer = React.createClass({
             if(scope.state.activeStation === station.id){
                 singleStation = (
                     <tr>
-                        <td colSpan={10} style={{height:300}}>
+                        <td colSpan={11} style={{height:300}}>
                             {scope.getSingleStation()}
                         </td>
                     </tr>
@@ -274,6 +275,7 @@ var GraphContainer = React.createClass({
                     onClick={scope.stationClick.bind(null,station.id)}>
                     <td>{i+1}</td>
                     <td>{station.id}</td>
+                    <td>{station.type}</td>
                     <td>{station.funcClass}</td>
 
                     <td>{station.routeSign}</td>
@@ -321,6 +323,7 @@ var GraphContainer = React.createClass({
                     <tr>
                         <th></th>
                         <th>Id</th>
+                        <th>Type</th>
                         <th className={scope.state.sortBy === 'class' ? 'active' : ''} onClick={scope.sortClick.bind(null,'class')} >Class</th>
                         <th className={scope.state.sortBy === 'route' ? 'active' : ''} onClick={scope.sortClick.bind(null,'route')}>Route</th>
                         <th colSpan={2}></th>
