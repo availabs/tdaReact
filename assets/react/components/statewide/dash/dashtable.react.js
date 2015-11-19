@@ -152,7 +152,7 @@ var GraphContainer = React.createClass({
         }
         return (
             <div>
-             <h3>Station {this.state.activeStation}  <i onClick={scope.toggleStation} className="fa fa-times pull-right"> </i></h3>
+             <h3>Station {this.state.activeStation}  <i onClick={scope.toggleStation} className="fa fa-times pull-right" style={{cursor:'pointer'}}> </i></h3>
              Type:{type.toUpperCase()}<br />
              <small>{scope.props.stations[scope.props.selectedState][this.state.activeStation].properties.station_location} </small>
               <SingleStationGraph 
