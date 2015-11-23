@@ -11,13 +11,7 @@ var React = require('react'),
     SingleStationPanel = require('../components/statewide/panels/SingleStationPanel.react'),
 
     WidgetHeader = require('../components/WidgetHeader.react'),
-    
-    
-
-    
-    
-    
-    
+        
     StateWideMap =require('../components/statewide/StateWideMap.react'),
 
     //--Stores
@@ -53,14 +47,13 @@ var StateIndex = React.createClass({
         var activeStation = '',
             type='class',
             wimGraphs = <span />;
-       
 
-        var currentPanel = <span />;
+        var currentPanel = null;
         switch(this.state.activeComponent){
 
 
             case 'dash':
-                currentPanel = <DashPanel selectedStation={this.props.selectedStation} stations={this.props.stations} currentAgency={this.props.currentAgency} selectedState={this.props.selectedState} selectedStation={this.props.selectedStation} activeFilters={this.props.activeFilters} />;
+                currentPanel = <DashPanel selectedStation={this.props.selectedStation} stations={this.props.stations} currentAgency={this.props.currentAgency} selectedState={this.props.selectedState} activeFilters={this.props.activeFilters} />;
             break;
 
             case 'class':
@@ -76,7 +69,7 @@ var StateIndex = React.createClass({
             break;
 
             case 'enforcement':
-                currentPanel = <EnforcementPanel selectedStation={this.props.selectedStation} stations={this.props.stations} currentAgency={this.props.currentAgency} selectedState={this.props.selectedState} selectedStation={this.props.selectedStation} activeFilters={this.props.activeFilters} />;
+                currentPanel = <EnforcementPanel stations={this.props.stations} currentAgency={this.props.currentAgency} selectedState={this.props.selectedState} selectedStation={this.props.selectedStation} activeFilters={this.props.activeFilters} />;
             break;
 
         
