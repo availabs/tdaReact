@@ -104,16 +104,18 @@ var Overview = React.createClass({
                 var graphId = 'cg'+type+key;
                 var year = getYear(key);
                 //console.log('write row',yearsArray[key])
-                return (
-                    <tr>
-                        <td> 
-                            <CalendarGraph divId={graphId} year={year} data={ yearsArray[key] }/>
-                            {'Total Active Stations: '+Years[key]}
-                        </td>
-                    </tr>
-                )
+                if(year > 1995){
+                    return (
+                        <tr>
+                            <td> 
+                                <CalendarGraph divId={graphId} year={year} data={ yearsArray[key] }/>
+                                {'Total Active Stations: '+Years[key]}
+                            </td>
+                        </tr>
+                    )
+                }
             }
-        })
+        }).filter(function(d){return d})
         
         return (
              <div className='col-md-6'>
