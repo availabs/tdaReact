@@ -124,11 +124,7 @@ var StateIndex = React.createClass({
                                     {activeStation}
                                 </ul>
                             </header>
-                            <section style={{backgroundColor:'#fff',padding:'10px'}}>
-                                <Filters
-                                    agency={this.props.currentAgency.datasource}
-                                    selectedState={this.props.selectedState} />
-                            </section>
+                           
                             <div className="body">
                                 
                                 {currentPanel}       

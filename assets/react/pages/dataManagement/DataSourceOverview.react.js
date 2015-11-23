@@ -40,7 +40,11 @@ var Overview = React.createClass({
         function getYear(year){
             
             if(year.length  == 2){
-                    year = parseInt('20'+year)
+                var front = '20';
+                    if(+year > 20){
+                        front = '19'
+                    }
+                    year = parseInt(front+year)
                 }
             if(year.length == 1){
                 year = parseInt('200'+year)
@@ -70,7 +74,7 @@ var Overview = React.createClass({
         var yearsArray = {};
         
         if(this.props.agencyOverviewDay[type]){
-            //console.log('Day data',this.props.agencyOverviewDay[type])
+            console.log('Day data',scope.props.agencyOverviewDay[type])
              Object.keys(Years).forEach(function(year){
                 if(year != 'null'){
                     var yearData = {};
@@ -89,9 +93,13 @@ var Overview = React.createClass({
         }
        
         
-        //console.log('yearsArray',type,yearsArray);
+        console.log('yearsArray',type,yearsArray);
 
-        var rows = Object.keys(Years).map(function(key){
+        Object.keys(yearsArray)
+        var rows = []
+
+        rows =  Object.keys(Years).map(function(key){
+
             if(key != 'null'){
                 var graphId = 'cg'+type+key;
                 var year = getYear(key);

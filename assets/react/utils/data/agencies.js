@@ -1,7 +1,7 @@
 module.exports = {
-	"1":{"name":"TMAS","datasource":"allWim","settings":null,"id":1},
+	"1":{"name":"TMAS","datasource":"tmas","settings":null,"id":1},
 	"2":{"name":"Michigan","datasource":"mdot","settings":null,"id":2},
-	"3":{"name":"North Carolina","datasource":"ncdot","settings":null,"id":3},
+	"3":{"name":"North Carolina","datasource":"ncdotData","settings":null,"id":3},
 	"4":{"name":"Ohio","datasource":"ohwim","settings":null,"id":4},
 	"5":{"name":"Pennsylvania","datasource":"pawim","settings":null,"id":5},
 	"6":{"name":"Texas","datasource":"txdot","settings":null,"id":6},
