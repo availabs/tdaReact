@@ -227,7 +227,7 @@ module.exports = {
 						data.schema.fields.forEach(function(field,i){
 
 							outrow[field.name] = row.f[i].v;
-							if(field.name === 'year' && row.f[i].v > 2000){
+							if(field.name === 'year' && row.f[i].v >= 2000){
 								outrow[field.name] = row.f[i].v-2000;
 							}
 							
@@ -257,10 +257,11 @@ module.exports = {
 					var fullData = data.rows.map(function(row,index){
 						var outrow = {}
 						data.schema.fields.forEach(function(field,i){
-							if(field.name === 'year' && row.f[i].v > 2000){
+							outrow[field.name] = row.f[i].v;
+							if(field.name === 'year' && row.f[i].v >= 2000){
 								outrow[field.name] = row.f[i].v-2000;
 							}
-							outrow[field.name] = row.f[i].v;
+							
 						});
 						return outrow;
 					});
