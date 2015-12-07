@@ -324,6 +324,7 @@ var StateWideMap = React.createClass({
 
         stationLayer = L.geoJson(stationsGeo, {
             pointToLayer: function (d, latlng) {
+                console.log('w/c',d.properties.station_id,d.properties.method_of_truck_weighing)
                 var type = d.properties.method_of_truck_weighing > 0 ? 'WIM' :'Class';
                 var options = {
                    
@@ -348,7 +349,7 @@ var StateWideMap = React.createClass({
                 
                 layer.on({
                     click: function(e){
-                        console.log('sclick',feature.properties.station_id,feature.properties.state_fips)
+                        //console.log('sclick',feature.properties.station_id,feature.properties.state_fips)
                        ClientActionsCreator.setSelectedStation(feature.properties.station_id,feature.properties.state_fips);
                        var d = e.target.feature;
                       

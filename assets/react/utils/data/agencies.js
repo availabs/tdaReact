@@ -6,5 +6,6 @@ module.exports = {
 	"5":{"name":"Pennsylvania","datasource":"pawim","settings":null,"id":5},
 	"6":{"name":"Texas","datasource":"txdot","settings":null,"id":6},
 	"7":{"name":"Testing","datasource":"testDB","settings":null,"id":7},
-	"8":{"name":"New York DOT","datasource":"nysdot","settings":"","id":8}
+	"8":{"name":"New York DOT","datasource":"nysdot","settings":"","id":8},
+	"10":{"name":"Connecticut DOT","datasource":"ctdot","settings":"","id":10}
 }
