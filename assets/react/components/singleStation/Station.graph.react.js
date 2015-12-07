@@ -10,6 +10,7 @@ var StationGraph = React.createClass({
 	},
 
 	componentDidMount:function(){
+		console.log('station graph mount agency',this.props.agency)
 		stationgraph.grapher( '#wimGraph_'+this.state.stationId, this.props.agency).drawGraph(this.state.stationId, this.props.type,this.props.fips,this.props.agency);
 	},
 

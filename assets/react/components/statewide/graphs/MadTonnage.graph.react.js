@@ -72,7 +72,7 @@ var GraphContainer = React.createClass({
                     var output = {}
                     data.forEach(function(d){
                         if(!output[d.label]){ output[d.label] = {key:d.label,values:[]} }
-                        output[d.label].values.push({month:d.month,y:+(d.value)})
+                        output[d.label].values.push({month:d.month,y:+(d.value/2000)})
                     })
                     var output = Object.keys(output).map(function(k){
                         if(season){
@@ -119,6 +119,17 @@ var GraphContainer = React.createClass({
               .transitionDuration(350)
               .showXAxis(true);
 
+            
+            chart.yAxis
+                .axisLabel('Tons')
+                .tickFormat(function(d){
+                    var label = +d;
+                    if(scope.props.type==='season'){
+                        return label.toFixed(2)
+                    }
+                    return parseInt(label);
+                }) 
+            
             chart.xAxis     //Chart x-axis settings
                 .axisLabel('Months')
                 .tickFormat(function(d){

@@ -324,7 +324,7 @@ var StateWideMap = React.createClass({
 
         stationLayer = L.geoJson(stationsGeo, {
             pointToLayer: function (d, latlng) {
-                console.log('w/c',d.properties.station_id,d.properties.method_of_truck_weighing)
+                //console.log('w/c',d.properties.station_id,d.properties.method_of_truck_weighing)
                 var type = d.properties.method_of_truck_weighing > 0 ? 'WIM' :'Class';
                 var options = {
                    

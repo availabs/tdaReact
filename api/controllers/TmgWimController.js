@@ -22,6 +22,8 @@ var bigQuery = googleapis.bigquery('v2');
 var wimTonsByDayFilter = require('../../assets/react/utils/dataFilters/wimTonsByDayFilter'),
 	tonFilters = {};
 
+var newTMG = {'ncdotData':true};
+
 function getClassStations(database){
 
 	var sql = 'SELECT state_fips,station_id FROM [tmasWIM12.'+database+'Class] group by state_fips,station_id';
@@ -36,20 +38,21 @@ module.exports = {
 	TonageNew:function(req,res){
 		var fips = req.param('fips'),
 			database = req.param('database'),
-			timescale = req.param('monthly') ? ',month' : '';
+			timescale = req.param('monthly') ? ',month' : '',
+			mult = database in newTMG ? '1' : '220.462';
 
 
 		var sql = 	'SELECT'+
-					'(SUM(case when ((total_weight*220.462)-19539) >= 0 and class = 4 then total_weight else 0 end) + '+
-					'SUM(case when ((total_weight*220.462)-31464) >= 0 and class = 5 then total_weight else 0 end) + '+
-					'SUM(case when ((total_weight*220.462)-39739) >= 0 and class = 6 then total_weight else 0 end) + '+
-					'SUM(case when ((total_weight*220.462)-37000) >= 0 and class = 7 then total_weight else 0 end) + '+
-					'SUM(case when ((total_weight*220.462)-40000) >= 0 and class = 8 then total_weight else 0 end) + '+
-					'SUM(case when ((total_weight*220.462)-51935) >= 0 and class = 9 then total_weight else 0 end) + '+
-					'SUM(case when ((total_weight*220.462)-31000) >= 0 and class = 10 then total_weight else 0 end) + '+
-					'SUM(case when ((total_weight*220.462)-40000) >= 0 and class = 11 then total_weight else 0 end) + '+
-					'SUM(case when ((total_weight*220.462)-40000) >= 0 and class = 12 then total_weight else 0 end) + '+
-					'SUM(case when ((total_weight*220.462)-40000) >= 0 and class = 13 then total_weight else 0 end)) / '+
+					'(SUM(case when ((total_weight*'+mult+')-19539) >= 0 and class = 4 then total_weight else 0 end) + '+
+					'SUM(case when ((total_weight*'+mult+')-31464) >= 0 and class = 5 then total_weight else 0 end) + '+
+					'SUM(case when ((total_weight*'+mult+')-39739) >= 0 and class = 6 then total_weight else 0 end) + '+
+					'SUM(case when ((total_weight*'+mult+')-37000) >= 0 and class = 7 then total_weight else 0 end) + '+
+					'SUM(case when ((total_weight*'+mult+')-40000) >= 0 and class = 8 then total_weight else 0 end) + '+
+					'SUM(case when ((total_weight*'+mult+')-51935) >= 0 and class = 9 then total_weight else 0 end) + '+
+					'SUM(case when ((total_weight*'+mult+')-31000) >= 0 and class = 10 then total_weight else 0 end) + '+
+					'SUM(case when ((total_weight*'+mult+')-40000) >= 0 and class = 11 then total_weight else 0 end) + '+
+					'SUM(case when ((total_weight*'+mult+')-40000) >= 0 and class = 12 then total_weight else 0 end) + '+
+					'SUM(case when ((total_weight*'+mult+')-40000) >= 0 and class = 13 then total_weight else 0 end)) / '+
 					'count(DISTINCT concat(STRING(year),"-",STRING(month),"-",STRING(day)))  as value, '+
 					'station_id as label '+ 
 					timescale + 
@@ -86,10 +89,11 @@ module.exports = {
 			station = req.param('stationId'),
 			database = req.param('database'),
 			threshold = req.param('threshold') || 90000,
-			filters = req.param('filters') || {};
+			filters = req.param('filters') || {},
+			mult = database in newTMG ? '1' : '220.462';
 
 		var sql = 'select '+
- 		' dir,year as y,month as m,day as d,count(1) as t, SUM(CASE WHEN total_weight*220.462 >= '+threshold+' THEN 1 ELSE 0 END) as o '+
+ 		' dir,year as y,month as m,day as d,count(1) as t, SUM(CASE WHEN total_weight*'+mult+' >= '+threshold+' THEN 1 ELSE 0 END) as o '+
  		' from [tmasWIM12.'+database+'] '+
  		' where class >= 8 and station_id = "'+station+'" and state_fips="'+fips+'"'+
  		' group by dir,y,m,d order by dir,y,m,d'
@@ -119,10 +123,11 @@ module.exports = {
 			station = req.param('stationId'),
 			database = req.param('database'),
 			threshold = req.param('threshold') || 90000,
-			filters = req.param('filters') || {};
+			filters = req.param('filters') || {},
+			mult = database in newTMG ? '1' : '220.462';
 
 		var sql = 'select DAYOFWEEK(TIMESTAMP(concat(STRING(year),"-",STRING(month),"-",STRING(day)))) as dow,'+
- 		' hour,count(1), dir, SUM(CASE WHEN total_weight*220.462 >= '+threshold+' THEN 1 ELSE 0 END) '+
+ 		' hour,count(1), dir, SUM(CASE WHEN total_weight*'+mult+' >= '+threshold+' THEN 1 ELSE 0 END) '+
  		' from [tmasWIM12.'+database+'] '+
  		' where class >= 8 and station_id = "'+station+'" and state_fips="'+fips+'"'+
  		' group by dow,hour,dir order by dow,hour,dir'
@@ -150,11 +155,14 @@ module.exports = {
 	getEnforcementDashData:function(req,res){
 		var fips = req.param('fips'),
 			database = req.param('database'),
-			filters = req.param('filters') || {};
+			filters = req.param('filters') || {},
+			mult = database in newTMG ? '1' : '220.462';
+
+			console.log(database,newTMG,database in newTMG,mult);
 
 		var sql = "select station_id,"+
-			"       SUM(CASE WHEN a.total_weight*220.462 >= 90000 and a.class > 8 THEN 1 ELSE 0 END) as overTT,"+
-			"       SUM(CASE WHEN a.total_weight*220.462 >= 90000 and a.class <= 8 THEN 1 ELSE 0 END) as oversingle,"+
+			"       SUM(CASE WHEN a.total_weight*"+mult+" >= 90000 and a.class > 8 THEN 1 ELSE 0 END) as overTT,"+
+			"       SUM(CASE WHEN a.total_weight*"+mult+" >= 90000 and a.class <= 8 THEN 1 ELSE 0 END) as oversingle,"+
 			"       SUM(CASE WHEN a.class >= 8 THEN 1 ELSE 0 END) as TT,"+
 			"       SUM(CASE WHEN a.class < 8 THEN 1 ELSE 0 END) as single,"+
 			"       month,"+
@@ -297,94 +305,6 @@ module.exports = {
 
 	},
 
-	TonageMadtGraph:function(req,res){
-		var fips = req.param('fips'),
-			database = req.param('database'),
-			filters = req.param('filters') || {},
-			season = req.param('season'),
-			
-    		AdtScale = d3.scale.quantile().domain([0,70000]).range(colorRange);
-
-		getFilter(database,fips,function(cFilter){
-			
-			if(cFilter.initialized()){
-
-				cFilter.getDimension('year').filter(null);
-	 			cFilter.getDimension('month').filter(null);
-	 			cFilter.getDimension('dir').filter(null);
-	 		
-	 			if(filters.year){
-	 				cFilter.getDimension('year').filter(filters.year)
-	 			}
-	 			if(filters.dir){
-	 				cFilter.getDimension('dir').filter(filters.dir)	 				
-	 			};
-	 			var stations = {}
-				var stationADT = cFilter.getGroup('ADT')
-					.order(function(p){return p.avg})
-                	.top(Infinity)
-                	.filter(function(d){ 
-                        return d.value.avg  
-                    })
-                stationADT.forEach(function(d){
-                	stations[d.key] = d.value.avg
-                })
-				//console.log('total',stationADT);
-                AdtScale.domain(stationADT.map(function(ADT){
-	                return ADT.value.avg;
-	            }));
-
-				var output = cFilter.getGroup('ADT')
-					.order(function(p){return p.avg})
-                    .top(Infinity)
-                    .filter(function(d){ 
-                        return d.value.avg  
-                    })
-                    .map(function (ADT){
-
-                    	var values = cFilter.getGroup('month')
-	                		.top(Infinity)
-	                		.map(function(m){
-	                			cFilter.getDimension('month').filter(m.key);
-
-	                			var data = cFilter.getGroup('ADT')
-	                				.top(Infinity)
-	                				.filter(function(d){
-	                					return d.key === ADT.key
-	                				})
-	                			var o = Math.round(data[0].value.avg)
-	                			if(season){
-	                				var adt = stationADT.filter(function(v){
-	                					return v.key === ADT.key
-	                				})
-	                				//console.log(m.key,o,stations[ADT.key],o / stations[ADT.key])
-	                				o = o / stations[ADT.key];
-	                			}
-	                			//console.log('month',m,cFilter.getGroup('ADT').top(Infinity))
-	                			return {month:m.key, y: o || 0}
-	                		}).sort(function(a,b){
-	                			return a.month - b.month;
-	                		})
-                    	//console.log("color",AdtScale(ADT.value.avg || 0))
-                        return {
-                            "key":(ADT.key),
-                            "values":values,
-                            "color":AdtScale(ADT.value.avg || 0)
-                        }
-                    })
-				res.json(output)
-
-			}else {
-				
-				res.json({loading:true})
-			
-			}
-			
-		})
-
-	},
-	
-
 	Tonage: function(req,res) {
  		if(typeof req.param('fips') == 'undefined'){
  			res.send('{status:"error",message:"state FIPS required"}',500);
@@ -469,18 +389,19 @@ function TonageData(fips,database,cb){
 				cb(data);
 				console.timeEnd('send cache');
 			}else{
+			var mult = database in newTMG ? '1' : '220.462';
 	 		var sql = 'SELECT '+
 	 			//' SUM(case when total_weight*220.462 <= '+empty_truck_tonage+' then total_weight else 0 end) as empty_vius,'+
-	 			'SUM(case when ((total_weight*220.462)-19539) >= 0 and class = 4 then total_weight else 0 end) as c4 ,'+
-	 			'SUM(case when ((total_weight*220.462)-31464) >= 0 and class = 5 then total_weight else 0 end) c5,'+
-	 			'SUM(case when ((total_weight*220.462)-39739) >= 0 and class = 6 then total_weight else 0 end) c6,'+
-	 			'SUM(case when ((total_weight*220.462)-37000) >= 0 and class = 7 then total_weight else 0 end) c7,'+
-	 			'SUM(case when ((total_weight*220.462)-40000) >= 0 and class = 8 then total_weight else 0 end) c8,'+
-	 			'SUM(case when ((total_weight*220.462)-51935) >= 0 and class = 9 then total_weight else 0 end) c9,'+
-	 			'SUM(case when ((total_weight*220.462)-31000) >= 0 and class = 10 then total_weight else 0 end) c10,'+
-	 			'SUM(case when ((total_weight*220.462)-40000) >= 0 and class = 11 then total_weight else 0 end) c11,'+
-	 			'SUM(case when ((total_weight*220.462)-40000) >= 0 and class = 12 then total_weight else 0 end) c12,'+
-	 			'SUM(case when ((total_weight*220.462)-40000) >= 0 and class = 13 then total_weight else 0 end) c13,'+
+	 			'SUM(case when ((total_weight*'+mult+')-19539) >= 0 and class = 4 then total_weight else 0 end) as c4 ,'+
+	 			'SUM(case when ((total_weight*'+mult+')-31464) >= 0 and class = 5 then total_weight else 0 end) c5,'+
+	 			'SUM(case when ((total_weight*'+mult+')-39739) >= 0 and class = 6 then total_weight else 0 end) c6,'+
+	 			'SUM(case when ((total_weight*'+mult+')-37000) >= 0 and class = 7 then total_weight else 0 end) c7,'+
+	 			'SUM(case when ((total_weight*'+mult+')-40000) >= 0 and class = 8 then total_weight else 0 end) c8,'+
+	 			'SUM(case when ((total_weight*'+mult+')-51935) >= 0 and class = 9 then total_weight else 0 end) c9,'+
+	 			'SUM(case when ((total_weight*'+mult+')-31000) >= 0 and class = 10 then total_weight else 0 end) c10,'+
+	 			'SUM(case when ((total_weight*'+mult+')-40000) >= 0 and class = 11 then total_weight else 0 end) c11,'+
+	 			'SUM(case when ((total_weight*'+mult+')-40000) >= 0 and class = 12 then total_weight else 0 end) c12,'+
+	 			'SUM(case when ((total_weight*'+mult+')-40000) >= 0 and class = 13 then total_weight else 0 end) c13,'+
 	 			'station_id, '+
 	 			' dir,year,month,day, '+
 	 			' FROM [tmasWIM12.'+database+'] where state_fips = "'+fips+'" where year < 16'+

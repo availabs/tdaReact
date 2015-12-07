@@ -90,12 +90,19 @@ var GraphContainer = React.createClass({
         nv.addGraph(function() {
             var chart = nv.models.discreteBarChart()
               .x(function(d) { return d.label })    //Specify the data accessors.
-              .y(function(d) { return d.value })
+              .y(function(d) { return d.value/2000 })
               .staggerLabels(false)    //Too many bars and not enough room? Try staggering labels.
               .tooltips(true)        //Don't show tooltips
               .showValues(false)       //...instead, show the bar value right on top of each bar.
               .transitionDuration(350)
               .showXAxis(true);
+
+            chart.yAxis
+                .axisLabel('Tons')
+                .tickFormat(function(d){
+                    var label = +d;
+                    return parseInt(label);
+                }) 
 
             chart.xAxis     //Chart x-axis settings
                 .axisLabel('Stations')

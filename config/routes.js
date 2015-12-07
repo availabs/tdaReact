@@ -61,7 +61,7 @@ module.exports.routes = {
   // -- WIM data
   '/tmgWim/tonnage/:fips' : 'TmgWimController.TonageNew',
   '/tmgWim/tonnage/month/:fips/' :'TmgWimController.TonageMonthGraph',
-  '/tmgWim/tonnage/madt/:fips/' :'TmgWimController.TonageMadtGraph',
+  //'/tmgWim/tonnage/madt/:fips/' :'TmgWimController.TonageMadtGraph',
   '/tmgWim/:fips/:stationId':'TmgWimController.getWimStationData',
   '/enforcement/:fips' : 'TmgWimController.getEnforcementDashData',
   '/heatmap/:fips/:stationId' : 'TmgWimController.getEnforcementHeatData',

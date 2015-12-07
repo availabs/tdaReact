@@ -3,7 +3,8 @@ var wimgraphOut = {};
 (function() {
 	var wimgraph = {
 		version: "0.1.0",
-		classType : ''
+		classType : '',
+		agency : ''
 	};
 
 	function _WIMGrapher(id,db) {
@@ -34,16 +35,16 @@ var wimgraphOut = {};
 		
 					//Used to keep track of page type(class/wim)
 
-			route = ['url','station',''],	// URL to retrieve graph data from
+			route = ['url','station',''];	// URL to retrieve graph data from
 
-			agency = db ? db : 'allWim', 
+			wimgraph.agency = db ? db : 'allWim';
 			
 
 		// depth is an array object that is treated as a stack.
 		// Ss users delve deeper into graph times, the year, month, or
 		// day being viewed is pushed onto depth. The stack is initialized
 		// to the root of the data.
-			depth = [0],
+		var depth = [0],
 		// used to determine which time is currently being viewed,
 		// the key corresponds to the length of depth
 			TIMES = {
@@ -337,10 +338,11 @@ var wimgraphOut = {};
 		for (var i = 0; i < numBands; i++) {
 			range.push(i);
 		}
-
+		console.log('wim graph convert',wimgraph.agency)
 		var	weightScale = d3.scale.quantize()
 			.domain([0, maxWeight+bandSize])
 			.range(range),
+
 
 			_CONVERT = 220.462;  // multiplier to convert tenths of metric tons to pounds
 
@@ -485,9 +487,9 @@ var wimgraphOut = {};
 		// this function retrieves the requested data from the back end API
 		function _getData() {
 			
-			console.log("getData",{'database': agency, 'depth': depth,'id':route[1],'state_code':route[2]});
+			console.log("getData",{'database': wimgraph.agency, 'depth': depth,'id':route[1],'state_code':route[2]});
 			loader.style('display', 'inline')
-			d3.json(route[0]).post(JSON.stringify({'database': agency, 'depth': depth,'id':route[1],'state_code':route[2]}), function(error, data) {
+			d3.json(route[0]).post(JSON.stringify({'database': wimgraph.agency, 'depth': depth,'id':route[1],'state_code':route[2]}), function(error, data) {
             	if (error) {
             		console.log(error);
             		return;
@@ -574,6 +576,12 @@ var wimgraphOut = {};
 				currentTimeIndex = null,
 				i = 0;
 
+			var newTMG = {ncdotData:true};
+			
+			if(wimgraph.agency in newTMG){
+				_CONVERT = 1;
+			}
+			
 			while (i < data.rows.length) {
 				if (+data.rows[i].f[timeIndex].v === currentTimeIndex) {
 					// create a new data object for current time index
@@ -1128,12 +1136,12 @@ var wimgraphOut = {};
 		self.drawGraph = function(station, type, state,db) {
 			//stationID = station;
 			//stationType = type;
-			console.log('draw Graph',station,type,state,db,agency)
+			console.log('draw Graph',station,type,state,db,wimgraph.agency)
 			route[0] = '/station/'+type;
 			route[1] = station;
 			route[2] = state;
 			wimgraph.classType = type;
-			//agency = db;
+			wimgraph.agency = db;
 
 
 			if (type == 'class') {
