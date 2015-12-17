@@ -6,6 +6,7 @@ var React = require('react'),
     SparklinesLine  = require('../charts/sparklines').SparklinesLine,
     Heatmap = require('./heatmap.react'),
     ClientActionsCreator = require('../../actions/ClientActionsCreator'),
+    ReactSelect = require('react-select'),
     //, SparklinesBars, SparklinesLine, SparklinesNormalBand, SparklinesReferenceLine, SparklinesSpots }
 
     //-- Stores
@@ -36,7 +37,10 @@ var GraphContainer = React.createClass({
             toggleChart:false,
             currentData:[],
             sortBy:'percent',
-            activeStation:null
+            activeStation:null,
+            activeOver: 90000,
+            displayOver:90000,
+            type:'total'
         }
     },
     
@@ -70,7 +74,7 @@ var GraphContainer = React.createClass({
         }
     },
 
-    _loadData:function(fips,agency){
+    _loadData:function(fips,agency,threshold,type){
         var scope = this;
        
         if(!this.state.loading && fips && agency){
@@ -81,16 +85,19 @@ var GraphContainer = React.createClass({
                 currentData:[]
             });
 
+            console.log('loading data',threshold || this.state.activeOver)
             d3.json(url)
-                .post(JSON.stringify({filters:scope.props.filters}),function(err,data){
+                .post(JSON.stringify({
+                    type: type || this.state.type,
+                    threshold:threshold || this.state.activeOver,
+                    filters:scope.props.filters
+                }),function(err,data){
                 //console.log('adtGraph data',data)
-                
-                   
 
-                scope.setState({
-                    loading:false,
-                    currentData:scope.processData(data)
-                });
+                    scope.setState({
+                        loading:false,
+                        currentData:scope.processData(data)
+                    });
                 
             })
         }
@@ -142,6 +149,70 @@ var GraphContainer = React.createClass({
         d3.select('.station_'+id)
             .attr('stroke-width',0)
     },
+
+    changeSettings: function(e){
+        console.log('change',e.target.value)
+        this.setState({displayOver:e.target.value})
+    },
+
+    setWeight: function (){
+        this._loadData(this.props.selectedState,this.props.agency,this.state.displayOver);
+        this.setState({activeOver:this.state.displayOver})
+    },
+    typeChange:function(v){
+        console.log(v);
+        var newWeight = v === 'axle' ? 25000 : 90000;
+        this._loadData(this.props.selectedState,this.props.agency,newWeight,v);
+        this.setState({
+            type:v,
+            activeOver:newWeight,
+            displayOver:newWeight
+        })
+
+    },
+
+    renderSettings: function(){
+        var disabled = this.state.displayOver === this.state.activeOver ? ' disabled' : '',
+            typeOptions = [
+                { value:'total', label:'Gross Vehichle Weight' },
+                { value:'axle', label:'Axle Weight' },
+                { value:'bridge', label:'Bridge Forula' },
+
+            ]
+
+        return (
+            <div className='row'>
+
+            <div className='col-md-6'>
+
+                    Type: 
+                    <div className='form-group' style={{fontSize:10}}>
+                        <ReactSelect options={typeOptions} value={this.state.type} onChange={this.typeChange} />
+                    </div>
+                </div>
+                <div className='col-md-6'>
+
+                   Threshold (lbs) : 
+                    <div className='form-group'>
+                        <div className='input-group'>
+                            <input type='number' onChange={this.changeSettings} step='1000' className='form-control' value={this.state.displayOver} />
+                            <div className='input-group-btn'>
+                                <button type="button" className={"btn btn-default"+disabled} onClick={this.setWeight} >Set</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )
+    },
+    shouldComponentUpdate:function(nextProps,nextState){
+        // if(this.state.loading !== nextState.loading || this.props.selectedStation !== nextProps.selectedStation){
+        //     //console.log('should update?',this.state.loading !== nextState.loading,this.state.loading, nextState.loading)
+        //     return true;
+        // }
+        // return false;
+        return true
+    },
     render: function() {
         var scope = this;
        
@@ -149,6 +220,7 @@ var GraphContainer = React.createClass({
            
             return (
                 <section className="widget" style={{ background:'none'}}>
+                     {this.renderSettings()}
                      <div style={{position:'relative',top:'20%',left:'40%',width:'200px'}}>
                          Loading {this.props.selectedStation}<br /> 
                          <img src={'/images/loading.gif'} />
@@ -247,7 +319,7 @@ var GraphContainer = React.createClass({
                         <td colSpan={8} style={{height:300}}>
                              <i onClick={scope.toggleStation} className="fa fa-times pull-right" style={{cursor:'pointer',fontSize:14,padding:10}}> </i>
                                 <br />
-                             <Heatmap selectedState={scope.props.selectedState} agency={scope.props.agency} station={scope.props.selectedStation} />
+                             <Heatmap threshold={scope.state.activeOver} type={scope.state.type} selectedState={scope.props.selectedState} agency={scope.props.agency} station={scope.props.selectedStation} />
                         </td>
                     </tr>
                 )
@@ -285,14 +357,14 @@ var GraphContainer = React.createClass({
         return (
            
             <section className="widget" style={{ background:'none'}}>
-                 {this.props.selectedStation}
+                 {this.renderSettings()}
                 
                  <table className='table table-hover' style={{backgroundColor:'#fff'}} >
                     <thead>
                     <tr>
                          <th colSpan={3} style={{textAlign:'center'}}>Station</th>
                          <th colSpan={2}></th>
-                         <th colSpan={3}> Tractor Trailor Weight Violations </th>
+                         <th colSpan={3}> Tractor Trailor Weight </th>
                     </tr>
                     <tr>
                         <th>Id</th>

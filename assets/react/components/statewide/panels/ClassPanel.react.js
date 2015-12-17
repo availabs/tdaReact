@@ -1,4 +1,5 @@
 var React = require('react'),
+    Filters = require('../../layout/Filters.react'),
 
 	// -- compoinents
 	AdtGraph = require('../graphs/Adt.graph.react'),
@@ -16,7 +17,10 @@ var ClassPanel = React.createClass({
         }
 	    return (
 	    	<div>
-                
+                <Filters  
+                    agency={this.props.currentAgency.datasource}
+                    selectedState={this.props.selectedState} 
+                />
                 <AdtGraph
                     agency={this.props.currentAgency.datasource}
                     selectedState={this.props.selectedState} 

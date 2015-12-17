@@ -1,5 +1,5 @@
 var React = require('react'),
-
+    Filters = require('../../layout/Filters.react'),
     TonnageGraph = require('../graphs/Tonnage.graph.react'),
     MadTonnageGraph = require('../graphs/MadTonnage.graph.react');
 
@@ -16,6 +16,10 @@ var WimPanel = React.createClass({
         }
 	    return (
 	    	<div>
+                <Filters  
+                    agency={this.props.currentAgency.datasource}
+                    selectedState={this.props.selectedState} 
+                />
                 <TonnageGraph 
                     agency={this.props.currentAgency.datasource}
                     selectedState={this.props.selectedState}

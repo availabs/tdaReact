@@ -122,12 +122,22 @@ module.exports = {
 		var fips = req.param('fips'),
 			station = req.param('stationId'),
 			database = req.param('database'),
+			type = req.param('type') || 'total',
 			threshold = req.param('threshold') || 90000,
 			filters = req.param('filters') || {},
 			mult = database in newTMG ? '1' : '220.462';
 
+			var query = 'total_weight*'+mult+' >= '+threshold;
+			if(type === 'axle'){
+				query = ''
+				for(var i = 1; i < 13;i++){
+					query += " axle"+i+" *"+mult+" >= "+threshold+" or";
+				}
+				query += " axle13 *"+mult+" >= "+threshold
+			}
+
 		var sql = 'select DAYOFWEEK(TIMESTAMP(concat(STRING(year),"-",STRING(month),"-",STRING(day)))) as dow,'+
- 		' hour,count(1), dir, SUM(CASE WHEN total_weight*'+mult+' >= '+threshold+' THEN 1 ELSE 0 END) '+
+ 		' hour,count(1), dir, SUM(CASE WHEN '+query+' THEN 1 ELSE 0 END) '+
  		' from [tmasWIM12.'+database+'] '+
  		' where class >= 8 and station_id = "'+station+'" and state_fips="'+fips+'"'+
  		' group by dow,hour,dir order by dow,hour,dir'
@@ -155,14 +165,25 @@ module.exports = {
 	getEnforcementDashData:function(req,res){
 		var fips = req.param('fips'),
 			database = req.param('database'),
+			threshold = req.param('threshold') || 90000,
+			type = req.param('type') || 'total'
 			filters = req.param('filters') || {},
 			mult = database in newTMG ? '1' : '220.462';
 
 			console.log(database,newTMG,database in newTMG,mult);
 
+			var query = "a.total_weight*"+mult+" >= "+threshold;
+			if(type === 'axle'){
+				query = ''
+				for(var i = 1; i < 13;i++){
+					query += " a.axle"+i+" *"+mult+" >= "+threshold+" or";
+				}
+				query += " a.axle13 *"+mult+" >= "+threshold
+			}
+
 		var sql = "select station_id,"+
-			"       SUM(CASE WHEN a.total_weight*"+mult+" >= 90000 and a.class > 8 THEN 1 ELSE 0 END) as overTT,"+
-			"       SUM(CASE WHEN a.total_weight*"+mult+" >= 90000 and a.class <= 8 THEN 1 ELSE 0 END) as oversingle,"+
+			"       SUM(CASE WHEN "+query+" and a.class > 8 THEN 1 ELSE 0 END) as overTT,"+
+			"       SUM(CASE WHEN "+query+" and a.class <= 8 THEN 1 ELSE 0 END) as oversingle,"+
 			"       SUM(CASE WHEN a.class >= 8 THEN 1 ELSE 0 END) as TT,"+
 			"       SUM(CASE WHEN a.class < 8 THEN 1 ELSE 0 END) as single,"+
 			"       month,"+
@@ -372,16 +393,7 @@ function TonageData(fips,database,cb){
 		if(!fips){
 			return {status:"error",message:"state FIPS required"}
 		}
-		// if(typeof req.param('stationId') == 'undefined'){
-		// 	res.send('{status:"error",message:"state FIPS required"}',500);
-		// 	return;
-		// }
-		// var stationId = req.param('stationId'),
-		// 	fips = req.param('fips'),
-		// 	database = req.param('database');
-
-		// var empty_truck_tonage = 43558,
-		// 	truck_class = 9
+		
 		fileCache.checkCache({datasource:database,type:'stateTonnage',typeId:fips},function(data){
 			if(data){
 				console.log('cache sucess');

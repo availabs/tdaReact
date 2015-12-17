@@ -33,6 +33,7 @@ var GraphContainer = React.createClass({
             currentData:[],
             display:'total',
             direction:null,
+            loading:true
         }
     },
 
@@ -54,15 +55,19 @@ var GraphContainer = React.createClass({
         if(fips && agency){
             var url = '/heatmap/'+fips+'/'+station+'?database='+agency;
 
-            this.setState({currentData:[]});
+            this.setState({currentData:[],loading:true});
             d3.json(url)
-            .post(JSON.stringify({filters:scope.props.filters}),function(err,data){
+            .post(JSON.stringify({
+                type:scope.props.type,
+                threshold:scope.props.threshold ,
+                filters:scope.props.filters}),function(err,data){
                     
                 if(err){ console.log('error:',err),  scope.setState({currentData:[]});}
                 var newData = scope.processData(data)
                 scope.setState({
                     currentData:newData,
-                    direction:Object.keys(newData)[0]
+                    direction:Object.keys(newData)[0],
+                    loading:false
                 });
                 
             })
@@ -208,6 +213,14 @@ var GraphContainer = React.createClass({
         this.setState({display:val})
     },
 
+    shouldComponentUpdate:function(nextProps,nextState){
+        if(this.state.loading !== nextState.loading || nextProps.selectedState !== this.props.selectedState || this.props.agency !== nextProps.agency  || nextProps.station !== this.props.station){
+            //console.log('update?',this.state.loading !== nextState.loading,zthis.state.loading !== nextState.loading)
+            return true;
+        }
+        return true;
+    },
+ 
     render: function() {
         var scope = this;
        
