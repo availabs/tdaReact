@@ -338,10 +338,14 @@ var StateWideMap = React.createClass({
                     'type_'+type
                 };
 
-                AdtScale.range([0,3,4,5,6,7,8,9])
-                options.radius = AdtScale(d.properties.ADT || 0);
+                // AdtScale.range([0,3,4,5,6,7,8,9])
+                // options.radius = AdtScale(d.properties.ADT || 0);
+                // AdtScale.range(colorRange);                
+                // options.fillColor = AdtScale(d.properties.ADT || 0);
+
+                options.radius = AdtScale(d.properties.ADT || 0) === 0 ? 0 :type === 'WIM' ? 6 : 5
                 AdtScale.range(colorRange);                
-                options.fillColor = AdtScale(d.properties.ADT || 0);
+                options.fillColor =  type === 'WIM' ? 'rgb(35, 139, 69)' : 'rgb(5, 112, 176)';
 
                 return L.circleMarker(latlng, options);
             },
@@ -349,7 +353,7 @@ var StateWideMap = React.createClass({
                 
                 layer.on({
                     click: function(e){
-                        //console.log('sclick',feature.properties.station_id,feature.properties.state_fips)
+                       console.log('sclick',feature.properties.station_id,feature.properties.state_fips)
                        ClientActionsCreator.setSelectedStation(feature.properties.station_id,feature.properties.state_fips);
                        var d = e.target.feature;
                       
