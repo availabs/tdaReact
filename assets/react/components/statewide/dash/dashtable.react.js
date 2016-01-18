@@ -344,7 +344,7 @@ var GraphContainer = React.createClass({
                         <th></th>
                         <th>Id</th>
                         <th>Type</th>
-                        <th className={scope.state.sortBy === 'class' ? 'active' : ''} onClick={scope.sortClick.bind(null,'class')} >Class</th>
+                        <th className={scope.state.sortBy === 'class' ? 'active' : ''} onClick={scope.sortClick.bind(null,'class')}>Class</th>
                         <th className={scope.state.sortBy === 'route' ? 'active' : ''} onClick={scope.sortClick.bind(null,'route')}>Route</th>
                         <th colSpan={2}><small>last 12 months</small> </th>
                         <th className={scope.state.sortBy === 'madt' ? 'active' : ''} style={{textAlign:'right',cursor:'pointer'}} onClick={scope.sortClick.bind(null,'madt')}> 

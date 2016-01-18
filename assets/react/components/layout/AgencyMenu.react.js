@@ -53,7 +53,7 @@ var AgencyMenu = React.createClass({
 
         return (
              <li className="dropdown">
-                <a href="#" title="Messages" id="messages" className="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                <a href="#" title="Data Sources" id="messages" className="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                     <i className="fa fa-database"></i>
                 </a>
                 <ul id="messages-menu" className="dropdown-menu messages" role="menu">

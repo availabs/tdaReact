@@ -69,6 +69,27 @@ var StateWideMap = React.createClass({
             }else{
                  d3.selectAll('.type_Class').style('display','block')
             }
+            if(nextProps.activeView === 'class'){
+                this.state.stations.features.forEach(function(d){
+                    console.log('aa',d.properties)
+                    d3.select('.station_'+d.properties.station_id)
+                        .attr('fill',AdtScale(d.properties.ADT))
+                    //console.log(d.properties.station_id,AdtScale(d.properties.ADT))
+                })
+            }
+            console.log(nextProps.activeView , 'dash')
+            if(nextProps.activeView === 'dash' || nextProps.activeView === 'enforcement'){
+                
+                console.log('new dash')
+                d3.selectAll('.type_Class')
+                    .attr('fill','rgb(5, 112, 176)')
+
+                d3.selectAll('.type_WIM')
+                    .attr('fill','rgb(35, 139, 69)')
+                        
+               
+            }
+
         
         }
         if(nextProps.selectedState !== this.state.selectedState){
@@ -76,6 +97,7 @@ var StateWideMap = React.createClass({
             this.setState({selectedState:nextProps.selectedState});
         
         }
+
         if(nextProps.selectedStation !== this.props.selectedStation){
             d3.selectAll('.selected_station').classed('selected_station',false)
             d3.selectAll('.station_'+nextProps.selectedStation).classed('selected_station',true)
@@ -338,14 +360,18 @@ var StateWideMap = React.createClass({
                     'type_'+type
                 };
 
-                AdtScale.range([0,3,4,5,6,7,8,9])
-                // options.radius = AdtScale(d.properties.ADT || 0);
-                // AdtScale.range(colorRange);                
-                // options.fillColor = AdtScale(d.properties.ADT || 0);
+                //console.log('test', scope.props.activeView)
+                    // AdtScale.range([0,3,4,5,6,7,8,9])
+                    // options.radius = AdtScale(d.properties.ADT || 0);
+                    // AdtScale.range(colorRange);                
+                    // options.fillColor = AdtScale(d.properties.ADT || 0);
 
-                options.radius = AdtScale(d.properties.ADT || 0) === 0 ? 0 : type === 'WIM' ? 6 : 5
-                AdtScale.range(colorRange);                
-                options.fillColor =  type === 'WIM' ? 'rgb(35, 139, 69)' : 'rgb(5, 112, 176)';
+
+                    options.radius = AdtScale(d.properties.ADT || 0) === 0 ? 0 : type === 'WIM' ? 6 : 5
+                    AdtScale.range(colorRange);                
+                    options.fillColor =  type === 'WIM' ? 'rgb(35, 139, 69)' : 'rgb(5, 112, 176)';
+
+                
 
                 return L.circleMarker(latlng, options);
             },
@@ -441,7 +467,7 @@ var StateWideMap = React.createClass({
     // HPMS
     //----------------------------------------------------------------------------------------------------------------
     _loadHPMS:function(){
-        console.log('load hpms')
+        console.log('load hpms',this.state.selectedState)
         var scope = this;
         if(map.hasLayer(vectorLayer)){
             map.removeLayer(vectorLayer);
@@ -538,7 +564,8 @@ var StateWideMap = React.createClass({
         };
         vectorLayer = new L.TileLayer.Vector(url, options, vectorOptions); 
        
-            // add as base to switch with radio instead of checkbox
+        // add as base to switch with radio instead of checkbox
+        console.log('add to map', vectorLayer)
         vectorLayer.addTo(map);
             
     }

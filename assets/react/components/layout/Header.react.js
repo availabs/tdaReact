@@ -45,7 +45,7 @@ var Header = React.createClass({
                             </a>
                         </li>
 
-                        <li className="hidden-xs"><a href="/logout"><i className="fa fa-sign-out"></i></a></li>
+                        <li className="hidden-xs" title="Log Out"><a href="/logout"><i className="fa fa-sign-out"></i></a></li>
                     </ul>
                 </div>
             </header>
