@@ -133,7 +133,8 @@ L.TileQueue.prototype = {
                     time = +new Date - start;
                     timeout = Math.floor(time * 0.3);
                     //console.log('added  ' + tile.key + ' (' + time + 'ms > ' + timeout + 'ms)');
-                    this._queueTimeout = setTimeout(L.bind(arguments.callee, this), timeout);
+                    //console.log('callee', arguments.callee)
+                    this._queueTimeout = null;//setTimeout(L.bind(arguments.callee, this), timeout);
                 } else {
                     this._queueTimeout = null;
                 }

@@ -21,6 +21,7 @@ var React = require('react'),
     leafletTileLayer =  require('../../utils/dependencies/L.Tilelayer.Vector'),
     fips2state =        require('../../utils/data/fips2state'),
     stnCardMeta =        require('../../utils/data/stnCardMeta');
+
     
 var map = null,
     geoData = {'states':null,'congress':null,'counties':null},
@@ -287,7 +288,13 @@ var StateWideMap = React.createClass({
 
         
     },
+    componentWillUpdate: function(nextProps, nextState){
+        console.log('map update',this.state.selectedState, nextState.selectedState, nextProps.activeView)
 
+        if(nextProps.activeView === 'hpms'){
+            this._loadHPMS()
+        }
+    },
     //----------------------------------------------------------------------------------------------------------------
     // Render Components
     //----------------------------------------------------------------------------------------------------------------
@@ -571,10 +578,16 @@ var StateWideMap = React.createClass({
             //maxNativeZoom: 7,
             minZoom: 2
         };
+
+        var d3Vector= {
+            style: style
+        };
         vectorLayer = new L.TileLayer.Vector(url, options, vectorOptions); 
-       
+        //map._initPathRoot();
+        //vectorLayer = new L.TileLayer.d3_topoJSON(url, d3Vector)
+
         // add as base to switch with radio instead of checkbox
-        console.log('add to map', vectorLayer)
+        //console.log('add to map', vectorLayer)
         vectorLayer.addTo(map);
             
     }
