@@ -6,6 +6,12 @@ var React = require('react'),
     MadtGraph = require('../graphs/Madt.graph.react');
 
 var ClassPanel = React.createClass({
+    
+    onDataChange:function(data){
+        if(this.props.onDataChange){
+            this.props.onDataChange(data)
+        }
+    },
 
 	render: function() {
         if(!this.props.selectedState){
@@ -24,7 +30,8 @@ var ClassPanel = React.createClass({
                 <AdtGraph
                     agency={this.props.currentAgency.datasource}
                     selectedState={this.props.selectedState} 
-                    filters={this.props.activeFilters} />
+                    filters={this.props.activeFilters}
+                    onDataChange={this.onDataChange}/>
 
                 <MadtGraph
                     agency={this.props.currentAgency.datasource}  

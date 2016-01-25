@@ -9,7 +9,6 @@ var React = require('react'),
     StateWideStore = require('../../stores/StatewideStore'),
 
     // -- Components
-    ToolTip = require('../utils/ToolTip.react'),
 
     // -- Actions
     ClientActionsCreator = require('../../actions/ClientActionsCreator'),
@@ -62,6 +61,15 @@ var StateWideMap = React.createClass({
     },
     
     componentWillReceiveProps:function(nextProps){
+
+        var scope = this;
+        if(nextProps.activeView === 'class' || nextProps.activeView === 'wim'){
+            this.state.stations.features.forEach(function(d){
+                d3.select('.station_'+d.properties.station_id)
+                    .attr('fill', scope.props.mapData[d.properties.station_id] ? scope.props.mapData[d.properties.station_id] :  AdtScale(0))
+                //console.log(d.properties.station_id,AdtScale(d.properties.ADT))
+            })
+        }
         if(nextProps.activeView !== this.props.activeView){
             //console.log('new view')
             if(nextProps.activeView === 'wim' || nextProps.activeView === 'enforcement'){
@@ -69,13 +77,7 @@ var StateWideMap = React.createClass({
             }else{
                  d3.selectAll('.type_Class').style('display','block')
             }
-            if(nextProps.activeView === 'class'){
-                this.state.stations.features.forEach(function(d){
-                    d3.select('.station_'+d.properties.station_id)
-                        .attr('fill',AdtScale(d.properties.ADT))
-                    //console.log(d.properties.station_id,AdtScale(d.properties.ADT))
-                })
-            }
+            
             console.log(nextProps.activeView , 'dash')
             if(nextProps.activeView === 'dash' || nextProps.activeView === 'enforcement'){
                 
@@ -299,7 +301,6 @@ var StateWideMap = React.createClass({
 
         return (
             <div id="map">
-                <ToolTip />
             </div>
         );
     },

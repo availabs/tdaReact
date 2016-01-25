@@ -9,6 +9,7 @@ var React = require('react'),
     HpmsPanel = require('../components/statewide/panels/HpmsPanel.react'),
     EnforcementPanel = require('../components/statewide/panels/EnforcementPanel.react'),
     SingleStationPanel = require('../components/statewide/panels/SingleStationPanel.react'),
+    ToolTip = require('../components/utils/ToolTip.react'),
 
     WidgetHeader = require('../components/WidgetHeader.react'),
         
@@ -27,7 +28,8 @@ var StateIndex = React.createClass({
     
     getInitialState: function() {
         return {
-            activeComponent:'dash'
+            activeComponent:'dash',
+            mapData: {}
         };
     },
     
@@ -40,6 +42,17 @@ var StateIndex = React.createClass({
     //----------------------------------------------------------------------------------------------------------------
     // Render Components
     //----------------------------------------------------------------------------------------------------------------
+    setData(data){
+        var mapColors = {};
+        data.forEach(function(d){
+            mapColors[d.label] = d.color;
+        })
+        console.log('setData',mapColors)
+        this.setState({
+            mapData:mapColors
+        })
+    },
+
     render: function() {
         // var mapStyle ={
            
@@ -57,11 +70,11 @@ var StateIndex = React.createClass({
             break;
 
             case 'class':
-                currentPanel = <ClassPanel currentAgency={this.props.currentAgency} selectedState={this.props.selectedState} selectedStation={this.props.selectedStation} activeFilters={this.props.activeFilters} />;
+                currentPanel = <ClassPanel currentAgency={this.props.currentAgency} selectedState={this.props.selectedState} selectedStation={this.props.selectedStation} activeFilters={this.props.activeFilters} onDataChange={this.setData} />;
             break;
 
             case 'wim':
-                currentPanel = <WimPanel currentAgency={this.props.currentAgency} selectedState={this.props.selectedState} selectedStation={this.props.selectedStation} activeFilters={this.props.activeFilters} />;
+                currentPanel = <WimPanel currentAgency={this.props.currentAgency} selectedState={this.props.selectedState} selectedStation={this.props.selectedStation} activeFilters={this.props.activeFilters} onDataChange={this.setData}/>;
             break;
 
             case 'hpms':
@@ -88,7 +101,8 @@ var StateIndex = React.createClass({
                                     agency={this.props.currentAgency.datasource}
                                     selectedState={this.props.selectedState}
                                     filters={this.props.activeFilters}
-                                    stations={this.props.stations} />
+                                    stations={this.props.stations}
+                                    mapData={this.state.mapData} />
                             </div>
                         </section>
                     </div>
@@ -124,25 +138,13 @@ var StateIndex = React.createClass({
 
                             </div>
                         </section>
-                                                
-                        
-
-                        
-
                     </div>
-                   
-                    
                 </div>
-                
+                <ToolTip />
             </div>
             
         );
-    },
-
-    
-    
-
-    
+    }
 
 });
 

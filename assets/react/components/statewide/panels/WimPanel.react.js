@@ -5,6 +5,12 @@ var React = require('react'),
 
 var WimPanel = React.createClass({
 
+    onDataChange:function(data){
+        if(this.props.onDataChange){
+            this.props.onDataChange(data)
+        }
+    },
+
 	render: function() {
         console.log()
         if(!this.props.selectedState){
@@ -18,12 +24,13 @@ var WimPanel = React.createClass({
 	    	<div>
                 <Filters  
                     agency={this.props.currentAgency.datasource}
-                    selectedState={this.props.selectedState} 
+                    selectedState={this.props.selectedState}
                 />
                 <TonnageGraph 
                     agency={this.props.currentAgency.datasource}
                     selectedState={this.props.selectedState}
-                    filters={this.props.activeFilters} />
+                    filters={this.props.activeFilters}
+                    onDataChange={this.onDataChange} />
 
                 <MadTonnageGraph 
                     agency={this.props.currentAgency.datasource}

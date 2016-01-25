@@ -72,7 +72,9 @@ var GraphContainer = React.createClass({
                     }).sort(function(a,b){
                         return b.value - a.value
                     })
-
+                    if(scope.props.onDataChange){
+                        scope.props.onDataChange(output)
+                    }
                     scope.setState({currentData:output});
                 }
             })
