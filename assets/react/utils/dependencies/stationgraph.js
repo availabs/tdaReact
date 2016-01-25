@@ -31,6 +31,8 @@ var wimgraphOut = {};
 		// variable to keep track of weight classes in current data set
 			weightValues = [],
 
+			axleValues = [],
+
 			_formatData,
 		
 					//Used to keep track of page type(class/wim)
@@ -80,9 +82,54 @@ var wimgraphOut = {};
 				.classed('inactive', true)
 				.on('click', _selectorToggle);
 
+		var wSelectorDIV = d3.select(id).append('div')
+				.append('div')
+				.attr('id','weightSelector')
+				.attr('class', 'btn-group')
+				.style('display','none'),
+
+
+			totalWeightButton = wSelectorDIV.append('a')
+				.style('color','#000')
+				.text('Total Weight')
+				.attr('class','btn')
+				.classed('active', true)
+				.on('click', _weightToggle),
+
+			axleWeightButton = wSelectorDIV.append('a')
+				.style('color','#000')
+				.text('Axle Weight')
+				.attr('class','btn')
+				.classed('inactive', true)
+				.on('click', _weightToggle);
+
 		// this function is used to toggle between
-		// the weight/class graph
+		// the weight/class graphx
 		// and the weight dist. graph
+		function _weightToggle() {
+			var self = d3.select(this),
+				active = self.classed('active'),
+				deactivated = self.classed('deactivated');
+
+			if (!active && !clicked && !deactivated) {
+
+				wSelectorDIV.selectAll('a')
+					.classed('active', false)
+					.classed('inactive', true)
+				self.classed('active', true)
+					.classed('inactive', false)
+
+				if (totalWeightButton.classed('active')) {
+					//switch to total weight
+					_drawWDGraph('weight')
+				} else {
+					//switch to axle weight
+					_drawWDGraph('maxAxle')
+				}
+			}
+		}
+
+
 		function _selectorToggle() {
 			var self = d3.select(this),
 				active = self.classed('active'),
@@ -97,8 +144,10 @@ var wimgraphOut = {};
 					.classed('inactive', false)
 
 				if (classWeightButton.classed('active')) {
+					wSelectorDIV.style('display','none')
 					_toggleSVG(cwSVG);
 				} else {
+					wSelectorDIV.style('display','block')
 					_toggleSVG(wdSVG);
 				}
 			}
@@ -553,6 +602,7 @@ var wimgraphOut = {};
 		function _formatWIMData(data) {
 			classValues = [];
 			weightValues = [];
+			axleValues = [];
 
 			for (var weight in weightScale.range()) {
 				_FILTERS.weightDistribution[weight] = true;
@@ -598,7 +648,9 @@ var wimgraphOut = {};
 					_pushUnique(classValues, dataObj.class);
 					dataObj.weight = weightScale(dataObj.weight*_CONVERT);
 					_pushUnique(weightValues, dataObj.weight);
-
+					dataObj.maxAxle = weightScale(dataObj.maxAxle*_CONVERT);
+					_pushUnique(axleValues, dataObj.maxAxle);
+					
 					obj.data.push(dataObj);
 
 					i++;
@@ -662,7 +714,8 @@ var wimgraphOut = {};
 
 			return Math.min(Math.floor(i / (bandSize/WDbandSize)), maxIndex)
 		}
-		function _filterWeightDistributionData() {
+		function _filterWeightDistributionData(mode) {
+			mode = mode || 'weight'
 			var filtered = [];
 
 			var obj = null,
@@ -672,7 +725,7 @@ var wimgraphOut = {};
 				current = weightDistributionData[wdIndex];
 
 				obj = {};
-				obj.weight = wdIndex;
+				obj[mode] = wdIndex;
 				obj.amount = 0;
 				obj.extent = wdScale.invertExtent(+wdIndex);
 
@@ -689,12 +742,12 @@ var wimgraphOut = {};
 					}
 				}
 			}
-
 			return filtered;
 		}
-		function _drawWDGraph() {
-			
-			var data = _sortBy(_filterWeightDistributionData(), 'weight'),
+
+		function _drawWDGraph(mode) {
+			mode = mode || 'weight'
+			var data = _sortBy(_filterWeightDistributionData(mode), mode),
 				Ymax = d3.max(data, function(d) {return d.amount; });
 		   	var barWidth = Math.min((wdth-(data.length+1)*2) / data.length, 75),
 		   		space = wdth - (barWidth * data.length),
@@ -708,7 +761,7 @@ var wimgraphOut = {};
 
 		   	Yscale.domain([0, Ymax]);
 		   	
-
+		   	wdGraphSVG.selectAll('rect').remove();
 		   	var bars = wdGraphSVG.selectAll('rect').data(data);
 		   	bars.enter().append('rect')
 		   		.attr('y', hght)
@@ -716,7 +769,7 @@ var wimgraphOut = {};
 		    	.attr('height', 0)
 				.style('opacity', 0.75)
 		        .attr('fill', function(d) {
-		        	return _LEGEND_COLORS.weight[_WD2Weight(d.weight)];
+		        	return _LEGEND_COLORS.weight[_WD2Weight(d[mode])];
 		        })
 		        .on('mouseover', function(d) {
 		        	d3.select(this).attr('fill', '#d73027');
@@ -735,7 +788,7 @@ var wimgraphOut = {};
 		        .on('mousemove', function() { _movePopup(this); })
 		        .on('mouseout', function(d) {
 		        	d3.select(this).attr('fill', function(d) {
-		        		return _LEGEND_COLORS.weight[_WD2Weight(d.weight)];
+		        		return _LEGEND_COLORS.weight[_WD2Weight(d[mode])];
 		        	})
 		        	_hidePopup();
 		        });
@@ -744,14 +797,14 @@ var wimgraphOut = {};
 		   		.duration(500)
 		   		.attr('class', null)
 		   		.attr('class', function(d) {
-		   			return 'weight'+_WD2Weight(d.weight);
+		   			return 'weight'+_WD2Weight(d[mode]);
 		   		})
 		   		.attr('y', function(d) { return Yscale(d.amount); })
 		   		.attr('x', function(d, i) { return (i*(barWidth + gap) + gap); })
 		    	.attr('height', function(d) { return hght - Yscale(d.amount); })
 		        .attr('width', barWidth)
 		        .attr('fill', function(d) {
-		        	return _LEGEND_COLORS.weight[_WD2Weight(d.weight)];
+		        	return _LEGEND_COLORS.weight[_WD2Weight(d[mode])];
 		        });
 
 		   	bars.exit()
@@ -861,8 +914,8 @@ var wimgraphOut = {};
 		   	var timeRow = ""
 		   	for(var x = 0;x<data.length;x++){
 		   		if(time === "year"){
-		   			timeRow = timeRow+"<th style='color:#fff'>"+(2000+data[x][time])+"</th>"
-		   			ticks[x] = ticks[x]+2000
+		   			timeRow = timeRow+"<th style='color:#fff'>"+(data[x][time])+"</th>"
+		   			ticks[x] = ticks[x]
 		   		}
 		   		else if(time === "month"){
 		   			timeRow = timeRow+"<th style='color:#fff'>"+monthCheck(data[x][time]-1)+"</th>"

@@ -189,14 +189,19 @@ module.exports = {
       		//console.timeEnd('getWimStationDataSend')
 	    });
  		function generateSQL() {
- 			var sql	= "SELECT " + select[depth.length] + ", class, total_weight AS weight, count(*) AS amount "
+ 			var sql	= "SELECT " + select[depth.length] + ", class, total_weight AS weight, count(*) AS amount, "
+ 				+ "GREATEST(IFNULL(axle1,0),IFNULL(axle2,0),IFNULL(axle3,0),IFNULL(axle4,0),IFNULL(axle5,0),IFNULL(axle6,0),IFNULL(axle7,0),IFNULL(axle8,0),IFNULL(axle9,0),IFNULL(axle10,0),IFNULL(axle11,0),IFNULL(axle12,0),IFNULL(axle13,0)) as maxAxle "
  				+ "FROM [tmasWIM12."+database+"] "
  				+ "WHERE station_id = '"+station_id+"' "
  				+ "and state_fips ='"+state+"' "
  				+ addPredicates()
- 				+ "GROUP BY " + select[depth.length] + ", class, weight "
+ 				+ "GROUP BY " + select[depth.length] + ", class, weight, maxAxle "
  				+ "ORDER BY " + select[depth.length] + ";";
+ 			console.log('wimgraph weight')
+ 			console.log('--------------------------')
  			console.log(sql)
+ 			console.log('--------------------------')
+ 			
  			return sql;
  		}
  		function addPredicates() {
@@ -365,7 +370,10 @@ module.exports = {
 	 			}
 	 			if(filters.dir){
 	 				cFilter.getDimension('dir').filter(filters.dir)	 				
-	 			};
+	 			}
+	 			if(filters.class){
+	 				cFilter.getDimension('class').filter(filters.class)	 				
+	 			}
 
 
 	 			var data = cFilter.getGroups()
@@ -419,6 +427,7 @@ module.exports = {
 				cFilter.getDimension('year').filter(null);
 	 			cFilter.getDimension('month').filter(null);
 	 			cFilter.getDimension('dir').filter(null);
+	 			cFilter.getDimension('class').filter(null);
 	 		
 	 			if(filters.year){
 	 				cFilter.getDimension('year').filter(filters.year)
@@ -428,7 +437,10 @@ module.exports = {
 	 			}
 	 			if(filters.dir){
 	 				cFilter.getDimension('dir').filter(filters.dir)	 				
-	 			};
+	 			}
+	 			if(filters.class){
+	 				cFilter.getDimension('class').filter(filters.class)	 				
+	 			}
 
 		        var stationADT = cFilter.getGroups()
 		            .ADT.order(function(p){return p.avg})
@@ -518,6 +530,8 @@ module.exports = {
  			if(cFilter.initialized()){
  				cFilter.getDimension('year').filter(null);
 	 			cFilter.getDimension('month').filter(null);
+
+	 			cFilter.getDimension('class').filter(null)
 	 		
 	 			if(filters.year){
 	 				cFilter.getDimension('year').filter(filters.year)
@@ -525,7 +539,9 @@ module.exports = {
 	 			if(filters.month){
 	 				cFilter.getDimension('month').filter(filters.month)
 	 			}
- 			
+ 				if(filters.class){
+	 				cFilter.getDimension('class').filter(filters.class)	 				
+	 			}
 		
 				var classGrouping = 'classSum';//'classGroup' 
 	 			var output = cFilter.getGroup(classGrouping).top(Infinity).map(function(vclass,i){

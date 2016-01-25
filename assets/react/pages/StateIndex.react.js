@@ -112,7 +112,7 @@ var StateIndex = React.createClass({
                                         <a  value="hpms">HPMS</a>
                                     </li>
                                     <li className={this.state.activeComponent === 'enforcement' ? 'active' : ''}>
-                                        <a  value="enforcement">Enforcement</a>
+                                        <a  value="enforcement">Overweight Analysis</a>
                                     </li>
                                     {activeStation}
                                 </ul>

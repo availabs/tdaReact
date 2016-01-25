@@ -28,7 +28,7 @@ var map = null,
     stateLayer = null,
     stationLayer = null,
     vectorLayer = null,
-    colorRange = colorbrewer.RdYlBu[5].reverse(),
+    colorRange = ["#313695", "#4575b4", "#74add1", "#fdae61", "#f46d43", "#d73027", "#a50026"],//colorbrewer.RdYlBu[5].reverse(),
     AdtScale = d3.scale.quantile().domain([0,70000]),
     HpmsScale = d3.scale.quantile().domain([500,150000]).range(colorRange),
     hpmsData = [];
@@ -71,7 +71,6 @@ var StateWideMap = React.createClass({
             }
             if(nextProps.activeView === 'class'){
                 this.state.stations.features.forEach(function(d){
-                    console.log('aa',d.properties)
                     d3.select('.station_'+d.properties.station_id)
                         .attr('fill',AdtScale(d.properties.ADT))
                     //console.log(d.properties.station_id,AdtScale(d.properties.ADT))
@@ -83,6 +82,9 @@ var StateWideMap = React.createClass({
                 console.log('new dash')
                 d3.selectAll('.type_Class')
                     .attr('fill','rgb(5, 112, 176)')
+                    // .arrt('r',function(d){
+                    //     d.prop
+                    // })
 
                 d3.selectAll('.type_WIM')
                     .attr('fill','rgb(35, 139, 69)')
@@ -362,12 +364,15 @@ var StateWideMap = React.createClass({
 
                 //console.log('test', scope.props.activeView)
                     // AdtScale.range([0,3,4,5,6,7,8,9])
-                    // options.radius = AdtScale(d.properties.ADT || 0);
                     // AdtScale.range(colorRange);                
                     // options.fillColor = AdtScale(d.properties.ADT || 0);
 
-
-                    options.radius = AdtScale(d.properties.ADT || 0) === 0 ? 0 : type === 'WIM' ? 6 : 5
+                    AdtScale.range([0,3,4,5,6,7,8,9])
+                    if(!d.properties.ADT){
+                        options.radius = 0
+                    }else{
+                        options.radius = AdtScale(d.properties.ADT || 0) === 0 ? 0 : type === 'WIM' ? 6 : 5
+                    }
                     AdtScale.range(colorRange);                
                     options.fillColor =  type === 'WIM' ? 'rgb(35, 139, 69)' : 'rgb(5, 112, 176)';
 
@@ -500,8 +505,9 @@ var StateWideMap = React.createClass({
             d3.selectAll('.station_'+e.target.feature.properties.station_id).classed('highlighted-station',true);
             var toolTip = d3.select('.ToolTip').style({
                 top:+(e.originalEvent.clientY+5)+'px',
-                left:+(e.originalEvent.clientX+5)+'px',
-                display:'block'
+                right: 0-((+e.originalEvent.clientX+5)) +'px',
+                display:'block',
+                'z-index':999999
             });
 
             toolTip.select('h4')

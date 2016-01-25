@@ -40,7 +40,10 @@ module.exports = {
 			database = req.param('database'),
 			timescale = req.param('monthly') ? ',month' : '',
 			mult = database in newTMG ? '1' : '220.462';
-
+		var filters = req.param('filters') || {}
+		console.log('tonage new filters',filters)
+		var whereClass = filters.class ? ' and class = '+ filters.class + ' ' : ''
+		var whereYear = filters.year ? ' and year = '+ filters.year + ' ' : ''
 
 		var sql = 	'SELECT'+
 					'(SUM(case when ((total_weight*'+mult+')-19539) >= 0 and class = 4 then total_weight else 0 end) + '+
@@ -56,7 +59,7 @@ module.exports = {
 					'count(DISTINCT concat(STRING(year),"-",STRING(month),"-",STRING(day)))  as value, '+
 					'station_id as label '+ 
 					timescale + 
-	 			' FROM [tmasWIM12.'+database+'] where state_fips = "'+fips+'" and year < 16'+
+	 			' FROM [tmasWIM12.'+database+'] where state_fips = "'+fips+'" and year < 16 '+whereClass+' '+whereYear+
 	 			' group by label '+timescale
 
 	 	console.log('------------------------------------------------')
@@ -295,6 +298,7 @@ module.exports = {
 				cFilter.getDimension('year').filter(null);
 	 			cFilter.getDimension('month').filter(null);
 	 			cFilter.getDimension('dir').filter(null);
+	 			cFilter.getDimension('class').filter(null);
 	 		
 	 			if(filters.year){
 	 				cFilter.getDimension('year').filter(filters.year)
@@ -304,7 +308,11 @@ module.exports = {
 	 			}
 	 			if(filters.dir){
 	 				cFilter.getDimension('dir').filter(filters.dir)	 				
-	 			};
+	 			}
+	 			if(filters.class){
+	 				cFilter.getDimension('dir').filter(filters.dir)	 				
+	 			}
+
 				
 
 				var output = cFilter.getGroup('ADT').top(Infinity);

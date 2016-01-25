@@ -14,9 +14,6 @@ var labelStyle = {
 	"textlign":"center"
 }
 
-
-
-
 var Filters = React.createClass({
 //style="overflow-y: auto; min-height: 60px; max-height: 123px;"
     getInitialState: function() {
@@ -146,7 +143,26 @@ var Filters = React.createClass({
             return output;
         }
     },
-
+    _renderDirection : function(){
+        return (
+            <div className="col-xs-4" >
+                <label className="control-label centered" style={labelStyle} ><strong>Direction</strong></label>
+                <div className="controls form-group">
+                    <div className="btn-group bootstrap-select col-md-12">
+                        <button className="btn dropdown-toggle clearfix btn-primary btn-sm btn-block" 
+                            data-toggle="dropdown" id="simple-big" tabIndex="-1" 
+                            aria-expanded="false">
+                            <span className="filter-option">{currentDir}</span>&nbsp;<i className="fa fa-caret-down"></i>
+                        </button>
+                        <ul className="dropdown-menu" role="menu" >
+                            <li rel="0"><a tabIndex="-1" onClick={scope._setDirFilter} value={null}>All</a></li>
+                            {dirs}
+                        </ul>
+                    </div>               
+                </div>
+            </div>
+        )
+    },
     _getClasses : function(){
         var scope = this;
 
@@ -231,22 +247,7 @@ var Filters = React.createClass({
                                     </div>               
                                 </div>
                             </div>
-                            <div className="col-xs-4" >
-                                <label className="control-label centered" style={labelStyle} ><strong>Direction</strong></label>
-                                <div className="controls form-group">
-                                    <div className="btn-group bootstrap-select col-md-12">
-                                        <button className="btn dropdown-toggle clearfix btn-primary btn-sm btn-block" 
-                                            data-toggle="dropdown" id="simple-big" tabIndex="-1" 
-                                            aria-expanded="false">
-                                            <span className="filter-option">{currentDir}</span>&nbsp;<i className="fa fa-caret-down"></i>
-                                        </button>
-                                        <ul className="dropdown-menu" role="menu" >
-                                            <li rel="0"><a tabIndex="-1" onClick={scope._setDirFilter} value={null}>All</a></li>
-                                            {dirs}
-                                        </ul>
-                                    </div>               
-                                </div>
-                            </div>
+                            
                         </div>
 
                        
