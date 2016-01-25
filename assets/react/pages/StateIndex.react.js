@@ -70,11 +70,11 @@ var StateIndex = React.createClass({
             break;
 
             case 'class':
-                currentPanel = <ClassPanel currentAgency={this.props.currentAgency} selectedState={this.props.selectedState} selectedStation={this.props.selectedStation} activeFilters={this.props.activeFilters} onDataChange={this.setData} />;
+                currentPanel = <ClassPanel activeComponent={this.state.activeComponent} currentAgency={this.props.currentAgency} selectedState={this.props.selectedState} selectedStation={this.props.selectedStation} activeFilters={this.props.activeFilters} onDataChange={this.setData} />;
             break;
 
             case 'wim':
-                currentPanel = <WimPanel currentAgency={this.props.currentAgency} selectedState={this.props.selectedState} selectedStation={this.props.selectedStation} activeFilters={this.props.activeFilters} onDataChange={this.setData}/>;
+                currentPanel = <WimPanel activeComponent={this.state.activeComponent} currentAgency={this.props.currentAgency} selectedState={this.props.selectedState} selectedStation={this.props.selectedStation} activeFilters={this.props.activeFilters} onDataChange={this.setData} />;
             break;
 
             case 'hpms':

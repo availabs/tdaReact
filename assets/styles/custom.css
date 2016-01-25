@@ -390,6 +390,7 @@ display:inline;
 }
 .legend{
   color:#fff;
+  display:flex;
 }
 
 #graphDIV {
@@ -451,20 +452,22 @@ display:inline;
   position: absolute;
   right: 0;
   left: 0;
-  color
+  display:flex;
 }
 .legend a {
   line-height:40px;
   display: block;
-  float: left;
   height: 40px;
   text-decoration: none;
   opacity: 0.75;
   color: #000;
   padding-left: 3px;
+  text-align: center;
+  font-size: 12px;
+  flex:1;
 }
 .legend a.class-label {
-  width: 40px;
+  
 }
 .legend a.weight-label {
   width: 100px;

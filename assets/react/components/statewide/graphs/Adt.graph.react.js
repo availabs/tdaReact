@@ -29,6 +29,7 @@ var GraphContainer = React.createClass({
     getDefaultProps:function(){
         return {
             height: 300,
+            loading:false,
         }
     },
 
@@ -45,7 +46,7 @@ var GraphContainer = React.createClass({
     },
 
     componentWillReceiveProps:function(nextProps){
-        if(nextProps.selectedState && nextProps.agency){
+        if(nextProps.selectedState && nextProps.agency && !this.state.loading){
             this._loadData(nextProps.selectedState,nextProps.agency);
         }
     },
@@ -53,6 +54,7 @@ var GraphContainer = React.createClass({
     _loadData:function(fips,agency){
         var scope = this;
         if(fips && agency){
+            this.setState({loading:true})
             var url = '/tmgClass/stateAADT/'+fips+'?database='+agency;
             d3.json(url)
                 .post(JSON.stringify({filters:scope.props.filters}),function(err,data){
@@ -73,9 +75,13 @@ var GraphContainer = React.createClass({
                         return b.value - a.value
                     })
                     if(scope.props.onDataChange){
+                        console.log('send up class')
                         scope.props.onDataChange(output)
                     }
-                    scope.setState({currentData:output});
+                    scope.setState({
+                        currentData:output,
+                        loading:false
+                    });
                 }
             })
         }

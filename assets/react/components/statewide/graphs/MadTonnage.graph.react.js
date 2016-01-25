@@ -96,7 +96,7 @@ var GraphContainer = React.createClass({
                     })
 
                     
-                    console.log('madt tonnage',season,output)
+                    //console.log('madt tonnage',season,output)
                     scope.setState({
                         loading:false,
                         currentData:output

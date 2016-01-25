@@ -63,20 +63,22 @@ var StateWideMap = React.createClass({
     componentWillReceiveProps:function(nextProps){
 
         var scope = this;
-        if(nextProps.activeView === 'class' || nextProps.activeView === 'wim'){
+        if( ['class', 'wim'].indexOf(nextProps.activeView) >= 0 ){
+            console.log('update map colors', scope.props.mapData)
             this.state.stations.features.forEach(function(d){
                 d3.select('.station_'+d.properties.station_id)
-                    .attr('fill', scope.props.mapData[d.properties.station_id] ? scope.props.mapData[d.properties.station_id] :  AdtScale(0))
+                    .attr('fill', nextProps.mapData[d.properties.station_id] ? nextProps.mapData[d.properties.station_id] :  AdtScale(0))
                 //console.log(d.properties.station_id,AdtScale(d.properties.ADT))
             })
         }
+        if(nextProps.activeView === 'wim' || nextProps.activeView === 'enforcement'){
+            d3.selectAll('.type_Class').style('display','none')
+        }else{
+             d3.selectAll('.type_Class').style('display','block')
+        }
         if(nextProps.activeView !== this.props.activeView){
             //console.log('new view')
-            if(nextProps.activeView === 'wim' || nextProps.activeView === 'enforcement'){
-                d3.selectAll('.type_Class').style('display','none')
-            }else{
-                 d3.selectAll('.type_Class').style('display','block')
-            }
+            
             
             console.log(nextProps.activeView , 'dash')
             if(nextProps.activeView === 'dash' || nextProps.activeView === 'enforcement'){
@@ -115,7 +117,7 @@ var StateWideMap = React.createClass({
             if(nextProps.activeView === 'hpms' && this.state.selectedState){
                 this._loadHPMS();
             }else if(this.props.activeView){
-                if(map.hasLayer(vectorLayer)){
+                if(map && map.hasLayer(vectorLayer)){
                     map.removeLayer(vectorLayer);
                 }
             }

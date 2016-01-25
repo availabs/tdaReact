@@ -6,7 +6,7 @@ var React = require('react'),
 var WimPanel = React.createClass({
 
     onDataChange:function(data){
-        if(this.props.onDataChange){
+        if(this.props.onDataChange && this.props.activeComponent==='wim'){
             this.props.onDataChange(data)
         }
     },

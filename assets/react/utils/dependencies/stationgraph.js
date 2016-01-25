@@ -22,6 +22,7 @@ var wimgraphOut = {};
 		// truck weight, truck class, and the amount of trucks
 			formattedData = [],
 			weightDistributionData = {},
+			axleDistributionData = {},
 			//stationID,			// current station being viewed
 			//stationType,		// type of current station
 			clicked = true,		// used to keep track of when users click on graph
@@ -34,6 +35,7 @@ var wimgraphOut = {};
 			axleValues = [],
 
 			_formatData,
+			mode = 'weight',
 		
 					//Used to keep track of page type(class/wim)
 
@@ -121,10 +123,12 @@ var wimgraphOut = {};
 
 				if (totalWeightButton.classed('active')) {
 					//switch to total weight
-					_drawWDGraph('weight')
+					mode = 'weight'
+					_drawWDGraph()
 				} else {
 					//switch to axle weight
-					_drawWDGraph('maxAxle')
+					mode = 'axle'
+					_drawWDGraph()
 				}
 			}
 		}
@@ -155,7 +159,7 @@ var wimgraphOut = {};
 		// this function displays which ever svg was passed as a parameter
 		// and hides the other svg
 		function _toggleSVG(svg) {
-			console.log('_toggleSVG',svg)
+			//console.log('_toggleSVG',svg)
 			var hide = (svg === cwSVG ? wdSVG : cwSVG);
 
 			svg.style('display', 'block');
@@ -387,7 +391,7 @@ var wimgraphOut = {};
 		for (var i = 0; i < numBands; i++) {
 			range.push(i);
 		}
-		console.log('wim graph convert',wimgraph.agency)
+		//console.log('wim graph convert',wimgraph.agency)
 		var	weightScale = d3.scale.quantize()
 			.domain([0, maxWeight+bandSize])
 			.range(range),
@@ -406,10 +410,15 @@ var wimgraphOut = {};
 			WDrange.push(i);
 		}
 
+
 		// initialize weight distribution scale
 		var wdScale = d3.scale.quantize()
 			.domain([0, WDmaxWeight+WDbandSize])
 			.range(WDrange);
+
+		var axleScale = d3.scale.quantize()
+			.domain([0, 30000+500])
+			.range(d3.range(30500/500));
 
 		// used to color class and weight legends
 		var _LEGEND_COLORS = {
@@ -536,7 +545,7 @@ var wimgraphOut = {};
 		// this function retrieves the requested data from the back end API
 		function _getData() {
 			
-			console.log("getData",{'database': wimgraph.agency, 'depth': depth,'id':route[1],'state_code':route[2]});
+			//console.log("getData",{'database': wimgraph.agency, 'depth': depth,'id':route[1],'state_code':route[2]});
 			loader.style('display', 'inline')
 			d3.json(route[0]).post(JSON.stringify({'database': wimgraph.agency, 'depth': depth,'id':route[1],'state_code':route[2]}), function(error, data) {
             	if (error) {
@@ -676,7 +685,13 @@ var wimgraphOut = {};
 			function _clearWeightDistributionData() {
 				for (var i in wdScale.range()) {
 					weightDistributionData[i] = _newWDobj();
+					
 				}
+				for (var i in axleScale.range()) {
+					axleDistributionData[i] = _newWDobj();
+				}
+
+				
 			}
 			// creates a new weight distribution data object
 			function _newWDobj() {
@@ -688,9 +703,11 @@ var wimgraphOut = {};
 			}
 			function _populateWeightDistributionData(data) {
 				var index = wdScale(data.weight*_CONVERT),
+					axleIndex =  axleScale(data.maxAxle*_CONVERT),
 					cls = classScale(data.class);
 
 				weightDistributionData[index][cls] += data.amount;
+				axleDistributionData[axleIndex][cls] += data.amount
 			}
 		} // end _formatWIMData
 
@@ -721,13 +738,15 @@ var wimgraphOut = {};
 			var obj = null,
 				current = null;
 
-			for (var wdIndex in weightDistributionData) {
-				current = weightDistributionData[wdIndex];
+			var distroData = mode === 'weight' ? weightDistributionData : axleDistributionData;
+			var scale = mode === 'weight' ? wdScale : axleScale
+			for (var wdIndex in distroData) {
+				current = distroData[wdIndex]
 
 				obj = {};
 				obj[mode] = wdIndex;
 				obj.amount = 0;
-				obj.extent = wdScale.invertExtent(+wdIndex);
+				obj.extent = scale.invertExtent(+wdIndex);
 
 				if (_FILTERS.weight[_WD2Weight(wdIndex)] ||
 					_FILTERS.weightDistribution[_WD2Weight(wdIndex)]) {
@@ -745,7 +764,7 @@ var wimgraphOut = {};
 			return filtered;
 		}
 
-		function _drawWDGraph(mode) {
+		function _drawWDGraph() {
 			mode = mode || 'weight'
 			var data = _sortBy(_filterWeightDistributionData(mode), mode),
 				Ymax = d3.max(data, function(d) {return d.amount; });
@@ -753,7 +772,7 @@ var wimgraphOut = {};
 		   		space = wdth - (barWidth * data.length),
 		   		gap = space / (data.length+1);
 
-		   	console.log('_drawWDGraph',data,wdGraphSVG);
+		   	//console.log('_drawWDGraph',data,wdGraphSVG);
 		   	var padding = (2*gap + barWidth) / (gap + barWidth);
 
 		    wdXscale.domain([])
@@ -817,6 +836,13 @@ var wimgraphOut = {};
 
 		    wdGraphSVG.select('.x-axis').call(wdXaxis)
 		    wdGraphSVG.select('.y-axis').call(Yaxis);
+		    wdGraphSVG.append("text")
+		    .attr("class", "y label")
+		    .attr("text-anchor", "end")
+		    .attr("y", 6)
+		    .attr("dy", ".75em")
+		    .attr("transform", "rotate(-90)")
+		    .text("# of Vehicles");
 
 
 		}
@@ -1080,7 +1106,13 @@ var wimgraphOut = {};
 
 		    transition.select('.x-axis').call(Xaxis)
 		    transition.select('.y-axis').call(Yaxis);
-
+		    cwGraphSVG.append("text")
+		    .attr("class", "y label")
+		    .attr("text-anchor", "end")
+		    .attr("y", 6)
+		    .attr("dy", ".75em")
+		    .attr("transform", "rotate(-90)")
+		    .text("# of Vehicles");
 		    _drawNavigator();
 
 		    clicked = false;
@@ -1189,7 +1221,7 @@ var wimgraphOut = {};
 		self.drawGraph = function(station, type, state,db) {
 			//stationID = station;
 			//stationType = type;
-			console.log('draw Graph',station,type,state,db,wimgraph.agency)
+			//console.log('draw Graph',station,type,state,db,wimgraph.agency)
 			route[0] = '/station/'+type;
 			route[1] = station;
 			route[2] = state;

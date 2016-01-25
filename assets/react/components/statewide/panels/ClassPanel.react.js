@@ -8,7 +8,7 @@ var React = require('react'),
 var ClassPanel = React.createClass({
     
     onDataChange:function(data){
-        if(this.props.onDataChange){
+        if(this.props.onDataChange && this.props.activeComponent==='class'){
             this.props.onDataChange(data)
         }
     },
