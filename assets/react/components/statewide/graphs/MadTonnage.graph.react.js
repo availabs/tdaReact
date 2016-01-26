@@ -119,9 +119,10 @@ var GraphContainer = React.createClass({
               .transitionDuration(350)
               .showXAxis(true);
 
-            
+            var title = scope.props.graphType === 'season' ?   '(MAD Tons / AAD Tons)' : ' MADTons';
+               
             chart.yAxis
-                .axisLabel('Tons')
+                .axisLabel('title')
                 .tickFormat(function(d){
                     var label = +d;
                     if(scope.props.type==='season'){

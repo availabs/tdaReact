@@ -186,6 +186,10 @@ var GraphContainer = React.createClass({
                     })
                
 
+                var title = scope.props.graphType === 'count' ?  ' MADT' : '(MADT / AADT)'
+                chart.  yAxis
+                    .axisLabel('title')
+
 
                 
                 d3.select('#madtchart_'+scope.props.index+' svg')

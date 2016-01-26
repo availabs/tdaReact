@@ -107,7 +107,8 @@ var GraphContainer = React.createClass({
             chart.xAxis     //Chart x-axis settings
                 .axisLabel('Stations')
                 
-
+            chart.yAxis
+                    .axisLabel('AAD Tonnage')
             
             d3.select('#tonnagechart svg')
                 .datum(

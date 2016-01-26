@@ -98,11 +98,16 @@ var GraphContainer = React.createClass({
                   .tooltips(true)        //Don't show tooltips
                   .showValues(false)       //...instead, show the bar value right on top of each bar.
                   .transitionDuration(350)
-                  .showXAxis(true);
+                  .showXAxis(true)
+                  .showYAxis(true);
 
                 chart.xAxis     //Chart x-axis settings
                     .axisLabel('Stations')
-                    
+
+                 chart.yAxis     //Chart y-axis settings
+                  .axisLabel('Voltage (v)')
+                  
+
                 d3.select('#adtchart svg')
                     .datum(
                         [
