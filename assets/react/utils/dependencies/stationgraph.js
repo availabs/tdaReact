@@ -423,7 +423,7 @@ var wimgraphOut = {};
 		// used to color class and weight legends
 		var _LEGEND_COLORS = {
 			class: ["#08306b", "#08519c", "#2171b5", "#4292c6", "#6baed6", "#9ecae1","#ddffff","#a1d99b","#74c476","#41ab5d","#238b45","#006d2c","#00441b"],
-			weight: ["#fee6ce","#fdd0a2","#fdae6b","#fd8d3c","#f16913","#d94801","#a63603"]
+			weight: ['#543005','#8c510a','#bf812d','#dfc27d','#80cdc1','#35978f','#01665e']//["#fee6ce","#fdd0a2","#fdae6b","#fd8d3c","#f16913","#d94801","#a63603"]
 		}
 		var _FILTERS = {
 		// data filters for various classes. False indicates filter is inactive.

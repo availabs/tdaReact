@@ -8,8 +8,8 @@ var ToolTip = React.createClass({
 				x:0,
 				y:0,
 				display:'none',
-				content:'test 4123123 default',
-				title:'Tooltip Title default',
+				content:'...',
+				title:'...',
 			},
 			size:{
 				width:200,
