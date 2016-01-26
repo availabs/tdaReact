@@ -35,7 +35,7 @@ var Header = React.createClass({
                 <li role="presentation">            
                     <Link to="userAdmin">
                         <i className="fa fa-calendar"></i>
-                        User Admin
+                        &nbsp;User Admin
                     </Link>
                 </li>
             )
@@ -46,7 +46,7 @@ var Header = React.createClass({
                 <li role="presentation">      
                     <Link to="userAdmin">
                         <i className="fa fa-calendar"></i>
-                        User Admin
+                        &nbsp;User Admin
                     </Link>
                 </li>
             )
@@ -62,7 +62,7 @@ var Header = React.createClass({
                 <li role="presentation">
                     <Link to="datasourceList">
                         <i className="fa fa-inbox"></i>
-                        Data Management
+                        &nbsp;Data Management
                     </Link>
                 </li>
             )
@@ -75,7 +75,7 @@ var Header = React.createClass({
                 <li role="presentation">
                     <Link to="datasourceSingle" params={{agencyId:agencyId}}> 
                         <i className="fa fa-inbox"></i>
-                        Data Management
+                        &nbsp;Data Management
                     </Link>
                 </li>
             )
@@ -100,12 +100,20 @@ var Header = React.createClass({
                         <a href="form_account.html" className="link">
                             <a href="">
                                 <i className="fa fa-user"></i>
-                                Profile
+                                &nbsp;Profile
                             </a>
                         </a>
                     </li>
                     {this._renderUserAdmin()}
                     {this._renderDataSources()}
+                    <li role="presentation">
+                        <a href="/Task_5B_Report_Pooled_Fund_Continuous_Counts_and_Wim_Analytics.pdf" className="link">
+                            <a href="/Task_5B_Report_Pooled_Fund_Continuous_Counts_and_Wim_Analytics.pdf" target="_blank">
+                                <i className="fa fa-book"></i>
+                                &nbsp;User's Guide
+                            </a>
+                        </a>
+                    </li>
                 </ul>
             </li>
                         
