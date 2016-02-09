@@ -35,6 +35,64 @@ function getClassStations(database){
 
 module.exports = {
 	
+	axleDistro: function(req,res){
+		var fips = req.param('fips'),
+			station = req.param('stationId'),
+			database = req.param('database'),
+			timescale = req.param('monthly') ? ',month' : '',
+			mult = database in newTMG ? '1' : '220.462',
+			spaceMult = '3.93701',
+			minSpace = 36, maxSpace = 60;
+
+
+		var where = 'where state_fips = \'' + fips + '\' and station_id = \'' + station + '\' ';
+		var sql =  'select a.weight, a.total as singe_count, b.total as tandem_count, c.total as tri_count, d.total as quad_count from '
+			sql += generateQuery(1,'a')
+			sql += ' join '
+			sql += generateQuery(2,'b')
+			sql += ' on a.weight = b.weight join'
+			sql += generateQuery(3,'c')
+			sql += ' on a.weight = c.weight join'
+			sql += generateQuery(4,'d')
+			sql += ' on a.weight = d.weight'
+
+		BQuery(sql,function(data){		
+			var fullData = data.rows.map(function(row,index){
+				var outrow = {}
+				data.schema.fields.forEach(function(field,i){
+					outrow[field.name] = row.f[i].v;
+				});
+				return outrow;
+			});
+			var output = {}
+				fullData.forEach(function(d){
+					
+				})
+
+			res.json(fullData);
+		});
+
+
+		function generateQuery(numAxles, nameAs){
+			var output = ' (SELECT CASE '
+			for(var i=1;i<=13-numAxles;i++){
+				output += ' WHEN'
+				var axles = []
+				for(var j=0;j <numAxles;j++){
+					' (axle'+(i+j)+'sp * ' + spaceMult + ' > '+ minSpace +' and axle'+(i+j)+'sp * '+spaceMult+' < '+maxSpace+') and' +
+					axles.push('axle'+(i+j))
+				}
+				var curAxle = (numAxles+(i-1))
+				output += ' not (axle'+curAxle+'sp * ' + spaceMult + ' > '+ minSpace +' and axle'+curAxle+'sp * '+spaceMult+' < '+maxSpace+') '
+		    	output += ' THEN ('+axles.join(' + ')+') '
+			}
+			output += ' END as weight, count(1) as total from [tmasWIM12.'+database+']' + where
+			output += ' group by weight) as '+ nameAs
+			return output
+		}
+
+	},
+
 	TonageNew:function(req,res){
 		var fips = req.param('fips'),
 			database = req.param('database'),

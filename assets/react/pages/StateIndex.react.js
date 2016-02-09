@@ -10,6 +10,7 @@ var React = require('react'),
     EnforcementPanel = require('../components/statewide/panels/EnforcementPanel.react'),
     SingleStationPanel = require('../components/statewide/panels/SingleStationPanel.react'),
     ToolTip = require('../components/utils/ToolTip.react'),
+    ClientActionsCreator = require('../actions/ClientActionsCreator'),
 
     WidgetHeader = require('../components/WidgetHeader.react'),
         
@@ -36,6 +37,7 @@ var StateIndex = React.createClass({
 
     _setActiveComponent : function(e){
         this.setState({activeComponent:e.target.getAttribute('value')})
+        ClientActionsCreator.setSelectedStation(null,null)
     },
 
     
@@ -47,7 +49,6 @@ var StateIndex = React.createClass({
         data.forEach(function(d){
             mapColors[d.label] = d.color;
         })
-        console.log('setData',mapColors)
         this.setState({
             mapData:mapColors
         })

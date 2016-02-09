@@ -115,6 +115,7 @@ var StateWideMap = React.createClass({
         console.log('activeView',nextProps.activeView,this.props.activeView ,nextProps.activeView !== this.props.activeView );
         //console.log('----------------------------')
          if(nextProps.activeView !== this.props.activeView ){
+
             if(nextProps.activeView === 'hpms' && this.state.selectedState){
                 this._loadHPMS();
             }else if(this.props.activeView){
@@ -122,7 +123,7 @@ var StateWideMap = React.createClass({
                     map.removeLayer(vectorLayer);
                 }
             }
-        }
+                    }
 
         if( nextProps.selectedState !== this.props.selectedState || nextProps.agency !== this.props.agency ){ 
             console.log('loading data',nextProps.selectedState,nextProps.agency);

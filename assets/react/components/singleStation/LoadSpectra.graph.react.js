@@ -1,187 +1,333 @@
 'use strict';
-
 var React = require('react'),
-   
-    // -- Utils
     d3 = require('d3'),
-    $lime = "#8CBF26",
-    $red = "#e5603b",
-    $redDark = "#d04f4f",
-    $blue = "#6a8da7",
-    $green = "#56bc76",
-    $orange = "#eac85e",
-    $pink = "#E671B8",
-    $purple = "#A700AE",
-    $brown = "#A05000",
-    $teal = "#4ab0ce",
-    $gray = "#666",
-    $white = "#fff",
-    $textColor = $gray,
-    COLOR_VALUES = [$green, $teal, $redDark,  $blue, $red, $orange,  ];
-    nv = require('../../utils/dependencies/nvd3.js');
+    colorbrewer = require('colorbrewer'),
+    nv = require('../../utils/dependencies/nvd3'), 
+    fips2state = require('../../utils/data/fips2state'),
+
+    //-- for making the chart
+    DataTable = require('../utils/DataTable.react'),    
+    saveSvgAsPng = require('save-svg-as-png'),
+    downloadFile = require('../utils/downloadHelper'),
 
 
+    //-- Stores
 
+    //-- Utils
+    colorRange = ["#313695", "#4575b4", "#74add1", "#fdae61", "#f46d43", "#d73027", "#a50026"],//colorbrewer.RdYlBu[5],
+    AdtScale = d3.scale.quantile().domain([0,70000]).range(colorRange),
+    months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-var SpectraGraph = React.createClass({
-	
-   getDefaultProps:function(){
-      return {
-          height:400
-      }
+var GraphContainer = React.createClass({
+    
+    getDefaultProps:function(){
+        return {
+            graphType:'count',
+            height:300,
+            index:0
+        }
     },
 
     getInitialState:function(){
-        return {
+        return{
             toggleChart:false,
             currentData:[],
-            loading:true
-        }
-    },
-    
-    componentWillReceiveProps:function(nextProps){
-        //console.log(nextProps.filters.year,this.props.filters.year,nextProps.filters.year !== this.props.filters.year)
-        if( nextProps.selectedStation !== this.props.selectedStation ){ 
-            this._loadData(nextProps.fips,nextProps.selectedStation);
-        }
-        if(nextProps.fips+''+nextProps.selectedStation !== this.props.fips+''+this.props.selectedStation){
-           
+            loading: false
         }
     },
 
-    _loadData:function(fips,stationId){
-        var scope = this;
-        if(stationId){
-            //var filters = getAsUriParameters(scope.props.filters)
-            //console.log('filters',scope.props.filters)
-            console.log('loadspectra','/tmgWim/'+fips+'/'+stationId+'?database=allWim');
-            scope.setState({loading:true})
-            d3.json('/tmgWim/'+fips+'/'+stationId+'?database=allWim')
-              .post(JSON.stringify({filters:scope.props.filters}),function(err,data){
-                if(err){
-                    console.log('loading load spectra err',err)
-                }
-                if(data.loading){
-                    console.log(' LS reloading')
-                    setTimeout(function(){ scope._loadData(fips,stationId) }, 2000);
-                    
-                
-                }else{
-                    //console.log('ls data',data)
-                    scope.setState({
-                        currentData:data,
-                        loading:false
+    componentDidMount:function(){
+        console.log('comp did mount')
+        if(this.props.fips && this.props.selectedStation){
+            this._loadData(this.props.fips, this.props.selectedStation, this.props.agency);
+        }
+    },
+
+    _loadData: function(fips,stateFips, agency){
+        var scope = this; 
+        if(fips && agency){
+            this.setState({loading:true})
+            d3.json('/tmgWim/axle/'+fips+'/'+stateFips+'?database='+agency)
+                .post(JSON.stringify({filters:scope.props.filters}),function(err,data){
+                    console.log('axle weight raw data',data)
+                    var totals = [0,0,0,0]
+                    var output = [
+                        {
+                            key:'single',
+                            values:{}
+                        },
+                        {
+                            key:'tandem',
+                            values:{}
+                        },
+                        {
+                            key:'tri',
+                            values:{}
+                        },
+                        {
+                            key:'quad',
+                            values:{}
+                        }
+                    ];
+
+                    data.forEach(function(w){
+                        var types = ['singe_count','tandem_count','tri_count','quad_count']
+                        for(var z=0; z<=3; z++){
+                            var weightKey = parseInt((w.a_weight*220.462)/500)
+                            if(!output[z].values[weightKey]){
+                                output[z].values[weightKey] = 0
+                            }
+                            output[z].values[weightKey] += (+w[types[z]])
+
+                            //if(w.a_weight*220.462 < 70000){
+                                totals[z] += (+w[types[z]])
+                            //}
+                        }
                     })
+                    output.forEach(function(o,z){
+                        o.values = Object.keys(o.values)
+                            // .filter(function(key){
+                            //     return parseInt(key*500) < 70000
+                            // })
+                            .map(function(key){
+                                return {key:parseInt(key*500), value:(o.values[key]/totals[z])*100 }
+                            });
+                    })
+                    console.log('data',output)
+                    scope.setState({
+                        currentData:output,
+                        loading:false
+                    });
+                
+            })
+        }
+    },
+    toggleChartClick:function(){
+        console.log('toggleChart')
+        this.setState({toggleChart:!this.state.toggleChart})
+    },
+    renderDownload : function(){
+        var scope=this;
+        return (
+            <div className="btn-group pull-right">
+                
+                <button className="btn btn-info btn-sm dropdown-toggle" data-toggle="dropdown" data-original-title="" title="" aria-expanded="false">
+                    <span className="fa fa-download"></span>
+                </button>
+                <ul className="dropdown-menu">
+                    <li><a onClick={scope.downloadPng} href="#">PNG</a></li>
+                    <li><a onClick={scope.downloadCsv} href="#">CSV</a></li>
+                </ul>
+            </div>
+        )
+    },
+    formatData : function(){
+        var scope = this,            
+            fieldNames = ['Station Id','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+            lines = '',
+            line = '';
+
+        var chartData = scope.chartData();
+
+        Object.keys(chartData).forEach(function(station){
+            //console.log(chartData[station]);
+
+            Object.keys(chartData[station]).forEach(function(column){
+                //console.log(chartData[station][column]);
+
+                if(column === 'key'){
+                    line = chartData[station][column] + "," + line;
+                }
+                else if(column === '11'){
+                    line = line + chartData[station][column];
+                }
+                else{
+                    line = line + chartData[station][column] + ',';
                 }
             })
-        }
-         
-    },
-    
-    processData:function(){
-        var scope = this;
-        var curData = this.state.currentData;
-        if(scope.props.filters.class){
-            curData = curData.filter(function(d){
-                return d.class == scope.props.filters.class
-            })
-        }
-        var pairs = curData.reduce(function(prev,next){
-            if(!prev[next.weight]){
 
-                prev[next.weight] = 0
+            if(navigator.msSaveBlob){ //IF WE R IN IE :(
+                lines += line + '\r\n';
+            }else{
+                lines += line + '%0A';
             }
-            prev[next.weight] += parseInt(next.amount);
-            return prev
-        },{})
-        var dataArray = Object.keys(pairs).map(function(d){
-            return {key:d, value:pairs[d]}
-        }).filter(function(ds){
-            return ds.key < 500
+            line = '';
+            //console.log(line);
         })
 
-        return [{"key": "Spectra",values:dataArray}]  
+        if(navigator.msSaveBlob){ //IF WE R IN IE :(
+            lines = fieldNames.join(',') + '\r\n' + lines;
+        }else{
+            lines = fieldNames.join(',') + '%0A' + lines;
+        }
+        return lines;
     },
+    chartData : function (){
+        //Function flattens data so that each station has a field for every month
+        //Rather than each station having an object that has a field for every month
 
-    renderGraph:function(){
+        var scope = this,
+            flatData = [];
+
+        flatData = Object.keys(scope.state.currentData).map(function(station){
+
+            var curStation = {};
+
+            curStation.key = scope.state.currentData[station].key;
+
+            scope.state.currentData[station].values.forEach(function(month){
+                curStation[month.month] = month.y;
+            })
+
+            return curStation;
+
+        })
+        return flatData;
+
+    },
+    downloadPng : function(){
+        console.log("downloading png");
+        var svgId = "madt-graph"+this.props.graphType;
+        var chartFileName = svgId + ".png";
+        saveSvgAsPng.saveSvgAsPng(document.getElementById(svgId), chartFileName);
+    },
+    downloadCsv : function(id){
         var scope = this;
-        
-        nv.addGraph(function(){
-            var chart = nv.models.multiBarChart()
-                .x(function(d) { return d.key })    //Specify the data accessors.
-                .y(function(d) { return d.value })
-                .color(COLOR_VALUES)
-              //.staggerLabels(true)    //Too many bars and not enough room? Try staggering labels.
-                .tooltips(true)        //Don't show tooltips
-              //.showValues(false)       //...instead, show the bar value right on top of each bar.
-                .transitionDuration(350)
-                .stacked(true)
-                .showControls(false)
-                .showLegend(false)  
+
+        console.log("downloading csv");
+
+        var type = "data:text/csv;charset=utf-8,";
+        var fname = "madtgraph"+this.props.graphType+".csv";
+        var formattedData =  scope.formatData();
+
+        // /console.log(formattedData);
+        downloadFile(type,formattedData,fname,id);
+
+    },
+    _updateGraph: function(){
+        var scope = this;
+
             
-            chart.xAxis
-                .axisLabel('Tons')
-                .tickFormat(function(d){
-                    return parseInt(d*220.462);
-                })
+            //var colorScale = d3.scale.quantile
+            nv.addGraph(function() {
+                var chart = nv.models.lineChart()
+                  .x(function(d) { return d.key })    //Specify the data accessors.
+                  .y(function(d) { return +d.value })
+                  .showLegend(true)
+                  .useInteractiveGuideline(true)       //Don't show tooltips
+                  .transitionDuration(350)
+                  .showXAxis(true);
 
-            d3.select('#SpectraGraph svg')
-                .datum(scope.processData())
-                .call(chart);  
-        
-            nv.utils.windowResize(chart.update);
-        })
-        
+                chart.xAxis     //Chart x-axis settings
+                    .axisLabel('lbs')
+                    .tickFormat(function(d){
+                        return d+' lbs';
+                    })
+                    
+               
+
+                var title = scope.props.graphType === 'count' ?  ' MADT' : '(MADT / AADT)'
+                chart.  yAxis
+                    .axisLabel('title')
+                    .tickFormat(function(d){
+                        return d.toFixed(2)+'%';
+                    })
+
+
+                
+                d3.select('#madtchart_'+scope.props.index+' svg')
+                    .datum(scope.state.currentData)
+                    .call(chart);
+
+                nv.utils.windowResize(chart.update);
+
+                return chart;
+            });
     },
 
-    componentDidUpdate:function(){
-        if(!this.state.loading){
-            //console.log('render spectra graph',this.state.currentData,this.processData())
-            this.renderGraph();
-        }
-    },
+    //DOWNLOADS
+    //Col 1 = Station Id (every row gets a station ID)
+    //Col 2-14 = months (each row has 12 months)
+    //Seasonal will follow suit
 
-    render:function(){
-      	var scope = this;
-    	var svgStyle = {
-          height: '100%',
+    render: function() {
+        var scope = this;
+        var svgStyle = {
+          height: this.props.height+'px',
           width: '100%'
+        };
+        var widgetStyle = {
+            background:'none'
         }
-        var svg = <svg style={svgStyle}/>
-        if(this.state.loading){
-           
-            svg = <div style={{position:'relative',top:'20%',left:'40%',width:'200px'}}>Loading {this.props.selectedStation}<br /> <img src={'/images/loading.gif'} /></div> 
-            
-            
-        }
+        this._updateGraph();
         
-      	
-         var timeName = 'Year',
-            timeFor = '',
-            avg = 'Average'
-        if(scope.props.filters.year){
-            timeName = 'Month'
-            timeFor = ' for ' +scope.props.filters.year
+        var id = "madtchart_"+this.props.index;
+        var svgId = "madt-graph"+this.props.graphType;
+        var headerStyle = {
+            backgroundColor:'none',
+            width:'100%',
+            padding:'5px',
+            marginLeft:'-10px',
+            fontWeight:'700',
+            //display: Object.keys(scope.props.classByMonth.getDimensions()).length > 0 ? 'block' : 'none'
         }
-        if(scope.props.filters.month){
-            timeName = 'Day'
-            timeFor = ' for '+scope.props.filters.month +' '+scope.props.filters.year;
-            avg = '';
-        }
-    	return(
-            <section className="widget large" style={{background:'none'}}>
-                <header>
-                    <h4><i className="fa fa-bar-chart-o"></i> Load Spectra {timeFor}
-                        <small  className="hidden-xs"></small>
-                    </h4>
-                </header>
-                <div id="SpectraGraph" className="body chart">
-                   {svg}
+
+
+
+        var chartData = scope.chartData();
+
+
+        var title = this.props.graphType === 'count' ?  ' Monthly Average Daily Traffic' : ' Seasonal Adjustment Factor (MADT / AADT) ';
+        var graph = (
+           
+                <div className="body">
+                    <div id={id} >
+                        <svg id={svgId} style={svgStyle}></svg>
+                    </div>
                 </div>
+           
+        ),
+        chart = (
+             <div>
+                <DataTable 
+                data={chartData} 
+                pageLength={5}
+                columns={ [
+                    {key:'key', name:'Station ID'},
+                    {key:'0', name:'Jan'},
+                    {key:'1', name:'Feb'},
+                    {key:'2', name:'Mar'},
+                    {key:'3', name:'Apr'},
+                    {key:'4', name:'May'},
+                    {key:'5', name:'Jun'},
+                    {key:'6', name:'Jul'},
+                    {key:'7', name:'Aug'},
+                    {key:'8', name:'Sep'},
+                    {key:'9', name:'Oct'},
+                    {key:'10', name:'Nov'},
+                    {key:'11', name:'Dec'},
+                ]} />
+            </div>
+        );
+
+
+
+        return (
+            <section className="widget large" style={{ background:'none'}}>
+                <header>
+                    <h4 style={headerStyle}>
+                        Axle Load Distributions
+                        {this.renderDownload()}
+                        <a onClick={this.toggleChartClick} className='btn btn-sm btn-success pull-right' style={{marginRight:'5px'}}>
+                            {scope.state.toggleChart ? <span className='fa fa-bar-chart'/> : <span className='fa fa-list'/>}
+                        </a>
+                    </h4>
+                    
+                </header>
+                {this.state.loading ? <span>Loading</span> : scope.state.toggleChart ? chart : graph}
             </section>
-    		
-    	)
+        );
     }
 });
 
-module.exports = SpectraGraph;
+module.exports = GraphContainer;

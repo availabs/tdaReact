@@ -6,6 +6,7 @@ var React = require('react'),
     SparklinesLine  = require('../../charts/sparklines').SparklinesLine,
     DashHeader = require('./dashheader.react'),
     SingleStationGraph =  require('../../singleStation/Station.graph.react'),
+    LoadSpectraGraph = require('../../singleStation/LoadSpectra.graph.react'),
     //, SparklinesBars, SparklinesLine, SparklinesNormalBand, SparklinesReferenceLine, SparklinesSpots }
 
     //-- Actions
@@ -170,15 +171,24 @@ var GraphContainer = React.createClass({
         }
         return (
             <div>
-             <h3>Station {this.props.selectedStation}  <i onClick={scope.toggleStation} className="fa fa-times pull-right" style={{cursor:'pointer'}}> </i></h3>
-             Type:{type.toUpperCase()}<br />
-             <small>{scope.props.stations[scope.props.selectedState][this.props.selectedStation].properties.station_location} </small>
-              AGENCY {this.props.agency}
-              <SingleStationGraph 
+                <h3>Station {this.props.selectedStation}  <i onClick={scope.toggleStation} className="fa fa-times pull-right" style={{cursor:'pointer'}}> </i></h3>
+                Type:{type.toUpperCase()}<br />
+                <small>{scope.props.stations[scope.props.selectedState][this.props.selectedStation].properties.station_location} </small>
+                AGENCY {this.props.agency}
+                <SingleStationGraph 
                     fips={this.props.selectedState} 
                     selectedStation={this.props.selectedStation} 
                     agency={this.props.agency}
                     type = {type} />
+                { type === 'wim' ?
+                    <LoadSpectraGraph
+                        fips={this.props.selectedState} 
+                        selectedStation={this.props.selectedStation} 
+                        agency={this.props.agency}
+                        type = {type} /> 
+                    : <span />
+                }
+
 
             </div>
         )
