@@ -72,6 +72,8 @@ var App = React.createClass({
   },
 
   render: function() {
+
+    console.log('layout render', this.state)
     return (
         <div>
             <div className="wrap">

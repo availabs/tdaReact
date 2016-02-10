@@ -37,7 +37,7 @@ var StateIndex = React.createClass({
 
     _setActiveComponent : function(e){
         this.setState({activeComponent:e.target.getAttribute('value')})
-        ClientActionsCreator.setSelectedStation(null,null)
+        ClientActionsCreator.setSelectedStation(null,this.props.selectedState)
     },
 
     
@@ -49,15 +49,14 @@ var StateIndex = React.createClass({
         data.forEach(function(d){
             mapColors[d.label] = d.color;
         })
+        console.log('setData',data)
         this.setState({
             mapData:mapColors
         })
     },
 
     render: function() {
-        // var mapStyle ={
-           
-        // };
+        console.log('no selecter state?', this.props.selectedState)
         var activeStation = '',
             type='class',
             wimGraphs = <span />;

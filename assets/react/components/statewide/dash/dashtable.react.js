@@ -51,13 +51,13 @@ var GraphContainer = React.createClass({
     },
 
     componentWillReceiveProps:function(nextProps){
-        if(nextProps.selectedState  && nextProps.agency
-            && (nextProps.selectedState !== this.props.selectedState ||
-                nextProps.agency !== this.props.agency)){
+        // if(nextProps.selectedState  && nextProps.agency
+        //     && (nextProps.selectedState !== this.props.selectedState ||
+        //         nextProps.agency !== this.props.agency)){
 
-            console.log('load?',nextProps.selectedState !== this.props.selectedState, nextProps.agency !== this.props.agency)
-            //this._loadData(nextProps.selectedState,nextProps.agency);
-        }
+        //     console.log('load?',nextProps.selectedState !== this.props.selectedState, nextProps.agency !== this.props.agency)
+        //     //this._loadData(nextProps.selectedState,nextProps.agency);
+        // }
        
         if(nextProps.selectedStation !== this.props.selectedStation){
             var el = $('#station_'+nextProps.selectedStation);

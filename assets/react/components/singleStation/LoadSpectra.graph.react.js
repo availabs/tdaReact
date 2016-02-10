@@ -10,9 +10,6 @@ var React = require('react'),
     saveSvgAsPng = require('save-svg-as-png'),
     downloadFile = require('../utils/downloadHelper'),
 
-
-    //-- Stores
-
     //-- Utils
     colorRange = ["#313695", "#4575b4", "#74add1", "#fdae61", "#f46d43", "#d73027", "#a50026"],//colorbrewer.RdYlBu[5],
     AdtScale = d3.scale.quantile().domain([0,70000]).range(colorRange),

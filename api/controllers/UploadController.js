@@ -271,7 +271,6 @@ var newDataUploadChecker = function(newData,typeD,lines,fs,files,terminal,curren
 						else if(yearFormat === "2001"){
 							if(lines[0][0] === 'W'){
 								var schema = "'record_type:string,state_fips:string,station_id:string,dir:integer,lane:integer,year:integer,month:integer,day:integer,hour:integer,class:integer,open:string,total_weight:integer,numAxles:integer,axle1:integer,axle1sp:integer,axle2:integer,axle2sp:integer,axle3:integer,axle3sp:integer,axle4:integer,axle4sp:integer,axle5:integer,axle5sp:integer,axle6:integer,axle6sp:integer,axle7:integer,axle7sp:integer,axle8:integer,axle8sp:integer,axle9:integer,axle9sp:integer,axle10:integer,axle10sp:integer,axle11:integer,axle11sp:integer,axle12:integer,axle12sp:integer,axle13:integer'"
-								var schema = "'record_type:string,state_fips:string,station_id:string,dir:integer,lane:integer,year:integer,month:integer,day:integer,hour:integer,class:integer,open:string,total_weight:integer,numAxles:integer,axle1:integer,axle1sp:integer,axle2:integer,axle2sp:integer,axle3:integer,axle3sp:integer,axle4:integer,axle4sp:integer,axle5:integer,axle5sp:integer,axle6:integer,axle6sp:integer,axle7:integer,axle7sp:integer,axle8:integer,axle8sp:integer,axle9:integer,axle9sp:integer,axle10:integer,axle10sp:integer,axle11:integer,axle11sp:integer,axle12:integer,axle12sp:integer,axle13:integer'"
 								
 								terminal.stdin.write("sed 's/\\r$//' '"+files[0].fd+"_"+currentJob.id+"' > '"+files[0].fd+"'\n")
 								terminal.stdin.write("gawk -v FIELDWIDTHS='1 2 6 1 1 2 2 2 2 2 3 4 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3' -v OFS=',' '{ $1=$1 \"\"; print }' '"+files[0].fd+"' > '"+files[0].fd+"_"+currentJob.id+"'\n")
@@ -323,7 +322,11 @@ var newDataUploadChecker = function(newData,typeD,lines,fs,files,terminal,curren
 					    		if(err){ console.log(err) }
 					    		sails.sockets.blast('job_updated',job);
 					    	})
-							var maxBad = parseInt(lines.length/10)			    	
+							var maxBad = parseInt(lines.length/10)
+							console.log('yearFormat', yearFormat)
+							console.log('--------------------------')
+							console.log('schema', schema)	
+
 					    	console.log('bash command',"bq --project_id=avail-wim load --max_bad_records="+maxBad+" tmasWIM12."+database+" "+files[0].fd+"_"+currentJob.id+" "+schema+" \n")
 				            terminal.stdin.write("~/google-cloud-sdk/bin/bq --project_id=avail-wim load --max_bad_records="+maxBad+" tmasWIM12."+database+" "+files[0].fd+"_"+currentJob.id+" "+schema+" \n");
 							//Below removes junkfiles and lets the user know what data got uploaded
@@ -339,7 +342,7 @@ var newDataUploadChecker = function(newData,typeD,lines,fs,files,terminal,curren
 			    		if(err){ console.log(err)}
 			    	})
 					console.log('Ending terminal session.');
-					terminal.stdin.write('rm ' + files[0].fd+"_"+currentJob.id +'\n');
+					terminal.stdin.write('rm ' + files[0].fd + "_" + currentJob.id + '\n');
 					terminal.stdin.write('rm ' + files[0].fd +'\n');
 					blastBackData.push("There was either an error with the file uploaded or google servies. Please try reuploading the file "+files[0].filename)
 					sails.sockets.blast('file_parsed',blastBackData)
