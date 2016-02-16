@@ -29,7 +29,8 @@ var GraphContainer = React.createClass({
         return{
             toggleChart:false,
             currentData:[],
-            loading: false
+            loading: false,
+            percent: true
         }
     },
 
@@ -70,24 +71,27 @@ var GraphContainer = React.createClass({
                     data.forEach(function(w){
                         var types = ['singe_count','tandem_count','tri_count','quad_count']
                         for(var z=0; z<=3; z++){
-                            var weightKey = parseInt((w.a_weight*220.462)/500)
+                            var weightKey = parseInt((w.a_weight*220.462)/5000)
                             if(!output[z].values[weightKey]){
                                 output[z].values[weightKey] = 0
                             }
-                            output[z].values[weightKey] += (+w[types[z]])
+                            if(w.a_weight*220.462 < 70000){
+                                output[z].values[weightKey] += (+w[types[z]])
+                            }else{
+                                 output[z].values[parseInt( (70000/5000) ,10)] += (+w[types[z]])
+                            }
 
-                            //if(w.a_weight*220.462 < 70000){
-                                totals[z] += (+w[types[z]])
-                            //}
+                            totals[z] += (+w[types[z]])
+                            
                         }
                     })
                     output.forEach(function(o,z){
                         o.values = Object.keys(o.values)
-                            // .filter(function(key){
-                            //     return parseInt(key*500) < 70000
-                            // })
+                            .filter(function(key){
+                                return parseInt(key*5000) <= 70000
+                            })
                             .map(function(key){
-                                return {key:parseInt(key*500), value:(o.values[key]/totals[z])*100 }
+                                return {key:parseInt(key*5000), value:scope.state.percent ? (o.values[key]/totals[z])*100 : o.values[key] }
                             });
                     })
                     console.log('data',output)
@@ -99,9 +103,14 @@ var GraphContainer = React.createClass({
             })
         }
     },
+
     toggleChartClick:function(){
         console.log('toggleChart')
         this.setState({toggleChart:!this.state.toggleChart})
+    },
+    togglePercentClick:function(){
+        this.setState({percent:!this.state.percent})
+        this._loadData(this.props.fips, this.props.selectedStation, this.props.agency);
     },
     renderDownload : function(){
         var scope=this;
@@ -120,7 +129,7 @@ var GraphContainer = React.createClass({
     },
     formatData : function(){
         var scope = this,            
-            fieldNames = ['Station Id','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+            fieldNames = ['Weight','Single','Tandem','Tridem','Quad'],
             lines = '',
             line = '';
 
@@ -164,22 +173,18 @@ var GraphContainer = React.createClass({
         //Rather than each station having an object that has a field for every month
 
         var scope = this,
-            flatData = [];
+            flatData = {};
+        console.log(scope.state.currentData)
+        Object.keys(scope.state.currentData).forEach(function(group,i){
 
-        flatData = Object.keys(scope.state.currentData).map(function(station){
-
-            var curStation = {};
-
-            curStation.key = scope.state.currentData[station].key;
-
-            scope.state.currentData[station].values.forEach(function(month){
-                curStation[month.month] = month.y;
+            scope.state.currentData[group].values.forEach(function(weight){
+                if(!flatData[weight.key]) { flatData[weight.key] = {weight:weight.key}}
+                flatData[weight.key][scope.state.currentData[group].key] = scope.state.percent ? (weight.value).toFixed(2) +  '%' : (weight.value).toLocaleString(); 
             })
 
-            return curStation;
-
         })
-        return flatData;
+        return Object.keys(flatData).map(function(k){ return flatData[k]})
+       
 
     },
     downloadPng : function(){
@@ -218,7 +223,7 @@ var GraphContainer = React.createClass({
                 chart.xAxis     //Chart x-axis settings
                     .axisLabel('lbs')
                     .tickFormat(function(d){
-                        return d+' lbs';
+                        return '< '+d.toLocaleString()+' lbs';
                     })
                     
                
@@ -227,7 +232,7 @@ var GraphContainer = React.createClass({
                 chart.  yAxis
                     .axisLabel('title')
                     .tickFormat(function(d){
-                        return d.toFixed(2)+'%';
+                        return scope.state.percent ? d.toFixed(2) +  '%' : d.toLocaleString();
                     })
 
 
@@ -272,7 +277,7 @@ var GraphContainer = React.createClass({
 
 
         var chartData = scope.chartData();
-
+        console.log('chartData', chartData)
 
         var title = this.props.graphType === 'count' ?  ' Monthly Average Daily Traffic' : ' Seasonal Adjustment Factor (MADT / AADT) ';
         var graph = (
@@ -288,21 +293,13 @@ var GraphContainer = React.createClass({
              <div>
                 <DataTable 
                 data={chartData} 
-                pageLength={5}
+                pageLength={25}
                 columns={ [
-                    {key:'key', name:'Station ID'},
-                    {key:'0', name:'Jan'},
-                    {key:'1', name:'Feb'},
-                    {key:'2', name:'Mar'},
-                    {key:'3', name:'Apr'},
-                    {key:'4', name:'May'},
-                    {key:'5', name:'Jun'},
-                    {key:'6', name:'Jul'},
-                    {key:'7', name:'Aug'},
-                    {key:'8', name:'Sep'},
-                    {key:'9', name:'Oct'},
-                    {key:'10', name:'Nov'},
-                    {key:'11', name:'Dec'},
+                    {key:'weight', name:'Weight'},
+                    {key:'single', name:'Single'},
+                    {key:'tandem', name:'Tandem'},
+                    {key:'tri', name:'Tridem'},
+                    {key:'quad', name:'Quad'}
                 ]} />
             </div>
         );
@@ -310,13 +307,16 @@ var GraphContainer = React.createClass({
 
 
         return (
-            <section className="widget large" style={{ background:'none'}}>
+            <section className="widget" style={{ background:'none'}}>
                 <header>
                     <h4 style={headerStyle}>
                         Axle Load Distributions
                         {this.renderDownload()}
                         <a onClick={this.toggleChartClick} className='btn btn-sm btn-success pull-right' style={{marginRight:'5px'}}>
                             {scope.state.toggleChart ? <span className='fa fa-bar-chart'/> : <span className='fa fa-list'/>}
+                        </a>
+                        <a onClick={this.togglePercentClick} className='btn btn-sm btn-warning pull-right' style={{marginRight:'5px'}}>
+                            {scope.state.percent ? '%' : '#'}
                         </a>
                     </h4>
                     
