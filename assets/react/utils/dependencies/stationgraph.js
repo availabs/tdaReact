@@ -545,7 +545,7 @@ var wimgraphOut = {};
 		// this function retrieves the requested data from the back end API
 		function _getData() {
 			
-			//console.log("getData",{'database': wimgraph.agency, 'depth': depth,'id':route[1],'state_code':route[2]});
+			console.log("getData",{'database': wimgraph.agency, 'depth': depth,'id':route[1],'state_code':route[2]});
 			loader.style('display', 'inline')
 			d3.json(route[0]).post(JSON.stringify({'database': wimgraph.agency, 'depth': depth,'id':route[1],'state_code':route[2]}), function(error, data) {
             	if (error) {
@@ -553,7 +553,7 @@ var wimgraphOut = {};
             		return;
             	}
             	time = TIMES[depth.length];
-
+            	console.log('got data',data)
             	_formatData(data);
             	//console.timeEnd("getData");
             	// console.log(depth)
@@ -573,6 +573,7 @@ var wimgraphOut = {};
 			var	timeIndex = 0,
 				schema = [];
 
+			console.log('formatData',data)
 			for (var i in data.schema.fields) {
 				schema.push(data.schema.fields[i].name)
 			}

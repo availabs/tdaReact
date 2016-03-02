@@ -55,10 +55,10 @@ var GraphContainer = React.createClass({
                 .post(JSON.stringify({filters:scope.props.filters}),function(err,data){
                 
                 if(data.loading){
-                        console.log('reloading')
+                        //console.log('reloading')
                         setTimeout(function(){ scope._loadData(fips) }, 2000);
                 }else{
-                    console.log('test',data)
+                    //console.log('test',data)
                     scope.setState({currentData:data});
                 }
             })

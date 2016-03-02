@@ -172,16 +172,8 @@ module.exports = {
  		var SQL = generateSQL();
  		//console.time('getWimStationDataQuery')
  		//console.log("wimstation ",SQL)
- 		var request = bigQuery.jobs.query({
-	    	kind: "bigquery#queryRequest",
-	    	projectId: 'avail-wim',
-	    	timeoutMs: '1000',
-	    	resource: {query:SQL,projectId:'avail-wim'},
-	    	auth: jwt
-	    },
-
-		function(err, response) {
-      		if (err) console.log('Error:',err);
+ 		BQuery(SQL,
+		function(response) {
       		//console.timeEnd('getWimStationDataQuery')
       		//console.time('getWimStationDataSend')
       		//console.log(response)
@@ -190,7 +182,7 @@ module.exports = {
 	    });
  		function generateSQL() {
  			var sql	= "SELECT " + select[depth.length] + ", class, total_weight AS weight, count(*) AS amount, "
- 				+ "GREATEST(IFNULL(axle1,0),IFNULL(axle2,0),IFNULL(axle3,0),IFNULL(axle4,0),IFNULL(axle5,0),IFNULL(axle6,0),IFNULL(axle7,0),IFNULL(axle8,0),IFNULL(axle9,0),IFNULL(axle10,0),IFNULL(axle11,0),IFNULL(axle12,0),IFNULL(axle13,0)) as maxAxle "
+ 				+ "0 as maxAxle "
  				+ "FROM [tmasWIM12."+database+"] "
  				+ "WHERE station_id = '"+station_id+"' "
  				+ "and state_fips ='"+state+"' "
