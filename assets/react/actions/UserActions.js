@@ -26,13 +26,8 @@ module.exports = {
            })
        })
    },
-   updateUser: function(user) {
-       SailsWebApi.updateUser(user, function(user) {
-           AppDispatcher.handleViewAction({
-               type: UserConstants.UPDATE_USER,
-               user: user
-           })
-       })
+   update: function(user) {
+       SailsWebApi.update('user', user)
    },
    deleteUser: function(user) {
        SailsWebApi.deleteUser(user, function(user) {
