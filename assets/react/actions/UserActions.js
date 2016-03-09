@@ -19,7 +19,7 @@ module.exports = {
        })
    },
    createUser: function(user) {
-       SailsWebApi.createUser(user, function(user) {
+       SailsWebApi.create('user', user, function(user) {
            AppDispatcher.handleViewAction({
                type: UserConstants.CREATE_USER,
                user: user

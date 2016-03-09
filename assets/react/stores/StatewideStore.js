@@ -153,28 +153,6 @@ var StatewideStore = assign({}, EventEmitter.prototype, {
     return _selectedStation;
   },
 
-  // getClassByHour:function(){
-  //   //if data is loaded send it
-  //   //console.log('StatewideStore getClassByHour',_selectedState,_selectedStation)
-  //   if(_classbyHour[_selectedStation] && _classbyHour[_selectedStation] !== 'loading' ){
-  //     _classbyHour.init(_classbyHour[_selectedStation],_selectedStation);
-  //     return ClassByHourFilter;
-  //   }
-    
-  //   //if data hasn't start started loading, load it 
-  //   if(_classbyHour[_selectedStation] !== 'loading'){
-  //     //console.log('load',_selectedStation,_selectedState),
-
-  //     SailsWebApi.getClassByHour(_selectedStation,_selectedState,AgencyStore.getSelectedAgency());
-  //     _classbyHour[_selectedStation] = 'loading';
-  //     ClassByHourFilter.init('reset',_selectedStation);
-  //   }
-
-  //   //if requested data isn't loaded send most recent data
-  //   // may want to rethink this
-  //   return ClassByHourFilter;
-  // },
-
   getClassByDay:function(){
     //if data is loaded send it
     if(_classbyDay[_selectedState] && _classbyDay[_selectedState] !== 'loading' ){

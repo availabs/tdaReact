@@ -24,7 +24,7 @@ var UserRow = React.createClass({
                 <td>{ this.props.user.name }</td>
                 <td>{ this.props.user.username }</td>
                 <td>{ this.props.user.email }</td>
-                <td>{ this.props.user.group }</td>
+                <td>{ this.props.user.agency[0] ? this.props.user.agency[0].name : '' }</td>
                 <td>{ this.props.user.admin.toString() }</td>
                 <td>
                     <button onClick={ this.handleEditClick } data-user={ this.props.user } className="btn btn-xs btn-primary">

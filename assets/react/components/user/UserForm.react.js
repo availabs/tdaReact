@@ -2,11 +2,8 @@
 
 var React = require('react'),
     assign = require("object-assign"),
-
     AgencyStore = require("../../stores/AgencyStore"),
-
     UserActions = require("../../actions/UserActions"),
-
     FormComponents = require("./FormComponents.react"),
     FormGroup = FormComponents.FormGroup,
     InputGroup = FormComponents.InputGroup,

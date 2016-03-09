@@ -64,10 +64,12 @@ var GraphContainer = React.createClass({
             })
         }
     },
+
     toggleChartClick:function(){
         console.log('toggleChart')
         this.setState({toggleChart:!this.state.toggleChart})
     },
+    
     renderDownload : function(){
         var scope=this;
         return (

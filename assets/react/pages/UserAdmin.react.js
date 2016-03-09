@@ -33,14 +33,22 @@ module.exports = React.createClass({
     },
 
     render: function() {
+        console.log('users', this.state.user.agency[0] ? this.state.user.agency[0].name : '' )
+        var users = this.state.users;
+        if( this.state.user.agency[0] ){
+            users = users.filter((user) => {
+                //console.log(user.agency[0] ? user.agency[0].id ?  'na')
+                return user.agency[0] && user.agency[0].id === this.state.user.agency[0].id
+            })
+        }
         return (
              <div className="content container">
                 <div className='row'>
                     <div className="col-lg-10">
-                        <UserTable users={ this.state.users }/>
+                        <UserTable users={ users }/>
                     </div>
                     <div className="col-lg-2">
-                        <UserForm users={ this.state.users } user={ this.state.user }
+                        <UserForm users={ users } user={ this.state.user }
                             editTarget={ this.state.editTarget } />
                     </div>
                 </div>
