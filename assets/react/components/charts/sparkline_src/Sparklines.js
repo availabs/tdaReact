@@ -1,4 +1,4 @@
-var React = require('react');
+import React from 'react';
 import SparklinesLine from './SparklinesLine';
 // import SparklinesBars from './SparklinesBars';
 // import SparklinesSpots from './SparklinesSpots';

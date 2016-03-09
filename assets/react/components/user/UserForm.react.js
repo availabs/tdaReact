@@ -80,6 +80,7 @@ var PanelBody = React.createClass({
     },
     handleChange: function(e) {
         var state = this.state;
+        console.log('handleChange', e.target.name,e.target.checked)
 
         switch (e.target.name) {
             case "name":

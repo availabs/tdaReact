@@ -30,12 +30,15 @@ exports.CheckboxGroup = React.createClass({
 exports.InlineCheckbox = React.createClass({
     render: function() {
         return (
-            <div className="checkbox">
-                <label>
+            <div className='row'>
+                <div className="col-xs-2" style={{paddingRight:5, paddingLeft:10}}>
                     { this.props.children }
-                    { this.props.label }
-                </label>
+                </div>
+                <div className="col-xs-10 no-padding" >
+                        { this.props.label }
+                </div>
             </div>
+           
         )
     }
 })
