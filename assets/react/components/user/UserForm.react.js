@@ -75,7 +75,7 @@ var PanelBody = React.createClass({
                 data.confirmation = this.state.confirmation;
             }
             var user = assign({}, this.props.editTarget, data);
-            UserActions.updateUser(user);
+            UserActions.update('user',user);
         }
     },
     handleChange: function(e) {
