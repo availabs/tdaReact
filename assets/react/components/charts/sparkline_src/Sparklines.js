@@ -1,10 +1,10 @@
-import React from 'react';
-import SparklinesLine from './SparklinesLine';
+var React = require('react'),
+ SparklinesLine =require('./SparklinesLine'),
 // import SparklinesBars from './SparklinesBars';
 // import SparklinesSpots from './SparklinesSpots';
 // import SparklinesReferenceLine from './SparklinesReferenceLine';
 // import SparklinesNormalBand from './SparklinesNormalBand';
-import DataProcessor from './DataProcessor';
+DataProcessor = require('./DataProcessor');
 
 class Sparklines extends React.Component {
 
@@ -34,6 +34,5 @@ class Sparklines extends React.Component {
         );
     }
 }
-
 
 export { Sparklines, SparklinesLine, DataProcessor }

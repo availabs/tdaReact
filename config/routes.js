@@ -67,6 +67,7 @@ module.exports.routes = {
   '/enforcement/:fips' : 'TmgWimController.getEnforcementDashData',
   '/heatmap/:fips/:stationId' : 'TmgWimController.getEnforcementHeatData',
   '/heatcalendar/:fips/:stationId' : 'TmgWimController.getEnforcementCalendarData',
+  '/volumecalendar/:fips/:stationId' : 'TmgWimController.getVolumeCalendarData',
 
   
 

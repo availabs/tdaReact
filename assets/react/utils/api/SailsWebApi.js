@@ -148,6 +148,7 @@ var api = {
 
 
   update: function(type,data){
+    console.log('update', type, data.id, data)
     d3.json('/'+type+'/'+data.id)
     .send('PUT',JSON.stringify(data),function(err,resData){
       //ToDo Check for Errors and Throw Error Case

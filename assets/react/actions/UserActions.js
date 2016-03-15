@@ -27,7 +27,8 @@ module.exports = {
        })
    },
    update: function(user) {
-       SailsWebApi.update('user', user)
+      
+      SailsWebApi.update('user', user)
    },
    deleteUser: function(user) {
        SailsWebApi.deleteUser(user, function(user) {

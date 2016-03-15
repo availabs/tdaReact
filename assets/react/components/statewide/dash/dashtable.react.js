@@ -7,6 +7,7 @@ var React = require('react'),
     DashHeader = require('./dashheader.react'),
     SingleStationGraph =  require('../../singleStation/Station.graph.react'),
     LoadSpectraGraph = require('../../singleStation/LoadSpectra.graph.react'),
+    SingleStationCalendar =  require('../../singleStation/SingleStationCalendar.react'),
     //, SparklinesBars, SparklinesLine, SparklinesNormalBand, SparklinesReferenceLine, SparklinesSpots }
 
     //-- Actions
@@ -166,7 +167,7 @@ var GraphContainer = React.createClass({
         var scope = this;
         var type = 'class',
             wimGraphs = null;
-        if(d3.select(".station_"+this.props.selectedStation).classed("type_WIM")){
+        if(d3.select(".station_"+this.props.selectedStation) && d3.select(".station_"+this.props.selectedStation).classed("type_WIM")){
             type='wim'
         }
         return (
@@ -188,6 +189,11 @@ var GraphContainer = React.createClass({
                         type = {type} /> 
                     : <span />
                 }
+                <SingleStationCalendar
+                    selectedState={this.props.selectedState} 
+                    station={this.props.selectedStation} 
+                    agency={this.props.agency}
+                    type = {type} />
 
 
             </div>

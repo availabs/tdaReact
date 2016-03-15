@@ -2,30 +2,20 @@
 var React = require('react'),
     d3 = require('d3'),
     colorbrewer = require('colorbrewer'),
-    Sparklines = require('../charts/sparklines').Sparklines,
-    SparklinesLine  = require('../charts/sparklines').SparklinesLine,
     CalendarGraph = require('../dataManagement/calendarGraph.react'),
+    ToolTip = require('../utils/nytToolTip.react'),
+    
     //-- Stores
-
 
     //-- Utils
     colorRange =  ["#4575b4", "#91bfdb", "#e0f3f8", "#ffffbf", "#fee090", "#fc8d59", "#d73027"], //colorbrewer.Greys[7], //colorbrewer.RdYlBu[7],
-    colorScale = d3.scale.quantile().domain([0,70000]).range(colorRange),
-    directionCodes = require('../../utils/data/directionCodes');
+    colorScale = d3.scale.quantile().domain([0,70000]).range(colorRange);
+    //directionCodes = require('../../utils/data/directionCodes');
  
 
-var removeLabels = function(){
-    d3.selectAll('#adtchart svg .nv-x .tick text').text('')
-}
+
 
 var GraphContainer = React.createClass({
-
-    
-    getDefaultProps:function(){
-        return {
-           
-        }
-    },
 
     getInitialState:function(){
         return {
@@ -47,20 +37,19 @@ var GraphContainer = React.createClass({
         }
     },
 
-
-
     _loadData:function(fips,station,agency){
         var scope = this;
-       
+        console.log('get data', fips,station, agency)
         if(fips && agency){
-            var url = '/heatcalendar/'+fips+'/'+station+'?database='+agency;
+            var url = '/volumecalendar/'+fips+'/'+station+'?database='+agency;
             console.log('heatcalendar load data',url)
             this.setState({currentData:[]});
             d3.json(url)
-            .post(JSON.stringify({filters:scope.props.filters}),function(err,data){
-                    
+            .post(JSON.stringify({filters:scope.props.filters, type: scope.props.type === 'class' ? 'Class' : ''}),function(err,data){
                 if(err){ console.log('error:',err),  scope.setState({currentData:[]});}
                 var newData = scope.processData(data)
+                console.log('single station calendar got data', newData,Object.keys(newData)[0])
+                
                 scope.setState({
                     currentData:newData,
                     direction:Object.keys(newData)[0]
@@ -71,61 +60,54 @@ var GraphContainer = React.createClass({
 
     },
 
-
-
-   
-
     processData:function(data){
         var dirs ={years:[]}
-
-
         data.forEach(function(d){
             
             if(dirs.years.indexOf(d.y) === -1) dirs.years.push(d.y)
 
             if(!dirs[d.dir] ) dirs[d.dir] = {} 
             
-            dirs[d.dir][getYear(d.y)+'-'+getTime(d.m)+'-'+getTime(d.d)] = {y:d.y,over:d.o,total:d.t }
+            dirs[d.dir][getYear(d.y)+'-'+getTime(d.m)+'-'+getTime(d.d)] = {y:d.y,total:d.t }
         
         })
         
-
         return dirs;
     },
 
     drawGraphs:function(){
         
-        if( !this.state.currentData.years || !this.state.currentData[this.props.direction] ) return;
-
+        if( !this.state.currentData.years || !this.state.currentData[this.state.direction] ) return;
         var scope = this,
             element = document.querySelector('#calDiv'),
             elemWidth = parseInt(window.getComputedStyle(element).width) *0.95;
 
-
         return scope.state.currentData.years.map(function(year){
 
             var yearData = {},
-                domain = Object.keys(scope.state.currentData[scope.props.direction]).map(function(k){
-                    var point = scope.state.currentData[scope.props.direction][k];
-                    //console.log('point',point)
-                    var out = scope.props.display === 'percent' ? (point.over/point.total) * 100 : point.over;
-                    return  out
-                }).sort(function(a,b) { return b - a })
-
-            Object.keys(scope.state.currentData[scope.props.direction]).filter(function(key){
+                domain = Object.keys(scope.state.currentData[scope.state.direction]).map(function(k){
+                    var point = scope.state.currentData[scope.state.direction][k];
+                    var out = point.total;
+                    return out
+                })
+                .sort(function(a,b){ 
+                    return b - a 
+                })
+            Object.keys(scope.state.currentData[scope.state.direction]).filter(function(key){
                 
-                return scope.state.currentData[scope.props.direction][key].y === year;
+                return scope.state.currentData[scope.state.direction][key].y === year;
 
             }).forEach(function(key){
                 //console.log(key)
-                var point = scope.state.currentData[scope.props.direction][key];
-                var out = scope.props.display === 'percent' ? (point.over/point.total) * 100 : point.over;
-                return yearData[key] = out
+                var point = scope.state.currentData[scope.state.direction][key];
+                var out = point.total;
+                yearData[key] = out
             })
 
-            console.log('year data',domain,colorRange);
+            console.log('year data',yearData,colorRange,domain);
 
             return (
+                <div>
                 <CalendarGraph
                     dayOver={scope.dayOver}
                     dayOut={scope.dayOut}
@@ -136,6 +118,7 @@ var GraphContainer = React.createClass({
                     divId={'ecg_'+getYear(year)} 
                     year={getYear(year)} 
                     data={ yearData }/>
+                </div>
             )
 
         })
@@ -152,9 +135,8 @@ var GraphContainer = React.createClass({
         d3.select("#nytg-tooltip .nytg-name").html(
             key+'<br>'+
             '<table style="width:100%;">'+
-            '<tr><td style="text-align:left"># Violations:</td><td style="text-align:right"><strong>'+(data ? data.over.toLocaleString() : '') +'</strong></td></tr>'+
-            '<tr><td style="text-align:left"># Tractor Trailers:</td><td  style="text-align:right"><strong>'+(data ? data.total.toLocaleString() : '') +'</strong></td></tr>'+
-            '<tr><td style="text-align:left">% violations:</td><td style="text-align:right"><strong>'+(data ? ((data.over/data.total)*100).toFixed(2) : '')+'%</strong></td></tr></table>'
+            '<tr><td style="text-align:left"># Vehicles:</td><td style="text-align:right"><strong>'+(data ? data.total.toLocaleString() : '') +'</strong></td></tr>'+
+            '</table>'
             
         )   
     },
@@ -170,17 +152,17 @@ var GraphContainer = React.createClass({
 
     render: function() {
         var scope = this;
-       
         
-        //console.log('adtGraph',this._processData())
+        
+        console.log('render')
         return (
            
-            <div  className='row' id='calDiv'>
-                <div className='col-sm-12'>
-                                    
-                    
+            <div  className='row' id='calDiv' >
+                <div className='col-sm-12'> 
+                <h4> Data Calendar </h4>
                     {scope.drawGraphs()}
                 </div>
+                <ToolTip />
             </div>            
         );
     }

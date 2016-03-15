@@ -2,10 +2,7 @@
 var React = require('react'),
     d3 = require('d3'),
     colorbrewer = require('colorbrewer'),
-   
     //-- Stores
-    
-
     //-- Utils
     colorRange = colorbrewer.YlGn[8],
     DataScale = d3.scale.quantile().domain([0,70000]).range(colorRange);
@@ -60,21 +57,19 @@ var GraphContainer = React.createClass({
             var min = d3.min(values),
                 max = d3.max(values);
 
-            DataScale.domain([d3.min(values),d3.max(values)]);
-            
-          
-            
+            //DataScale.domain([d3.min(values),d3.max(values)]);
+            if (this.props.domain){
+                DataScale.domain(this.props.domain)
+            }
+            if (this.props.range){
+                DataScale.range(this.props.range)
+            }
             var days = d3.select('#'+this.props.divId).selectAll("svg").selectAll(".day");
-            //console.log('selection',days)
             days
                 .filter(function(d) { 
-                    //console.log('filtering',d,d in scope.props.data)
                     return d in showData; 
                 })
                 .attr("fill", function(d,i) { 
-                    // if(i < 10){
-                    //     console.log(d,scope.props.data[d],DataScale(scope.props.data[d]),DataScale(max/2),max,max/2)
-                    // }
                     return DataScale(showData[d]); 
                 })
                 .select("title")
@@ -142,12 +137,10 @@ var GraphContainer = React.createClass({
                     scope.props.dayOut()
                 }
             })
-            .datum(format)
-            
+            .datum(format)            
 
         // rect.append("title")
         //     .text(function(d) { return d; });
-
         svg.selectAll(".month")
             .data(function(d) { return d3.time.months(new Date(d, 0, 1), new Date(d + 1, 0, 1)); })
           .enter().append("path")
@@ -156,7 +149,6 @@ var GraphContainer = React.createClass({
             .attr('stroke','#000')
             .attr('stroke-width', '2px')
             .attr("d", monthPath);
-
 
         function monthPath(t0) {
           var t1 = new Date(t0.getFullYear(), t0.getMonth() + 1, 0),

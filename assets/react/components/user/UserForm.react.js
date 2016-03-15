@@ -27,6 +27,7 @@ var PanelBody = React.createClass({
     componentWillReceiveProps: function(newProps) {
         if (newProps.mode == "update" && newProps.editTarget) {
             this.setState({
+                id: newProps.editTarget.id,
                 name: newProps.editTarget.name,
                 username: newProps.editTarget.username,
                 email: newProps.editTarget.email,
@@ -75,7 +76,8 @@ var PanelBody = React.createClass({
                 data.confirmation = this.state.confirmation;
             }
             var user = assign({}, this.props.editTarget, data);
-            UserActions.update('user',user);
+            console.log('update user', user)
+            UserActions.update(user);
         }
     },
     handleChange: function(e) {

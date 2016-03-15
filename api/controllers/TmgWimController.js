@@ -179,6 +179,44 @@ module.exports = {
 		});
 	},
 
+	getVolumeCalendarData:function(req,res){
+		var fips = req.param('fips'),
+			station = req.param('stationId'),
+			database = req.param('database'),
+			threshold = req.param('threshold') || 90000,
+			filters = req.param('filters') || {},
+			type = req.param('type') || '',
+			mult = database in newTMG ? '1' : '220.462';
+
+		var total = type === 'Class' ? 'sum(total_vol) as t' :'count(1) as t'
+
+		var sql = 'select '+
+ 		' 1 as dir,year as y,month as m,day as d,'+ total +
+ 		' from [tmasWIM12.' + database + type +'] '+
+ 		' where  station_id = "'+station+'" and state_fips="'+fips+'"'+
+ 		' group by dir,y,m,d order by dir,y,m,d'
+
+ 		console.log('------------------------------------------------')
+		console.log('getVolumeCalendarData')
+		console.log('------------------------------------------------')
+		console.log(sql)
+		console.log('------------------------------------------------')
+		BQuery(sql,function(data){
+				
+			var fullData = data.rows.map(function(row,index){
+				var outrow = {}
+				
+				data.schema.fields.forEach(function(field,i){
+					outrow[field.name] = row.f[i].v;
+				});
+				return outrow;
+			});
+
+			res.json(fullData);
+		});
+	},
+
+
 	getEnforcementHeatData:function(req,res){
 		var fips = req.param('fips'),
 			station = req.param('stationId'),
