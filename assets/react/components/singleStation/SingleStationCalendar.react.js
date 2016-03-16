@@ -39,16 +39,15 @@ var GraphContainer = React.createClass({
 
     _loadData:function(fips,station,agency){
         var scope = this;
-        console.log('get data', fips,station, agency)
+        //console.log('get data', fips,station, agency)
         if(fips && agency){
             var url = '/volumecalendar/'+fips+'/'+station+'?database='+agency;
-            console.log('heatcalendar load data',url)
+            //console.log('heatcalendar load data',url)
             this.setState({currentData:[]});
             d3.json(url)
             .post(JSON.stringify({filters:scope.props.filters, type: scope.props.type === 'class' ? 'Class' : ''}),function(err,data){
                 if(err){ console.log('error:',err),  scope.setState({currentData:[]});}
                 var newData = scope.processData(data)
-                console.log('single station calendar got data', newData,Object.keys(newData)[0])
                 
                 scope.setState({
                     currentData:newData,
@@ -104,8 +103,7 @@ var GraphContainer = React.createClass({
                 yearData[key] = out
             })
 
-            console.log('year data',yearData,colorRange,domain);
-
+            
             return (
                 <div>
                 <CalendarGraph
@@ -152,9 +150,6 @@ var GraphContainer = React.createClass({
 
     render: function() {
         var scope = this;
-        
-        
-        console.log('render')
         return (
            
             <div  className='row' id='calDiv' >

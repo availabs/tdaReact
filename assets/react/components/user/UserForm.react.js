@@ -17,7 +17,7 @@ var PanelBody = React.createClass({
             name: null,
             username: null,
             email: null,
-            group: null,
+            agency: null,
             password: null,
             confirmation: null,
             admin: false
@@ -31,7 +31,7 @@ var PanelBody = React.createClass({
                 name: newProps.editTarget.name,
                 username: newProps.editTarget.username,
                 email: newProps.editTarget.email,
-                group: newProps.editTarget.group,
+                agency: newProps.editTarget.agency,
                 admin: newProps.editTarget.admin,
             })
         }
@@ -43,18 +43,18 @@ var PanelBody = React.createClass({
     handleSubmit: function(e) {
         e.preventDefault();
 
-        if ($("#group").val() == "default") {
-            alert("You must select a user group!");
-            $("#group").focus();
-            return;
-        }
+        // if ($("#group").val() == "default") {
+        //     alert("You must select a user group!");
+        //     $("#group").focus();
+        //     return;
+        // }
 
         if (this.props.mode == 'create') {
             var user = {
                 name: this.state.name,
                 username: this.state.username,
                 email: this.state.email,
-                group: this.state.group || $("#group").val(),
+                agency: [this.state.agency] || $("#group").val(),
                 admin: this.state.admin,
                 password: this.state.password,
                 confirmation: this.state.confirmation
@@ -66,7 +66,7 @@ var PanelBody = React.createClass({
                 name: this.state.name,
                 username: this.state.username,
                 email: this.state.email,
-                group: this.state.group || $("#group").val(),
+                agency: this.state.agency || $("#group").val(),
                 admin: this.state.admin,
             }
             if (this.state.password) {
@@ -94,8 +94,8 @@ var PanelBody = React.createClass({
             case "email":
                 state.email = e.target.value;
                 break;
-            case "group":
-                state.group = e.target.value;
+            case "agency":
+                state.agency = [e.target.value];
                 break;
             case "password":
                 state.password = e.target.value;
@@ -126,7 +126,7 @@ var PanelBody = React.createClass({
             password = this.state.password,
             confirmation = this.state.confirmation,
             submitText = this.props.mode === "create" ? "Create User" : "Update User",
-            userGroups = Object.keys(AgencyStore.getAll()).map(function(d) { return { value: AgencyStore.getAll()[d].name, display: AgencyStore.getAll()[d].name }; });
+            userGroups = Object.keys(AgencyStore.getAll()).map(function(d) { return { value: AgencyStore.getAll()[d].id, display: AgencyStore.getAll()[d].name }; });
 
         userGroups.unshift({ value: "default", display: "user group" });
 
@@ -174,7 +174,7 @@ var PanelBody = React.createClass({
 
                     <FormGroup>
                         <InputGroup icon="fa fa-users">
-                            <select className="form-control" name="group"
+                            <select className="form-control" name="agency"
                                 placeholder={ "user group" } value={ group }
                                 onChange={ this.handleChange } required="required"
                                 id="group" list="groupList" disabled={ groupDisabled }>

@@ -19,23 +19,25 @@ module.exports = {
        })
    },
    createUser: function(user) {
-       SailsWebApi.create('user', user, function(user) {
-           AppDispatcher.handleViewAction({
-               type: UserConstants.CREATE_USER,
-               user: user
-           })
-       })
+       SailsWebApi.create('user', user)
+        // function(user) {
+        //    AppDispatcher.handleViewAction({
+        //        type: UserConstants.CREATE_USER,
+        //        user: user
+        //    })
+       // /})
    },
    update: function(user) {
       
       SailsWebApi.update('user', user)
    },
    deleteUser: function(user) {
-       SailsWebApi.deleteUser(user, function(user) {
-           AppDispatcher.handleViewAction({
-               type: UserConstants.DELETE_USER,
-               user: user
-           })
+       
+       SailsWebApi.delete('user',user.id)
+       AppDispatcher.handleViewAction({
+           type: UserConstants.DELETE_USER,
+           user: user
        })
+     
    }
 };

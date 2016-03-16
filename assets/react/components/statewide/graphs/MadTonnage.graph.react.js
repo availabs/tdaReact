@@ -43,17 +43,17 @@ var GraphContainer = React.createClass({
 
      componentDidMount:function(){
         if(this.props.selectedState){
-            this._loadData(this.props.selectedState,this.props.agency);
+            this._loadData(this.props.selectedState,this.props.agency,this.props.filters);
         }
     },
 
     componentWillReceiveProps:function(nextProps){
         if(nextProps.selectedState && nextProps.agency){
-            this._loadData(nextProps.selectedState,nextProps.agency);
+            this._loadData(nextProps.selectedState,nextProps.agency,nextProps.filters);
         }
     },
 
-    _loadData:function(fips,agency){
+    _loadData:function(fips,agency,filters){
         
         var scope = this;
         var filters = scope.props.filters;
@@ -67,7 +67,7 @@ var GraphContainer = React.createClass({
                 old = '/tmgWim/tonnage/madt/'+fips+'/?database='+agency;
                 //console.log('get data madt',url)
             d3.json(url)
-                .post(JSON.stringify({monthly:true}),function(err,data){
+                .post(JSON.stringify({filters:filters, monthly:true}),function(err,data){
                 
                     var output = {}
                     data.forEach(function(d){

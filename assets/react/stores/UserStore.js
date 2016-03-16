@@ -58,9 +58,19 @@ UserStore.dispatchToken = AppDispatcher.register(function(payload) {
 
     case UserConstants.RECEIVE_USERS:
       console.log('RECEIVE_USERS',action)
+        console.log('receieve_data', action)
         action.data.forEach(function(d){
-          USERS.push(d);
+          var updateIndex = USERS.map(function(u) { return u.id}).indexOf(d.id)
+          if(updateIndex === -1){
+            USERS.push(d);  
+          }else{
+            console.log('update',updateIndex)
+            USERS[updateIndex] = d;
+            EDIT_TARGET = null;
+          }
+          
         })
+        UserStore.emitChange();
         break;
 
     case UserConstants.SET_EDIT_TARGET:

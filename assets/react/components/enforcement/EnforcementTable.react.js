@@ -175,9 +175,7 @@ var GraphContainer = React.createClass({
         var disabled = this.state.displayOver === this.state.activeOver ? ' disabled' : '',
             typeOptions = [
                 { value:'total', label:'Gross Vehichle Weight' },
-                { value:'axle', label:'Axle Weight' },
-                { value:'bridge', label:'Bridge Forula' },
-
+                { value:'axle', label:'Axle Weight' }
             ]
 
         return (

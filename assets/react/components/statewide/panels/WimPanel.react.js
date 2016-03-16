@@ -26,6 +26,7 @@ var WimPanel = React.createClass({
                     agency={this.props.currentAgency.datasource}
                     selectedState={this.props.selectedState}
                 />
+                {this.props.activeFilters}
                 <TonnageGraph 
                     agency={this.props.currentAgency.datasource}
                     selectedState={this.props.selectedState}

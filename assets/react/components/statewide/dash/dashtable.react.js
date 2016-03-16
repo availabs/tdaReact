@@ -119,6 +119,7 @@ var GraphContainer = React.createClass({
         var rows = {},
             months = [];
 
+        console.log('what?', data.filter(function(d){ return d.station_id = '638209'}))
         //[{"station_id":"000280","madt":"1437","oversingle":"471","TT":"9305","single":"39562","month":"9","year":"12"},
         // {"station_id":"009631","overTT":"3517","oversingle":"0","TT":"24194","single":"8663","month":"7","year":"13"}];
 
@@ -215,9 +216,7 @@ var GraphContainer = React.createClass({
 
             
         }
-       
-        
-        //console.log('adtGraph',this._processData())
+        console.log('dashtable data',this.state)
 
         var max = {
             madt: false,
@@ -242,7 +241,6 @@ var GraphContainer = React.createClass({
             })
 
            
-           
             return {
                 id:station,
                 madt:dataSets['madt'],
@@ -256,7 +254,6 @@ var GraphContainer = React.createClass({
             }
 
         });
-
         var rows = rowsData.sort(function(a,b){
             switch(scope.state.sortBy){
                

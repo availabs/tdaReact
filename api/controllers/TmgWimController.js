@@ -99,7 +99,6 @@ module.exports = {
 			timescale = req.param('monthly') ? ',month' : '',
 			mult = database in newTMG ? '1' : '220.462';
 		var filters = req.param('filters') || {}
-		console.log('tonage new filters',filters)
 		var whereClass = filters.class ? ' and class = '+ filters.class + ' ' : ''
 		var whereYear = filters.year ? ' and year = '+ filters.year + ' ' : ''
 
@@ -138,7 +137,7 @@ module.exports = {
 				});
 				return outrow;
 			});
-
+			console.log('tonnage new sending', filters, fullData.length)
 			res.json(fullData);
 		});
 	

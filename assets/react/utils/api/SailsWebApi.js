@@ -110,10 +110,12 @@ var api = {
   // Sails Rest Route
   //---------------------------------------------------
   create: function(type,data){
+    console.log('sailsWebApi create', type, data)
     d3.json('/'+type).post(JSON.stringify(data),function(err,resData){
       //ToDo Check for Errors and Throw Error Case
       //console.log('utils/sailsWebApi/createUser',resData);
       //add new user back to store through 
+      if(err) { console.log('err', err, 'input',type, data ) }
       ServerActionCreators.receiveData(type,[resData]);
     });
   },
