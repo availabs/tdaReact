@@ -11,7 +11,8 @@ function getState() {
     return {
         user: UserStore.getSessionUser(),
         users: UserStore.getAllUsers(),
-        editTarget: UserStore.getEditTarget()
+        editTarget: UserStore.getEditTarget(),
+        errorMessage: UserStore.getErrorMessage()
     }
 }
 
@@ -33,12 +34,12 @@ module.exports = React.createClass({
     },
 
     render: function() {
-        console.log('users', this.state.user.agency[0] ? this.state.user.agency[0].name : '' )
+        // console.log('users', this.state )
         var users = this.state.users;
         if( this.state.user.agency[0] ){
             users = users.filter((user) => {
                 //console.log(user.agency[0] ? user.agency[0].id ?  'na')
-                return user.agency[0] && user.agency[0].id === this.state.user.agency[0].id
+                return user && user.agency[0] && user.agency[0].id === this.state.user.agency[0].id
             })
         }
         return (
@@ -49,7 +50,7 @@ module.exports = React.createClass({
                     </div>
                     <div className="col-lg-2">
                         <UserForm users={ users } user={ this.state.user }
-                            editTarget={ this.state.editTarget } />
+                            editTarget={ this.state.editTarget } error={this.state.errorMessage} />
                     </div>
                 </div>
             </div>

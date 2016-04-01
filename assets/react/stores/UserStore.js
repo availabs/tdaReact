@@ -9,7 +9,8 @@ var AppDispatcher = require('../dispatcher/AppDispatcher'),
 
 var USERS = [],
     SESSION_USER = {},
-    EDIT_TARGET = null;
+    EDIT_TARGET = null,
+    ERROR_MESSAGE = null;
 
 var UserStore = assign({}, EventEmitter.prototype, {
 
@@ -36,12 +37,22 @@ var UserStore = assign({}, EventEmitter.prototype, {
     },
     getEditTarget: function() {
         return EDIT_TARGET;
+    },
+    getErrorMessage: function() {
+        return ERROR_MESSAGE;
     }
+
 });
 
 UserStore.dispatchToken = AppDispatcher.register(function(payload) {
     var action = payload.action;
     switch(action.type) {
+
+    case UserConstants.RECEIVE_USER_MANAGEMENT_ERRORS:
+        console.log('----RECEIVE_USER_MANAGEMENT_ERRORS----',action)
+        ERROR_MESSAGE = action.data[0]
+        UserStore.emitChange();
+        break;
 
     case UserConstants.SET_SESSION_USER:
         console.log('set session user',action)

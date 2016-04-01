@@ -3,16 +3,17 @@
 
 var React = require('react'),
     Router = require('react-router'),
-
+    colorRange =  ["#4575b4", "#91bfdb", "#e0f3f8", "#ffffbf", "#fee090", "#fc8d59", "#d73027"], 
+    colorScale = d3.scale.quantile().domain([0,70000]).range(colorRange),
+    
     
     // -- components 
     Uploader = require('../../components/dataManagement/Uploader.react'),
     CalendarGraph = require('../../components/dataManagement/calendarGraph.react'),
     DataTable = require('../../components/utils/DataTable.react'),
-    
+    ToolTip = require('../../components/utils/nytToolTip.react'),
     // -- stores
    
-
     // -- actions
     ClientActionsCreator = require('../../actions/ClientActionsCreator');
 
@@ -74,7 +75,9 @@ var Overview = React.createClass({
         var yearsArray = {};
         
         if(this.props.agencyOverviewDay[type]){
-            console.log('Day data',scope.props.agencyOverviewDay[type])
+            var fullDomain = scope.props.agencyOverviewDay[type].map(function(d){ return +d.f0_ })
+            var minMaxDomain = [d3.min(fullDomain), d3.max(fullDomain)]
+                
              Object.keys(Years).forEach(function(year){
                 if(year != 'null'){
                     var yearData = {};
@@ -103,12 +106,48 @@ var Overview = React.createClass({
             if(key != 'null'){
                 var graphId = 'cg'+type+key;
                 var year = getYear(key);
-                //console.log('write row',yearsArray[key])
+                var interactiveFunctions = {
+                    dayOver:function(yearKey,pos){
+                        var scope = this,
+                            dayStrings = ['0','Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],
+                            data = yearsArray[key][yearKey];
+                       
+                        d3.select("#nytg-tooltip").style('top',(pos[1]-10)+"px").style('left',pos[0]+"px").style('display','block')
+                        
+                        d3.select("#nytg-tooltip .nytg-name").html(
+                            key+'<br>'+
+                            '<table style="width:100%;">'+
+                            '<tr><td style="text-align:left"># Stations Reporting:</td><td style="text-align:right"><strong>'+(data ? data.toLocaleString() : '') +'</strong></td></tr>'+
+                            '</table>'
+                            
+                        )   
+                    },
+
+                    dayMove:function(pos){
+                        d3.select("#nytg-tooltip").style('top',(pos[1]-10)+"px").style('left',pos[0]+"px").style('display','block')        
+                    },
+
+                    dayOut:function(e){
+
+                        d3.select("#nytg-tooltip").style('display','none')
+                    }
+                }
+                console.log('-------' + year + '--------')
+                console.log(year,minMaxDomain, colorRange)
                 if(year > 1995){
                     return (
                         <tr>
                             <td> 
-                                <CalendarGraph divId={graphId} year={year} data={ yearsArray[key] }/>
+                                <CalendarGraph 
+                                    divId={graphId} 
+                                    year={year} 
+                                    data={ yearsArray[key] }
+                                    range={ colorRange }
+                                    domain={ minMaxDomain }
+                                    dayOver={interactiveFunctions.dayOver}
+                                    dayOut={interactiveFunctions.dayOut}
+                                    dayMove={interactiveFunctions.dayMove}
+                                />
                                 {'Total Active Stations: '+Years[key]}
                             </td>
                         </tr>
@@ -134,6 +173,8 @@ var Overview = React.createClass({
             </div>
         )
     },
+
+    
 
     render: function() {
         
@@ -208,6 +249,7 @@ var Overview = React.createClass({
                         </section> 
                     </div>
                 </div>
+                <ToolTip />
             </div>
         );
     },

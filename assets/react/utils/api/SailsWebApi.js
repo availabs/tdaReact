@@ -110,13 +110,15 @@ var api = {
   // Sails Rest Route
   //---------------------------------------------------
   create: function(type,data){
-    console.log('sailsWebApi create', type, data)
     d3.json('/'+type).post(JSON.stringify(data),function(err,resData){
-      //ToDo Check for Errors and Throw Error Case
-      //console.log('utils/sailsWebApi/createUser',resData);
-      //add new user back to store through 
-      if(err) { console.log('err', err, 'input',type, data ) }
-      ServerActionCreators.receiveData(type,[resData]);
+      if(err){
+        var errorMessage = JSON.parse(err.responseText)
+        var displayMessage = errorMessage.error.raw && errorMessage.error.raw.err[0] || 'An error Happened'
+         ServerActionCreators.receiveData('USER_MANAGEMENT_ERROR',[displayMessage]);
+      }else{
+        ServerActionCreators.receiveData('USER_MANAGEMENT_ERROR',[null]);
+        ServerActionCreators.receiveData(type,[resData]);
+      }
     });
   },
   
@@ -138,7 +140,6 @@ var api = {
     
       //onsole.log('got data','/'+type+where,loadChildren,data)
 
-     
       if( type.indexOf('/') >= 0){
         type = type.split('/')[0]
       }
@@ -155,6 +156,15 @@ var api = {
     .send('PUT',JSON.stringify(data),function(err,resData){
       //ToDo Check for Errors and Throw Error Case
       console.log('utils/sailsWebApi/updateData',resData);
+
+      if(err && type === 'user'){
+        var errorMessage = JSON.parse(err.responseText)
+        var displayMessage = errorMessage.error.raw && errorMessage.error.raw.err[0] || 'An error Happened'
+         ServerActionCreators.receiveData('USER_MANAGEMENT_ERROR',[displayMessage]);
+      }else{
+        ServerActionCreators.receiveData('USER_MANAGEMENT_ERROR',[null]);
+        ServerActionCreators.receiveData(type,[resData]);
+      }
 
       //add new user back to store through 
       ServerActionCreators.receiveData(type,[resData]);

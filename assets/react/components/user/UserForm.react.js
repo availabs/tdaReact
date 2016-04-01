@@ -20,7 +20,8 @@ var PanelBody = React.createClass({
             agency: null,
             password: null,
             confirmation: null,
-            admin: false
+            admin: false,
+            error: null
         }
     },
 
@@ -35,9 +36,12 @@ var PanelBody = React.createClass({
                 admin: newProps.editTarget.admin,
             })
         }
-        else if (newProps.mode == "create") {
+        else if (newProps.mode == "create" && !newProps.error) {
             this.setState(this.getInitialState());
         }
+        if(newProps.error !== this.props.error ){
+            this.setState({error:newProps.error})
+        } 
     },
 
     handleSubmit: function(e) {
@@ -54,10 +58,22 @@ var PanelBody = React.createClass({
                 name: this.state.name,
                 username: this.state.username,
                 email: this.state.email,
-                agency: [this.state.agency] || $("#group").val(),
+               
                 admin: this.state.admin,
                 password: this.state.password,
                 confirmation: this.state.confirmation
+            }
+
+            console.log(
+                'create user / agency', 
+                this.state.agency,
+                $("#group").val(), 
+                this.state.agency || $("#group").val() !== 'default'
+
+            )
+            
+            if(this.state.agency || $("#group").val() !== 'default'){
+                 user.agency = [this.state.agency] || $("#group").val()
             }
             UserActions.createUser(user);
         }
@@ -82,7 +98,7 @@ var PanelBody = React.createClass({
     },
     handleChange: function(e) {
         var state = this.state;
-        console.log('handleChange', e.target.name,e.target.checked)
+        //console.log('handleChange', e.target.name,e.target.checked)
 
         switch (e.target.name) {
             case "name":
@@ -117,6 +133,17 @@ var PanelBody = React.createClass({
         this.setState(state);
     },
 
+    errorMessage: function() {
+        if(!this.props.error) return <span />
+        return (
+            <div className="alert alert-danger" role="alert">
+              <span className="glyphicon glyphicon-exclamation-sign"></span>
+              <span className="sr-only">Error:</span>
+              {this.props.error}
+            </div>
+        )
+    },
+
     render: function() {
         var name = this.state.name,
             username = this.state.username,
@@ -144,7 +171,7 @@ var PanelBody = React.createClass({
         return (
             <form onSubmit={ this.handleSubmit }>
                 <div className="panel-body">
-
+                    {this.errorMessage()}
                     <FormGroup>
                         <InputGroup icon="fa fa-user">
                             <input className="form-control" type="text" name='name'
@@ -282,7 +309,7 @@ module.exports = React.createClass({
                     clickHandler={ this.handleClick }/>
 
                 <PanelBody mode={ this.state.mode } editTarget={ target }
-                    users={ this.props.users } user={ this.props.user }/>
+                    users={ this.props.users } user={ this.props.user } error={this.props.error}/>
 
             </div>
         )

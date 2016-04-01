@@ -41,9 +41,9 @@ function _setState(fips){
       dir:null,
       stations:[]
   };
-  console.log('------set state---------')
-  console.log(fips)
-  console.log('------------------------')
+  // console.log('------set state---------')
+  // console.log(fips)
+  // console.log('------------------------')
 
   _selectedState = fips;
 }
@@ -143,9 +143,6 @@ var StatewideStore = assign({}, EventEmitter.prototype, {
   },
 
   getSelectedState:function(){
-    console.log('------get state---------')
-    console.log(_selectedState)
-    console.log('------------------------')
     return _selectedState;
   },
 

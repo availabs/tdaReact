@@ -45,7 +45,6 @@ var GraphContainer = React.createClass({
     },
 
     componentDidMount:function(){
-        console.log('mount')
         if(this.props.selectedState){
             this._loadData(this.props.selectedState,this.props.agency);
         }
@@ -62,7 +61,6 @@ var GraphContainer = React.createClass({
        
         if(nextProps.selectedStation !== this.props.selectedStation){
             var el = $('#station_'+nextProps.selectedStation);
-            //console.log('new station scroll','#station_'+nextProps.selectedStation,el.offset().top)
             if( el.offset() ){
                 setTimeout(function(){
                     $('html,body').animate({
@@ -80,7 +78,6 @@ var GraphContainer = React.createClass({
         if(!this.state.loading && fips && agency){
             var url = '/tmgClass/byMonthTable/'+fips+'?database='+agency;
 
-            //console.log('load data',fips,agency,url)
             this.setState({
                 currentData:[],
                 loading:true
@@ -88,10 +85,8 @@ var GraphContainer = React.createClass({
 
             d3.json(url)
                 .post(JSON.stringify({filters:scope.props.filters}),function(err,data){
-                //console.log('adtGraph data',data)
                    
                 var newData = scope.processData(data);
-                //console.log('got data',newData);
                 scope.setState({
                     currentData:newData.data,
                     months:newData.months,
@@ -119,8 +114,8 @@ var GraphContainer = React.createClass({
         var rows = {},
             months = [];
 
-        console.log('what?', data.filter(function(d){ return d.station_id = '638209'}))
-        //[{"station_id":"000280","madt":"1437","oversingle":"471","TT":"9305","single":"39562","month":"9","year":"12"},
+        // console.log('what?', data.filter(function(d){ return d.station_id = '638209'}))
+        // [{"station_id":"000280","madt":"1437","oversingle":"471","TT":"9305","single":"39562","month":"9","year":"12"},
         // {"station_id":"009631","overTT":"3517","oversingle":"0","TT":"24194","single":"8663","month":"7","year":"13"}];
 
         data.forEach(function(d){
@@ -143,7 +138,6 @@ var GraphContainer = React.createClass({
         })
         var thisYear = new Date().getFullYear().toString().substr(2,2);
 
-        //console.log(months,thisYear)
         months = months.filter((d) => parseInt( d.split('_')[0] ) < +thisYear  ).sort()
         return {data:rows,months:months}
     },
@@ -216,8 +210,7 @@ var GraphContainer = React.createClass({
 
             
         }
-        console.log('dashtable data',this.state)
-
+        
         var max = {
             madt: false,
             pov : false,

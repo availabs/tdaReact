@@ -40,6 +40,8 @@ module.exports = {
     UPDATE_USER: null,
     GET_ALL_USERS: null,
     SET_EDIT_TARGET: null,
+    RECEIVE_USER_MANAGEMENT_ERRORS: null,
+
 
     //-------Data--------------------------------------------
     GET_DATA_OVERVIEW:null,
