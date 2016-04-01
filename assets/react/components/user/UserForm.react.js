@@ -72,8 +72,8 @@ var PanelBody = React.createClass({
 
             )
             
-            if(this.state.agency || $("#group").val() !== 'default'){
-                 user.agency = [this.state.agency] || $("#group").val()
+            if($("#group").val() !== 'default'){
+                 user.agency = $("#group").val()
             }
             UserActions.createUser(user);
         }
@@ -165,7 +165,7 @@ var PanelBody = React.createClass({
         var groupDisabled = null;
         if (this.props.user && this.props.user.agency && this.props.user.agency[0]) {
             groupDisabled = "disabled";
-            group = this.props.user.agency[0].name;
+            group = [this.props.user.agency[0].id];
         }
 
         return (
@@ -199,6 +199,7 @@ var PanelBody = React.createClass({
                         </InputGroup>
                     </FormGroup>
 
+                
                     <FormGroup>
                         <InputGroup icon="fa fa-users">
                             <select className="form-control" name="agency"
@@ -209,6 +210,7 @@ var PanelBody = React.createClass({
                             </select>
                         </InputGroup>
                     </FormGroup>
+                
 
                     <FormGroup>
                         <InlineCheckbox label="Administrator Privileges">

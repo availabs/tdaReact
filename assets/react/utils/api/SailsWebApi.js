@@ -110,10 +110,11 @@ var api = {
   // Sails Rest Route
   //---------------------------------------------------
   create: function(type,data){
+    console.log('create', type,data)
     d3.json('/'+type).post(JSON.stringify(data),function(err,resData){
       if(err){
         var errorMessage = JSON.parse(err.responseText)
-        var displayMessage = errorMessage.error.raw && errorMessage.error.raw.err[0] || 'An error Happened'
+        var displayMessage = errorMessage.error ? JSON.stringify(errorMessage.error) : 'Unexpected Error' 
          ServerActionCreators.receiveData('USER_MANAGEMENT_ERROR',[displayMessage]);
       }else{
         ServerActionCreators.receiveData('USER_MANAGEMENT_ERROR',[null]);
@@ -159,14 +160,12 @@ var api = {
 
       if(err && type === 'user'){
         var errorMessage = JSON.parse(err.responseText)
-        var displayMessage = errorMessage.error.raw && errorMessage.error.raw.err[0] || 'An error Happened'
+        var displayMessage = errorMessage.error ? JSON.stringify(errorMessage.error) : 'Unexpected Error' 
          ServerActionCreators.receiveData('USER_MANAGEMENT_ERROR',[displayMessage]);
-      }else{
+      } else {
         ServerActionCreators.receiveData('USER_MANAGEMENT_ERROR',[null]);
         ServerActionCreators.receiveData(type,[resData]);
       }
-
-      //add new user back to store through 
       ServerActionCreators.receiveData(type,[resData]);
     });
   },

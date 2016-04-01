@@ -34,12 +34,12 @@ module.exports = React.createClass({
     },
 
     render: function() {
-        // console.log('users', this.state )
+        console.log('users', this.state )
         var users = this.state.users;
         if( this.state.user.agency[0] ){
             users = users.filter((user) => {
                 //console.log(user.agency[0] ? user.agency[0].id ?  'na')
-                return user && user.agency[0] && user.agency[0].id === this.state.user.agency[0].id
+                return user && user.agency && user.agency[0] && user.agency[0].id === this.state.user.agency[0].id
             })
         }
         return (
