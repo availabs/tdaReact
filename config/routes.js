@@ -37,6 +37,7 @@ module.exports.routes = {
   '/database/set/:agencyId': 'UserController.changeDatabase',
 
   '/data/overview/:database/:dataType' : 'TmGClassController.datasetOverview',
+  '/data/filelist/:database/:dataType' : 'TmGClassController.datasetOverviewByFile',
   '/data/overview/day/:database/:dataType' : 'TmGClassController.datasetOverviewDay',
 
   // -- Class  Data

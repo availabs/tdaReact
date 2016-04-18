@@ -15,6 +15,7 @@ var _selectedAgency = 1,
     _agencies = require('../utils/data/agencies'),
     _default = {datasource:'allWim',name:'TMAS'},
     _overviewData = {},
+    _overviewDataFiles = {},
     _overviewDayData = {},
     _uploads= {};
 
@@ -72,6 +73,15 @@ var AgencyStore = assign({}, EventEmitter.prototype, {
       if(!_overviewData[_selectedAgency]){
         SailsWebApi.getDataOverview(_agencies[_selectedAgency]);
         _overviewData[_selectedAgency] = 'loading';
+      }
+    }
+    return {}
+  },
+
+  getAgencyOverviewFiles:function(){
+    if(_agencies[_selectedAgency] && _agencies[_selectedAgency].datasource){
+      if(_overviewDataFiles[_selectedAgency]){
+        return _overviewDataFiles[_selectedAgency]
       }
     }
     return {}
@@ -158,7 +168,17 @@ AgencyStore.dispatchToken = AppDispatcher.register(function(payload) {
       AgencyStore.emitChange();
     break;
 
-     case ActionTypes.GET_DATA_OVERVIEW_DAY:
+    case ActionTypes.GET_DATA_OVERVIEW_FILES:
+      if(typeof _overviewDataFiles[action.id] !== 'object'){
+        _overviewDataFiles[action.id] = {}
+      }
+      
+      _overviewDataFiles[action.id][action.dataType] = action.data;
+
+      AgencyStore.emitChange();
+    break;
+
+    case ActionTypes.GET_DATA_OVERVIEW_DAY:
 
       if(_overviewDayData[action.id] === 'loading'){
         _overviewDayData[action.id] = {}

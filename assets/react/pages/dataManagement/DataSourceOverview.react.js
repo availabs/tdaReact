@@ -9,6 +9,7 @@ var React = require('react'),
     
     // -- components 
     Uploader = require('../../components/dataManagement/Uploader.react'),
+    FileList = require('../../components/dataManagement/FileList.react'),
     CalendarGraph = require('../../components/dataManagement/calendarGraph.react'),
     DataTable = require('../../components/utils/DataTable.react'),
     ToolTip = require('../../components/utils/nytToolTip.react'),
@@ -19,160 +20,153 @@ var React = require('react'),
 
 
 var Overview = React.createClass({
-    mixins: [Router.State],
+  mixins: [Router.State],
 
-    statics: {
-        
-        willTransitionTo: function (transition, params) {
-            
-            if(params.agencyId){
-               
-               ClientActionsCreator.setSelectedAgency(params.agencyId);
+  statics: {
+    willTransitionTo: function (transition, params) {
+      if(params.agencyId){ 
+         ClientActionsCreator.setSelectedAgency(params.agencyId);
+      }
+    }
+  },
 
-            }
-        }
+  renderOverviewDiv:function(type){
+    var scope = this,
+        Years = {};
     
-    },
-
-    renderOverviewDiv:function(type){
-        var scope = this,
-            Years = {};
+    function getYear(year){
         
-        function getYear(year){
-            
-            if(year.length  == 2){
-                var front = '20';
-                    if(+year > 20){
-                        front = '19'
-                    }
-                    year = parseInt(front+year)
-                }
-            if(year.length == 1){
-                year = parseInt('200'+year)
-            }
-            return year;
+      if(year.length  == 2){
+        var front = '20';
+          if(+year > 20){
+              front = '19'
+          }
+          year = parseInt(front+year)
         }
+      if(year.length == 1){
+        year = parseInt('200'+year)
+      }
+      return year;
+    }
 
-        function getTime(time){
-          
-             if(time.length == 1){
-                time = '0'+time
-            }
-            return time;
-        }
+    function getTime(time){
+      
+      if(time.length == 1){
+        time = '0'+time;
+      }
+      return time;
+    }
 
-        if(this.props.agencyOverview[type]){
-           
-            this.props.agencyOverview[type].forEach(function(d,i){
-                if(d.year != 'null'){
-                    if(!Years[d.year]){ Years[d.year] = 0};
-                    Years[d.year]++;
-                }
-            })
-
-        }
-        
-        var yearsArray = {};
-        
-        if(this.props.agencyOverviewDay[type]){
-            var fullDomain = scope.props.agencyOverviewDay[type].map(function(d){ return +d.f0_ })
-            var minMaxDomain = [d3.min(fullDomain), d3.max(fullDomain)]
-                
-             Object.keys(Years).forEach(function(year){
-                if(year != 'null'){
-                    var yearData = {};
-                    var yearDays = scope.props.agencyOverviewDay[type].filter(function(d){
-                        return d.year === year;
-                    });
-
-                    yearDays.forEach(function(day){
-                        yearData[getYear(day.year)+'-'+getTime(day.month)+'-'+getTime(day.day)] = parseInt(day.f0_);
-                    });
-
-                    yearsArray[year] = yearData;
-
-                }
-            })
-        }
+    if(this.props.agencyOverview[type]){
        
-        
-        console.log('yearsArray',type,yearsArray);
+      this.props.agencyOverview[type].forEach(function(d,i){
+        if(d.year != 'null'){
+          if(!Years[d.year]){ Years[d.year] = 0};
+          Years[d.year]++;
+        }
+      })
 
-        Object.keys(yearsArray)
-        var rows = []
+    }
+    
+    var yearsArray = {};
+    
+    if(this.props.agencyOverviewDay[type]){
+      var fullDomain = scope.props.agencyOverviewDay[type].map(function(d){ return +d.f0_ })
+      var minMaxDomain = [d3.min(fullDomain), d3.max(fullDomain)]
+          
+      Object.keys(Years).forEach(function(year){
+        if(year != 'null'){
+          var yearData = {};
+          var yearDays = scope.props.agencyOverviewDay[type].filter(function(d){
+            return d.year === year;
+          });
 
-        rows =  Object.keys(Years).map(function(key){
+          yearDays.forEach(function(day){
+            yearData[getYear(day.year)+'-'+getTime(day.month)+'-'+getTime(day.day)] = parseInt(day.f0_);
+          });
 
-            if(key != 'null'){
-                var graphId = 'cg'+type+key;
-                var year = getYear(key);
-                var interactiveFunctions = {
-                    dayOver:function(yearKey,pos){
-                        var scope = this,
-                            dayStrings = ['0','Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],
-                            data = yearsArray[key][yearKey];
-                       
-                        d3.select("#nytg-tooltip").style('top',(pos[1]-10)+"px").style('left',pos[0]+"px").style('display','block')
+          yearsArray[year] = yearData;
+
+        }
+      })
+    }
+   
+    
+    Object.keys(yearsArray)
+    var rows = []
+
+    rows =  Object.keys(Years).map(function(key){
+
+        if(key != 'null'){
+            var graphId = 'cg'+type+key;
+            var year = getYear(key);
+            var interactiveFunctions = {
+                dayOver:function(yearKey,pos){
+                    var scope = this,
+                        dayStrings = ['0','Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],
+                        data = yearsArray[key][yearKey];
+                   
+                    d3.select("#nytg-tooltip").style('top',(pos[1]-10)+"px").style('left',pos[0]+"px").style('display','block')
+                    
+                    d3.select("#nytg-tooltip .nytg-name").html(
+                        key+'<br>'+
+                        '<table style="width:100%;">'+
+                        '<tr><td style="text-align:left"># Stations Reporting:</td><td style="text-align:right"><strong>'+(data ? data.toLocaleString() : '') +'</strong></td></tr>'+
+                        '</table>'
                         
-                        d3.select("#nytg-tooltip .nytg-name").html(
-                            key+'<br>'+
-                            '<table style="width:100%;">'+
-                            '<tr><td style="text-align:left"># Stations Reporting:</td><td style="text-align:right"><strong>'+(data ? data.toLocaleString() : '') +'</strong></td></tr>'+
-                            '</table>'
-                            
-                        )   
-                    },
+                    )   
+                },
 
-                    dayMove:function(pos){
-                        d3.select("#nytg-tooltip").style('top',(pos[1]-10)+"px").style('left',pos[0]+"px").style('display','block')        
-                    },
+                dayMove:function(pos){
+                    d3.select("#nytg-tooltip").style('top',(pos[1]-10)+"px").style('left',pos[0]+"px").style('display','block')        
+                },
 
-                    dayOut:function(e){
+                dayOut:function(e){
 
-                        d3.select("#nytg-tooltip").style('display','none')
-                    }
-                }
-                console.log('-------' + year + '--------')
-                console.log(year,minMaxDomain, colorRange)
-                if(year > 1995){
-                    return (
-                        <tr>
-                            <td> 
-                                <CalendarGraph 
-                                    divId={graphId} 
-                                    year={year} 
-                                    data={ yearsArray[key] }
-                                    range={ colorRange }
-                                    domain={ minMaxDomain }
-                                    dayOver={interactiveFunctions.dayOver}
-                                    dayOut={interactiveFunctions.dayOut}
-                                    dayMove={interactiveFunctions.dayMove}
-                                />
-                                {'Total Active Stations: '+Years[key]}
-                            </td>
-                        </tr>
-                    )
+                    d3.select("#nytg-tooltip").style('display','none')
                 }
             }
-        }).filter(function(d){return d})
-        
-        return (
-             <div className='col-md-6'>
-                <h4>{type.toUpperCase()} Stations</h4>
-                <table className='table'>
-                    <thead>
-                        <tr>
-                            <th>Active Stations</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {rows}
-                    </tbody>
-                </table>
+            // console.log('-------' + year + '--------')
+            // console.log(year,minMaxDomain, colorRange)
+            if(year > 1995){
+                return (
+                    <tr>
+                        <td> 
+                            <CalendarGraph 
+                                divId={graphId} 
+                                year={year} 
+                                data={ yearsArray[key] }
+                                range={ colorRange }
+                                domain={ minMaxDomain }
+                                dayOver={interactiveFunctions.dayOver}
+                                dayOut={interactiveFunctions.dayOut}
+                                dayMove={interactiveFunctions.dayMove}
+                            />
+                            {'Total Active Stations: '+Years[key]}
+                        </td>
+                    </tr>
+                )
+            }
+        }
+    }).filter(function(d){return d})
+    
+    return (
+       <div className='col-md-6'>
+          <h4>{type.toUpperCase()} Stations</h4>
+          <table className='table'>
+              <thead>
+                  <tr>
+                      <th>Active Stations</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  {rows}
+              </tbody>
+          </table>
 
-            </div>
-        )
-    },
+      </div>
+    )
+  },
 
     
 
@@ -191,12 +185,24 @@ var Overview = React.createClass({
                         <section className="widget whitesmoke">
                             
                             <div className="body">
-                               <div className='row'>
+                              <div className='row'>
 
                                     {this.renderOverviewDiv('class')}
                                     {this.renderOverviewDiv('wim')}
                                
-                               </div>
+                              </div>
+                              <div className='row'>
+                                <div className='col-xs-6'>
+                                  <h4> Class Files </h4>
+                                  <FileList type='class' agency={this.props.currentAgency} data={this.props.agencyOverviewFiles} />
+                                 
+                                </div>
+                                <div className='col-xs-6'>
+                                  <h4> Wim Files </h4>
+                                  <FileList type='wim' agency={this.props.currentAgency} data={this.props.agencyOverviewFiles} />
+                                 
+                                </div>
+                              </div>
                             </div>
                         </section>                        
                     </div>

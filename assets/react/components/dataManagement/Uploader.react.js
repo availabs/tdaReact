@@ -25,7 +25,7 @@ var Upload = React.createClass({
     },
 
     uploadStarted: function(err,data){
-        console.log('upload started',err,data);
+       // console.log('upload started',err,data);
     },
 
     onDrop: function(files){
@@ -39,7 +39,7 @@ var Upload = React.createClass({
                     .attach('file', file, file.name)
                     .end(scope.uploadStarted)
                     .on('progress', function(e) {
-                        console.log('Percentage done: ', e.percent);
+                        //console.log('Percentage done: ', e.percent);
                     });
             
             });
@@ -52,7 +52,7 @@ var Upload = React.createClass({
     
     render: function() {
         
-        console.log('datasource overview',this.props.currentAgency);
+        //console.log('datasource overview',this.props.currentAgency);
 
         var recieved = "";
 

@@ -18,21 +18,20 @@ var React = require('react'),
 function getState(){
   
   return {
-
-      menu:AppStore.getMenu(),
-      agencies : AgencyStore.getAll(),
-      currentAgency : AgencyStore.getSelectedAgency(),
-      agencyOverview : AgencyStore.getAgencyOverview(),
-      agencyOverviewDay : AgencyStore.getAgencyOverviewDay(),
-      sessionUser : UserStore.getSessionUser(),
-      activeJobs : JobStore.getAll(),
-      selectedState : StateWideStore.getSelectedState(),
-      selectedStation : StateWideStore.getSelectedStation(),
-      hpmsData : HpmsStore.getStateData(),
-      activeFilters : StateWideStore.activeFilters(),
-      uploadJobs : AgencyStore.getUploads(),
-      stations : StationStore.getAll()
-  
+    menu:AppStore.getMenu(),
+    agencies : AgencyStore.getAll(),
+    currentAgency : AgencyStore.getSelectedAgency(),
+    agencyOverview : AgencyStore.getAgencyOverview(),
+    agencyOverviewDay : AgencyStore.getAgencyOverviewDay(),
+    agencyOverviewFiles: AgencyStore.getAgencyOverviewFiles(),
+    sessionUser : UserStore.getSessionUser(),
+    activeJobs : JobStore.getAll(),
+    selectedState : StateWideStore.getSelectedState(),
+    selectedStation : StateWideStore.getSelectedStation(),
+    hpmsData : HpmsStore.getStateData(),
+    activeFilters : StateWideStore.activeFilters(),
+    uploadJobs : AgencyStore.getUploads(),
+    stations : StationStore.getAll()
   };
 
 } 
@@ -85,6 +84,7 @@ var App = React.createClass({
                     currentAgency = {this.state.currentAgency}
                     agencyOverview = {this.state.agencyOverview}
                     agencyOverviewDay = {this.state.agencyOverviewDay}
+                    agencyOverviewFiles = {this.state.agencyOverviewFiles}
                     sessionUser={this.state.sessionUser}
                     activeJobs = {this.state.activeJobs}
                     selectedState = {this.state.selectedState}

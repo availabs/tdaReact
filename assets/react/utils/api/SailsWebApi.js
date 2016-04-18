@@ -64,12 +64,23 @@ var api = {
 
   getDataOverview : function(agency){
     
+    // -- Raw Data ----
     d3.json('/data/overview/'+agency.datasource+'/class',function(err,data){
         ServerActionCreators.getDataOverview(data,agency.id,'class')
     })
 
     d3.json('/data/overview/'+agency.datasource+'/wim',function(err,data){
         ServerActionCreators.getDataOverview(data,agency.id,'wim')
+    })
+    // --- File list Data ----
+    d3.json('/data/filelist/'+agency.datasource+'/class',function(err,data){
+      console.log('class files', data)
+      ServerActionCreators.getDataOverviewFiles(data,agency.id,'class')
+    })
+
+    d3.json('/data/filelist/'+agency.datasource+'/wim',function(err,data){
+      console.log('wim files', data)
+      ServerActionCreators.getDataOverviewFiles(data,agency.id,'wim')
     })
   
   },

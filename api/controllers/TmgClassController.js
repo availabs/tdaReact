@@ -5,8 +5,6 @@
  * @help        :: See http://links.sailsjs.org/docs/controllers
  */
 
-
-
 var googleapis = require('googleapis');
 var fs = require('fs');    
 var jwt = new googleapis.auth.JWT(
@@ -205,34 +203,61 @@ module.exports = {
  		}
 	},
 
+	datasetOverviewByFile:function(req,res){
+		var database = req.param('database'),
+			dataType = req.param('dataType');
+
+		var dataClass = dataType === 'class' ? 'Class' :'';
+
+		var sql = 	'SELECT source_file, count(distinct state_fips) as numStates, count(distinct station_id) as numStations, count(1) as numRecords '+
+					'from [tmasWIM12.'+database+dataClass+'] '+ 
+					'group by source_file '+
+					'order by source_file';
+					
+		console.log('datasetOverviewbyFile --- ',sql);
+		BQuery(sql,function(data){
+
+			var fullData = data.rows.map(function(row,index){
+				var outrow = {}
+				data.schema.fields.forEach(function(field,i){
+
+					outrow[field.name] = row.f[i].v;
+					
+				});
+				return outrow;
+			});
+			res.json(fullData);
+		});
+	},
+
 	datasetOverview:function(req,res){
 		var database = req.param('database'),
 			dataType = req.param('dataType');
 
-			var dataClass = dataType === 'class' ? 'Class' :'';
+		var dataClass = dataType === 'class' ? 'Class' :'';
 
-			var sql = 	'SELECT state_fips,station_id,year '+
-						'from [tmasWIM12.'+database+dataClass+'] where year < 2016  '+ 
-						'group by state_fips,station_id,year '+
-						'order by state_fips,station_id,year;';
-						
-			console.log('datasetOverview --- ',sql);
-			BQuery(sql,function(data){
+		var sql = 	'SELECT state_fips,station_id,year '+
+					'from [tmasWIM12.'+database+dataClass+'] where year < 2017  '+ 
+					'group by state_fips,station_id,year '+
+					'order by state_fips,station_id,year;';
+					
+		console.log('datasetOverview --- ',sql);
+		BQuery(sql,function(data){
 
-					var fullData = data.rows.map(function(row,index){
-						var outrow = {}
-						data.schema.fields.forEach(function(field,i){
+			var fullData = data.rows.map(function(row,index){
+				var outrow = {}
+				data.schema.fields.forEach(function(field,i){
 
-							outrow[field.name] = row.f[i].v;
-							if(field.name === 'year' && row.f[i].v >= 2000){
-								outrow[field.name] = row.f[i].v-2000;
-							}
-							
-						});
-						return outrow;
-					});
-					res.json(fullData);
+					outrow[field.name] = row.f[i].v;
+					if(field.name === 'year' && row.f[i].v >= 2000){
+						outrow[field.name] = row.f[i].v-2000;
+					}
+					
+				});
+				return outrow;
 			});
+			res.json(fullData);
+		});
 
 	},
 	

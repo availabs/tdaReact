@@ -89,6 +89,15 @@ module.exports = {
     })
   },
 
+  getDataOverviewFiles:function(data,id,dataType){
+    AppDispatcher.handleServerAction({
+      type: ActionTypes.GET_DATA_OVERVIEW_FILES,
+      data:data,
+      dataType:dataType,
+      id:id
+    })
+  },
+
   getDataOverviewDay:function(data,id,dataType){
     AppDispatcher.handleServerAction({
       type: ActionTypes.GET_DATA_OVERVIEW_DAY,
