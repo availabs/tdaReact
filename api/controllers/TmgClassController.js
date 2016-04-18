@@ -994,7 +994,7 @@ function BQuery(sql,cb){
     function(err, response) {
   		if (err) console.log('Error:',err);
   		console.timeEnd('TmgClassController - byDay - query');
-    	if(response.rows){
+    	if(response && response.rows){
 	    	console.log(response.rows.length,response.totalRows)
 	    	
       		output = response;
